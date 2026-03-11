@@ -1,0 +1,63 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme {
+  /* Brand Colors */
+  --color-brand-gold: #b88a44;
+  --color-brand-gold-light: #d4af37;
+  --color-brand-charcoal: #1a1f26;
+
+  /* UI Colors */
+  --color-bg-soft: #f9f9f9;
+  --color-text-main: #333333;
+
+  /* Fonts */
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Inter", sans-serif;
+}
+
+@layer components {
+  /* Responsive Padding Class */
+  .section-px {
+    @apply px-4 md:px-8 lg:px-16 xl:px-24;
+  }
+
+  /* Typography Defaults */
+  body {
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  h1 {
+    font-family: var(--font-heading);
+    @apply text-brand-charcoal font-bold text-4xl md:text-5xl lg:text-6xl tracking-tight mb-6;
+  }
+
+  h2 {
+    font-family: var(--font-heading);
+    @apply text-brand-charcoal font-semibold text-3xl md:text-4xl mb-4;
+  }
+
+  h6 {
+    font-family: var(--font-body);
+    @apply text-brand-gold font-bold text-sm uppercase tracking-widest mb-2;
+  }
+
+  p {
+    font-family: var(--font-body);
+    @apply text-text-main text-base md:text-lg leading-relaxed mb-4;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-brand-charcoal text-white px-6 py-3  transition-all duration-300 
+           hover:bg-brand-gold hover:shadow-lg active:scale-95 flex items-center justify-center 
+           font-medium uppercase tracking-wide text-sm;
+  }
+
+  .btn-outline {
+    @apply border-2 border-brand-gold text-brand-gold px-6 py-3  transition-all duration-300 
+           hover:bg-brand-gold hover:text-white font-medium uppercase text-sm;
+  }
+}
