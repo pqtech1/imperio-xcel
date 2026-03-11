@@ -10,20 +10,16 @@ import Blog from "./components/landing/pages/Blog";
 import Contacts from "./components/landing/pages/Contacts";
 import Architecture from "./components/landing/pages/Architecture";
 import Turnkey from "./components/landing/pages/Turnkey";
-import ScrollToTop from "./components/ScrollToTop";
 import Competence from "./components/landing/pages/Competence";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/imperio-xcel">
       <ScrollToTop />
       <Routes>
-        {/* Layout wrapper */}
         <Route path="/" element={<Layout />}>
-          {/* Home page */}
           <Route index element={<Home />} />
-
-          {/* Other routes */}
 
           <Route path="/about" element={<About />} />
           <Route path="/furniture-interior-services" element={<Interior />} />

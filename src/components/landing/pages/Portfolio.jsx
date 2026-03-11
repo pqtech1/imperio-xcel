@@ -583,7 +583,7 @@ const Portfolio = () => {
                                 onClick={() => handleImageClick(index)}
                               >
                                 <img
-                                  src={image}
+                                  src={`${import.meta.env.BASE_URL}${image.replace(/^\//, "")}`}
                                   alt={`${currentProject.name} - ${index + 1}`}
                                   className="w-full h-full object-contain p-1"
                                   onError={(e) => {

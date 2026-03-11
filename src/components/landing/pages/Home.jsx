@@ -29,6 +29,8 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 
+import { asset} from "@/components/constants/constants";
+
 import Testimonial from "./Testimonial";
 
 // Premium hero slides with fade effect
@@ -211,13 +213,13 @@ const workInProgress = [
     project: "TATA AIG LIFE INSURANCE",
     location: "Robertsgang, Sonbhadra",
     icon: BuildingLibraryIcon,
-    image: "/img/nykaa-haldwani-uttarakhand/30.jpg",
+    image: asset("/img/nykaa-haldwani-uttarakhand/30.jpg"), // ✅ using helper
   },
   {
     project: "NYKAA LUX",
     location: "HLP Galleria, Mohali",
     icon: ShoppingBagIcon,
-    image: "/img/nykaa-haldwani-uttarakhand/32.jpg",
+    image: asset("/img/nykaa-haldwani-uttarakhand/32.jpg"), // ✅ call asset here too
   },
 ];
 

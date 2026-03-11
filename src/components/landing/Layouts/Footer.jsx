@@ -28,6 +28,7 @@ const Footer = () => {
     { name: "Interior Design", path: "/interior-design" },
     { name: "Architecture", path: "/architecture" },
     { name: "Turnkey Solutions", path: "/turnkey-solutions" },
+    { name: "Competence", path: "/competence" },
    
   ];
 

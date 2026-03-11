@@ -1,5 +1,3 @@
-"use client";
-
 import { CONTACT, BRAND } from "@/components/constants/constants";
 import {
   NavigationMenu,
@@ -11,7 +9,7 @@ import {
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, X, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
@@ -47,7 +45,7 @@ const Header = () => {
     `block py-2 px-4 text-base font-medium rounded-lg transition-all duration-300 ${
       isActive
         ? "bg-brand-gold text-white"
-        : "text-gray-300 hover:bg-brand-gold/10 hover:text-brand-gold"
+        : "text-gray-300 hover:bg-brand-gold hover:text-white"
     }`;
 
   return (
@@ -81,10 +79,11 @@ const Header = () => {
               />
             </Link>
 
-            {/* DESKTOP MENU */}
+            {/* DESKTOP MENU - RESTRUCTURED */}
             <div className="hidden lg:block">
               <NavigationMenu>
-                <NavigationMenuList className="flex gap-1 lg:gap-4">
+                <NavigationMenuList className="flex gap-1 lg:gap-2 xl:gap-4">
+                  {/* Primary Navigation Items */}
                   <NavigationMenuItem>
                     <NavLink to="/" className={navLinkStyle} end>
                       HOME
@@ -97,6 +96,7 @@ const Header = () => {
                     </NavLink>
                   </NavigationMenuItem>
 
+                  {/* SERVICES Dropdown - Main Link */}
                   <NavigationMenuItem>
                     <NavigationMenuTrigger
                       className={`bg-transparent px-3 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
@@ -106,68 +106,198 @@ const Header = () => {
                       SERVICES
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <div className="w-72 p-2 bg-white rounded-lg shadow-xl border border-gray-100">
-                        <ul className="space-y-1">
-                          <li>
-                            <NavLink
-                              to="/furniture-interior-services"
-                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-gold/5 hover:text-brand-gold rounded-md transition-colors"
-                            >
-                              <span className="font-medium">
-                                Interior Designer
-                              </span>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                Expert interior design solutions
-                              </p>
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/architecture"
-                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-gold/5 hover:text-brand-gold rounded-md transition-colors"
-                            >
-                              <span className="font-medium">Architecture</span>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                Modern architectural designs
-                              </p>
-                            </NavLink>
-                          </li>
-                          <li>
-                            <NavLink
-                              to="/turnkey-interior"
-                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-gold/5 hover:text-brand-gold rounded-md transition-colors"
-                            >
-                              <span className="font-medium">
-                                Turnkey Solutions
-                              </span>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                Complete interior solutions
-                              </p>
-                            </NavLink>
-                          </li>
-                        </ul>
+                      <div className="w-150 p-2 bg-white rounded-lg shadow-xl border border-gray-100">
+                        <div className="grid grid-cols-2 gap-2">
+                          {/* Card 1 */}
+                          <NavLink
+                            to="/furniture-interior-services"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              // Force close dropdown by triggering a click outside
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://cdn.home-designing.com/wp-content/uploads/2022/03/modern-sofa-1024x602.jpg"
+                                alt="Interior Designer"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Interior Designer
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Expert interior design solutions
+                            </p>
+                          </NavLink>
+
+                          {/* Card 2 */}
+                          <NavLink
+                            to="/architecture"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://t3.ftcdn.net/jpg/06/52/11/36/360_F_652113635_7g9CSthI86C354xL72T5TGblhBm7cfou.jpg"
+                                alt="Architecture"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Architecture
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Modern architectural designs
+                            </p>
+                          </NavLink>
+
+                          {/* Card 3 */}
+                          <NavLink
+                            to="/turnkey-interior"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://zoeafountain.com/wp-content/uploads/2020/05/iStock-599783022.jpg"
+                                alt="Turnkey Solutions"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Turnkey Solutions
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Complete interior solutions
+                            </p>
+                          </NavLink>
+
+                          {/* Card 4 */}
+                          <NavLink
+                            to="/competence"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://www.gotooptimal.com.au/wp-content/uploads/2014/08/Our-Services-e1409546099161.jpg"
+                                alt="Our Competence"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Our Competence
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              18+ specialized domains
+                            </p>
+                          </NavLink>
+                        </div>
                       </div>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
+                  {/* COMPANY Dropdown - For less important links */}
                   <NavigationMenuItem>
-                    <NavLink to="/portfolio" className={navLinkStyle}>
-                      PORTFOLIO
-                    </NavLink>
+                    <NavigationMenuTrigger
+                      className={`bg-transparent px-3 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
+                        isScrolled ? "text-gray-800" : "text-white"
+                      }`}
+                    >
+                      COMPANY
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="w-140 p-2 bg-white rounded-lg shadow-xl border border-gray-100">
+                        <div className="flex space-x-2">
+                          {/* Card 1 */}
+                          <NavLink
+                            to="/portfolio"
+                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://i.ytimg.com/vi/TwYKwaEjJd4/maxresdefault.jpg"
+                                alt="Portfolio"
+                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Portfolio
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Our featured projects
+                            </p>
+                          </NavLink>
+
+                          {/* Card 2 */}
+                          <NavLink
+                            to="/achievement"
+                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://thumbs.dreamstime.com/b/achievements-complex-like-puzzle-pictured-as-word-pieces-being-complicated-topic-to-show-needs-cooperating-fit-377102762.jpg"
+                                alt="Achievements"
+                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Achievements
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Milestones & recognition
+                            </p>
+                          </NavLink>
+
+                          {/* Card 3 */}
+                          <NavLink
+                            to="/blog"
+                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://plus.unsplash.com/premium_photo-1720744786849-a7412d24ffbf?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmxvZ3xlbnwwfHwwfHx8MA%3D%3D"
+                                alt="Blog"
+                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Blog
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Insights & updates
+                            </p>
+                          </NavLink>
+                        </div>
+                      </div>
+                    </NavigationMenuContent>
                   </NavigationMenuItem>
 
-                  <NavigationMenuItem>
-                    <NavLink to="/achievement" className={navLinkStyle}>
-                      ACHIEVEMENTS
-                    </NavLink>
-                  </NavigationMenuItem>
-
-                  <NavigationMenuItem>
-                    <NavLink to="/blog" className={navLinkStyle}>
-                      BLOG
-                    </NavLink>
-                  </NavigationMenuItem>
-
+                  {/* CONTACT - Primary Link */}
                   <NavigationMenuItem>
                     <NavLink to="/contact" className={navLinkStyle}>
                       CONTACT
@@ -179,11 +309,10 @@ const Header = () => {
 
             {/* RIGHT SIDE - ACTIONS */}
             <div className="flex items-center gap-4">
-              
               {/* Get Quote Button */}
               <Link
                 to="/contact"
-                className={`hidden lg:block px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 transform hover:scale-105 ${
+                className={`hidden lg:block px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 transform hover:scale-105 ${
                   isScrolled
                     ? "bg-brand-gold text-white hover:bg-brand-gold-light shadow-md"
                     : "bg-white text-brand-gold hover:bg-gray-100"
@@ -205,10 +334,10 @@ const Header = () => {
                 <SheetContent
                   side="right"
                   className="w-full sm:w-80 bg-gray-900 border-none p-0"
-                  closeIcon={false} // This disables the default close icon
+                  closeIcon={false}
                 >
                   <div className="flex flex-col h-full">
-                    {/* Mobile Menu Header - Now with only our custom white close button */}
+                    {/* Mobile Menu Header */}
                     <div className="flex items-center justify-between p-6 border-b border-gray-800">
                       <img
                         src={BRAND.logo}
@@ -224,7 +353,7 @@ const Header = () => {
                       </button>
                     </div>
 
-                    {/* Mobile Navigation Links */}
+                    {/* Mobile Navigation Links - RESTRUCTURED */}
                     <div className="flex-1 overflow-y-auto py-6 px-4">
                       <div className="space-y-1">
                         <NavLink
@@ -244,6 +373,7 @@ const Header = () => {
                           ABOUT
                         </NavLink>
 
+                        {/* Services Section */}
                         <div className="pt-4 pb-2">
                           <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Services
@@ -274,6 +404,15 @@ const Header = () => {
                           Turnkey Solutions
                         </NavLink>
 
+                        <NavLink
+                          to="/competence"
+                          className={mobileNavStyle}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Our Competence
+                        </NavLink>
+
+                        {/* Company Section */}
                         <div className="pt-4 pb-2">
                           <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Company
