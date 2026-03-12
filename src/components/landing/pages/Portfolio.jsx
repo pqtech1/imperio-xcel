@@ -376,7 +376,7 @@ const Portfolio = () => {
   // Prepare slides for lightbox
   const lightboxSlides =
     currentProject?.images.map((src) => ({
-      src,
+      src: `${import.meta.env.BASE_URL}${src.replace(/^\//, "")}`,
       alt: `${currentProject.name}`,
     })) || [];
 
@@ -559,7 +559,6 @@ const Portfolio = () => {
                       <MapPinIcon className="w-3 h-3 text-brand-gold-light" />
                       <span>{currentProject.locations.join(" • ")}</span>
                     </div>
-                  
                   </div>
 
                   <div className="flex-1 relative bg-gray-100 rounded-lg overflow-hidden">
