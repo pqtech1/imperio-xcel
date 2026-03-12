@@ -242,7 +242,7 @@ const Architecture = () => {
               </h1>
               <div className="w-16 h-[2px] bg-brand-gold-light mb-4" />
               <p className="text-gray-600 !mb-0">
-                <strong>At ImperioXcel Architects & Interior Designers,</strong>{" "}
+                <strong>At InterioXcel Architects & Interior Designers,</strong>{" "}
                 we bring together creativity, functionality, and precision to
                 design spaces that inspire. Recognized among the{" "}
                 <strong>leading architects in Varanasi</strong>, our studio
@@ -278,10 +278,10 @@ const Architecture = () => {
                   <SparklesIcon className="w-4 h-4 text-brand-gold-light" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold">
+                  <p className=" font-semibold">
                     Mrs. Meera Ramesh Vishwakarma
                   </p>
-                  <p className="text-xs text-gray-500">Founder</p>
+                  <p className=" text-gray-500">Founder</p>
                 </div>
               </div>
             </div>
@@ -405,7 +405,7 @@ const Architecture = () => {
                       {feature.title}
                     </h3>
                     <p
-                      className="text-xs font-light leading-relaxed"
+                      className=" font-light leading-relaxed"
                       style={{
                         color: hoveredId === feature.id ? "#dddddd" : "#888888",
                         transition: "color 0.3s ease",
@@ -429,8 +429,8 @@ const Architecture = () => {
               ))}
             </div>
 
-            <p className="text-xs text-gray-400 font-light">
-              When you choose ImperioXcel, you choose{" "}
+            <p className=" text-gray-400 font-light">
+              When you choose InterioXcel, you choose{" "}
               <strong className="text-brand-gold-light font-semibold">
                 innovation, quality, and timeless design
               </strong>
@@ -459,7 +459,7 @@ const Architecture = () => {
                 >
                   <Icon className="w-8 h-8 mx-auto text-brand-gold-light mb-2" />
                   <h3 className="font-bold text-sm mb-1">{category.name}</h3>
-                  <p className="text-xs text-brand-gold-light">
+                  <p className=" text-brand-gold-light">
                     {category.count} Projects
                   </p>
                 </div>
@@ -488,12 +488,12 @@ const Architecture = () => {
               >
                 <div className="flex items-start justify-between mb-2">
                   <BuildingOfficeIcon className="w-6 h-6 text-brand-gold-light group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-xs bg-brand-gold-light/10 text-brand-gold-light px-2 py-0.5 rounded-full">
+                  <span className=" bg-brand-gold-light/10 text-brand-gold-light px-2 py-0.5 rounded-full">
                     {project.year}
                   </span>
                 </div>
-                <h3 className="font-bold text-xs mb-1">{project.name}</h3>
-                <p className="text-xs text-gray-500 mb-2">
+                <h3 className="font-bold  mb-1">{project.name}</h3>
+                <p className=" text-gray-500 mb-2">
                   {project.locations}
                 </p>
                 <div className="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
@@ -513,7 +513,7 @@ const Architecture = () => {
                 <h3 className="text-lg font-bold mb-1">
                   KASHI GOMATI SAMYUKT GRAMEEN BANK
                 </h3>
-                <p className="text-xs text-gray-300">
+                <p className=" text-gray-300">
                   Successfully delivered 40+ bank models across 8 districts in
                   Uttar Pradesh
                 </p>
@@ -523,17 +523,17 @@ const Architecture = () => {
                   <p className="text-2xl font-bold text-brand-gold-light">
                     40+
                   </p>
-                  <p className="text-xs text-gray-400">Bank Models</p>
+                  <p className=" text-gray-400">Bank Models</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-brand-gold-light">8</p>
-                  <p className="text-xs text-gray-400">Districts</p>
+                  <p className=" text-gray-400">Districts</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-brand-gold-light">
                     2023
                   </p>
-                  <p className="text-xs text-gray-400">Completed</p>
+                  <p className=" text-gray-400">Completed</p>
                 </div>
               </div>
             </div>
@@ -609,12 +609,12 @@ const Architecture = () => {
                 <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
 
                 {/* Role */}
-                <h6 className="!text-brand-gold-light !text-xs !mb-2">
+                <h6 className="!text-brand-gold-light ! !mb-2">
                   {member.role}
                 </h6>
 
                 {/* Description */}
-                <p className="text-xs text-gray-500">{member.desc}</p>
+                <p className=" text-gray-500">{member.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -648,7 +648,7 @@ const Architecture = () => {
               />
             </div>
             {/* Text */}
-            <div className="w-full lg:w-[320px] flex-shrink-0 text-text-main text-xs leading-6 p-5 bg-white rounded-lg shadow">
+            <div className="w-full lg:w-[320px] flex-shrink-0 text-text-main  leading-6 p-5 bg-white rounded-lg shadow">
               <TrophyIcon className="w-6 h-6 text-brand-gold-light mb-3" />
               <p className="mb-3">
                 Our architectural designs and projects have been delivered for
@@ -664,15 +664,15 @@ const Architecture = () => {
                 ].map((brand, i) => (
                   <span
                     key={i}
-                    className="text-xs bg-amber-50 px-2 py-0.5 rounded-full text-brand-charcoal"
+                    className=" bg-amber-50 px-2 py-0.5 rounded-full text-brand-charcoal"
                   >
                     {brand}
                   </span>
                 ))}
               </div>
-              <p className="text-gray-600 text-xs">
+              <p className="text-gray-600 ">
                 We have successfully executed <strong>40+ bank models</strong>{" "}
-                across Uttar Pradesh, establishing ImperioXcel as one of the
+                across Uttar Pradesh, establishing InterioXcel as one of the
                 most trusted architectural firms in the region.
               </p>
             </div>
@@ -693,11 +693,11 @@ const Architecture = () => {
                 <p className="text-white text-sm font-semibold">
                   TATA AIG LIFE INSURANCE
                 </p>
-                <p className="text-xs text-gray-300">Robertsgang, Sonbhadra</p>
+                <p className=" text-gray-300">Robertsgang, Sonbhadra</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
                 <p className="text-white text-sm font-semibold">NYKAA LUX</p>
-                <p className="text-xs text-gray-300">HLP Galleria, Mohali</p>
+                <p className=" text-gray-300">HLP Galleria, Mohali</p>
               </div>
             </div>
           </div>

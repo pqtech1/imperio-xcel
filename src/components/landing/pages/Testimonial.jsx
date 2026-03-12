@@ -14,7 +14,7 @@ import {
 const reviews = [
   {
     quote:
-      "ImperioXcel delivered exceptional work on our 40+ bank models across 8 districts. Their attention to detail, adherence to timelines, and quality of execution exceeded our expectations. The team's understanding of banking requirements and security protocols was impressive.",
+      "InterioXcel delivered exceptional work on our 40+ bank models across 8 districts. Their attention to detail, adherence to timelines, and quality of execution exceeded our expectations. The team's understanding of banking requirements and security protocols was impressive.",
     author: {
       name: "Regional Manager",
       title: "Kashi Gomati Samyukt Grameen Bank",
@@ -26,7 +26,7 @@ const reviews = [
   },
   {
     quote:
-      "We partnered with ImperioXcel for multiple Union Bank of India branches across Jaunpur and Varanasi. Their turnkey solutions made the process seamless. From design to execution, everything was handled professionally. Highly recommended for banking infrastructure.",
+      "We partnered with InterioXcel for multiple Union Bank of India branches across Jaunpur and Varanasi. Their turnkey solutions made the process seamless. From design to execution, everything was handled professionally. Highly recommended for banking infrastructure.",
     author: {
       name: "Chief Manager",
       title: "Union Bank of India",
@@ -38,7 +38,7 @@ const reviews = [
   },
   {
     quote:
-      "The team at ImperioXcel transformed our Tanishq showroom in Varanasi into a stunning retail space. Their understanding of jewelry retail requirements - lighting, security, customer flow - was exceptional. The project was completed on time and within budget.",
+      "The team at InterioXcel transformed our Tanishq showroom in Varanasi into a stunning retail space. Their understanding of jewelry retail requirements - lighting, security, customer flow - was exceptional. The project was completed on time and within budget.",
     author: {
       name: "Store Director",
       title: "Tanishq - Swastic City Center",
@@ -50,7 +50,7 @@ const reviews = [
   },
   {
     quote:
-      "Our Allen Solly store in Rourkela was designed and executed by ImperioXcel. They perfectly captured our brand essence while creating a functional retail space. The team's project management skills and attention to detail are commendable.",
+      "Our Allen Solly store in Rourkela was designed and executed by InterioXcel. They perfectly captured our brand essence while creating a functional retail space. The team's project management skills and attention to detail are commendable.",
     author: {
       name: "Regional Retail Head",
       title: "Allen Solly - Rourkela",
@@ -62,7 +62,7 @@ const reviews = [
   },
   {
     quote:
-      "We're extremely satisfied with the work done by ImperioXcel on our Nykaa store in Haldwani. The team understood our brand aesthetics and delivered a beautiful, functional space. Their post-completion support has been excellent.",
+      "We're extremely satisfied with the work done by InterioXcel on our Nykaa store in Haldwani. The team understood our brand aesthetics and delivered a beautiful, functional space. Their post-completion support has been excellent.",
     author: {
       name: "Store Operations Manager",
       title: "NYKAA - Haldwani",
@@ -198,15 +198,15 @@ const Testimonial = () => {
 
                 {/* Project Badge */}
                 <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-gold-light/10 rounded-full text-[10px] text-brand-gold-light">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-gold-light/10 rounded-full  text-brand-gold-light">
                     <BriefcaseIcon className="w-3 h-3" />
                     {review.author.project}
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full text-[10px] text-gray-600">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full  text-gray-600">
                     <MapPinIcon className="w-3 h-3" />
                     {review.author.location}
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full text-[10px] text-gray-600">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full  text-gray-600">
                     <CalendarIcon className="w-3 h-3" />
                     {review.author.year}
                   </span>
@@ -247,22 +247,22 @@ const Testimonial = () => {
           {/* Stats Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-6 border-t border-gray-200 w-full max-w-3xl">
             <div className="text-center">
-              <div className="text-lg font-bold text-brand-gold-light">50+</div>
-              <div className="text-[10px] text-gray-500">Projects</div>
+              <div className="text-xl font-bold text-brand-gold-light">50+</div>
+              <div className=" text-gray-500">Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-brand-gold-light">40+</div>
-              <div className="text-[10px] text-gray-500">Bank Models</div>
+              <div className="text-xl font-bold text-brand-gold-light">40+</div>
+              <div className=" text-gray-500">Bank Models</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-brand-gold-light">8+</div>
-              <div className="text-[10px] text-gray-500">Districts</div>
+              <div className="text-xl font-bold text-brand-gold-light">8+</div>
+              <div className=" text-gray-500">Districts</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-brand-gold-light">
+              <div className="text-xl font-bold text-brand-gold-light">
                 100%
               </div>
-              <div className="text-[10px] text-gray-500">Satisfaction</div>
+              <div className=" text-gray-500">Satisfaction</div>
             </div>
           </div>
         </div>

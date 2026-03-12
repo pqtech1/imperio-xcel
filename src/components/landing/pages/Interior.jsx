@@ -159,7 +159,7 @@ const faqData = [
     a: "Yes, we offer complete interior solutions across retail, insurance & finance, corporate, and hospitality industries, as well as residential spaces.",
   },
   {
-    q: "Who leads the team at ImperioXcel?",
+    q: "Who leads the team at InterioXcel?",
     a: "Our team is led by Abhishek Vishwakarma (Owner), with Kajal Vishwakarma as Architect and Ramesh Prasad Vishwakarma as Senior Advisor, bringing decades of combined experience.",
   },
   {
@@ -171,7 +171,7 @@ const faqData = [
     a: "Yes, we are your ultimate one-stop solution provider for all interior furnishing contracting needs, from initial design to final execution and handover.",
   },
   {
-    q: "How can I get started with ImperioXcel?",
+    q: "How can I get started with InterioXcel?",
     a: "Simply reach out via phone, email, or our contact form. We'll schedule an initial consultation to discuss your vision, requirements, and budget.",
   },
 ];
@@ -294,14 +294,14 @@ const ServiceCard = ({ service, index }) => {
         <h3 className="text-white text-lg md:text-xl font-bold font-serif tracking-wide mb-2">
           {service.title}
         </h3>
-        <p className="text-gray-300 text-sm leading-6 font-sans mb-3">
+        <p className="text-gray-300 text-base leading-6 font-sans mb-3">
           {service.desc}
         </p>
         <ul className="list-none p-0 m-0 space-y-1">
           {service.features.map((f, i) => (
             <li
               key={i}
-              className="flex items-center gap-2 text-gray-300 text-xs font-sans"
+              className="flex items-center gap-2 text-gray-300  font-sans"
               style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateX(0)" : "translateX(12px)",
@@ -309,7 +309,7 @@ const ServiceCard = ({ service, index }) => {
               }}
             >
               <span
-                className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-xs"
+                className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-white font-bold "
                 style={{ background: service.accent }}
               >
                 ✓
@@ -376,13 +376,13 @@ const WhyCard = ({ item, delay }) => {
           )}
         </div>
         <h3
-          className="text-sm md:text-base font-bold font-sans mb-2 tracking-tight transition-colors duration-300"
+          className="text-base md:text-base font-bold font-sans mb-2 tracking-tight transition-colors duration-300"
           style={{ color: hovered ? "#fff" : "#1a1f26" }}
         >
           {item.title}
         </h3>
         <p
-          className="text-xs md:text-sm leading-relaxed font-sans transition-colors duration-300"
+          className=" md:text-base leading-relaxed font-sans transition-colors duration-300"
           style={{ color: hovered ? "#bbb" : "#666" }}
         >
           {item.desc}
@@ -396,7 +396,7 @@ const WhyChooseUs = () => (
   <div className="bg-white pt-10 pb-8 section-px">
     <div className="text-center mb-8">
       <h6 className="text-brand-gold-light">Why Us</h6>
-      <h2 className="!mt-2">Why Choose ImperioXcel</h2>
+      <h2 className="!mt-2">Why Choose InterioXcel</h2>
       <div className="w-10 h-0.5 bg-brand-gold-light mx-auto mt-3 rounded" />
     </div>
     <div className="max-w-5xl mx-auto">
@@ -447,13 +447,13 @@ const ProcessCard = ({ item, delay, onHoverChange }) => {
         </span>
       </div>
       <h3
-        className="text-sm md:text-base font-bold font-sans mb-2 leading-snug transition-colors duration-300"
+        className="text-base md:text-base font-bold font-sans mb-2 leading-snug transition-colors duration-300"
         style={{ color: hovered ? "#fff" : "#1a1f26" }}
       >
         {item.title}
       </h3>
       <p
-        className="text-xs md:text-sm leading-relaxed font-sans transition-colors duration-300"
+        className=" md:text-base leading-relaxed font-sans transition-colors duration-300"
         style={{ color: hovered ? "#bbb" : "#666" }}
       >
         {item.desc}
@@ -558,9 +558,9 @@ const MajorProjects = () => {
               }}
             >
               <BuildingStorefrontIcon className="w-8 h-8 mx-auto text-brand-gold-light mb-2" />
-              <h3 className="font-bold text-xs mb-1">{project.name}</h3>
-              <p className="text-xs text-gray-500 mb-2">{project.locations}</p>
-              <span className="text-xs bg-brand-gold-light/10 text-brand-gold-light px-2 py-1 rounded-full">
+              <h3 className="font-bold  mb-1">{project.name}</h3>
+              <p className=" text-gray-500 mb-2">{project.locations}</p>
+              <span className=" bg-brand-gold-light/10 text-brand-gold-light px-2 py-1 rounded-full">
                 {project.count} Location{project.count > 1 ? "s" : ""}
               </span>
             </div>
@@ -613,10 +613,10 @@ const WorkInProgress = () => {
                   transition: `opacity 0.5s ease ${0.15 + index * 0.1}s, transform 0.5s ease ${0.15 + index * 0.1}s`,
                 }}
               >
-                <p className="text-white text-sm font-semibold">
+                <p className="text-white text-base font-semibold">
                   {project.name}
                 </p>
-                <p className="text-xs text-gray-300">{project.location}</p>
+                <p className=" text-gray-300">{project.location}</p>
               </div>
             ))}
           </div>
@@ -703,8 +703,8 @@ const QualitySafety = () => {
                   className="bg-amber-50/50 p-4 rounded-lg text-center"
                 >
                   <Icon className="w-8 h-8 mx-auto text-brand-gold-light mb-2" />
-                  <h4 className="font-bold text-xs mb-1">{item.title}</h4>
-                  <p className="text-xs text-gray-500">{item.desc}</p>
+                  <h4 className="font-bold  mb-1">{item.title}</h4>
+                  <p className=" text-gray-500">{item.desc}</p>
                 </div>
               );
             })}
@@ -735,7 +735,7 @@ const FAQItem = ({ item, index }) => {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex justify-between items-center py-3 md:py-4 bg-transparent border-none cursor-pointer text-left gap-3"
       >
-        <span className="text-sm md:text-base font-semibold font-serif leading-snug">
+        <span className="text-base md:text-base font-semibold font-serif leading-snug">
           {item.q}
         </span>
         <span
@@ -746,14 +746,14 @@ const FAQItem = ({ item, index }) => {
             transform: open ? "rotate(45deg)" : "rotate(0deg)",
           }}
         >
-          <span className="leading-none text-sm -mt-px">+</span>
+          <span className="leading-none text-base -mt-px">+</span>
         </span>
       </button>
       <div
         className="overflow-hidden transition-all duration-400"
         style={{ maxHeight: open ? "200px" : "0" }}
       >
-        <p className="text-xs leading-6 pb-4 pr-8">{item.a}</p>
+        <p className=" leading-6 pb-4 pr-8">{item.a}</p>
       </div>
     </div>
   );
@@ -818,14 +818,14 @@ const GetAQuote = () => {
     {
       icon: EnvelopeIcon,
       label: "Email",
-      lines: ["kkentp2018@gmail.com"],
+      lines: ["info@interioxcel.com"],
     },
   ];
 
   const inputCls =
-    "w-full border-0 border-b border-gray-300 pb-2 pt-2 text-sm font-sans bg-transparent outline-none focus:border-brand-gold-light transition-colors duration-200";
+    "w-full border-0 border-b border-gray-300 pb-2 pt-2 text-base font-sans bg-transparent outline-none focus:border-brand-gold-light transition-colors duration-200";
   const labelCls =
-    "block text-xs tracking-widest text-text-main/60 font-sans uppercase mb-1";
+    "block  tracking-widest text-text-main/60 font-sans uppercase mb-1";
 
   return (
     <div className="bg-white section-px py-8">
@@ -862,13 +862,13 @@ const GetAQuote = () => {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold font-sans mb-1">
+                    <p className=" font-bold font-sans mb-1">
                       {c.label}
                     </p>
                     {c.lines.map((l, j) => (
                       <p
                         key={j}
-                        className="text-xs text-text-main/70 font-sans leading-5 m-0"
+                        className=" text-text-main/70 font-sans leading-5 m-0"
                       >
                         {l}
                       </p>
@@ -887,7 +887,7 @@ const GetAQuote = () => {
                 <h3 className="font-sans font-semibold mb-2 text-base">
                   Message Sent!
                 </h3>
-                <p className="text-text-main/70 font-sans text-xs">
+                <p className="text-text-main/70 font-sans ">
                   We'll get back to you within 24 hours.
                 </p>
               </div>
@@ -995,7 +995,7 @@ export const Interior = () => {
             </strong>
             <br />
             <br />
-            At ImperioXcel, we offer a complete range of interior solutions
+            At InterioXcel, we offer a complete range of interior solutions
             including renovation, intricate interior detailing, meticulous
             material selection and finishing, procurement of furniture and
             accessories, specification management, budgeting, and seamless
@@ -1066,11 +1066,11 @@ export const Interior = () => {
           <h2 className="font-light text-2xl md:text-3xl !mb-2">
             Why Work With Us
           </h2>
-          <p className="text-sm md:text-base leading-7 text-brand-charcoal font-semibold mb-2 italic">
+          <p className="text-base md:text-base leading-7 text-brand-charcoal font-semibold mb-2 italic">
             "We shape our spaces, and then, our spaces shape us."
           </p>
           <p className="text-gray-600 !mb-0">
-            At ImperioXcel, we offer customized interior solutions and devoted
+            At InterioXcel, we offer customized interior solutions and devoted
             customer care with personal assistance. With assured convenience and
             end-to-end interior design solutions, we let you move right into
             your dream space. We have created some of the most unique interiors

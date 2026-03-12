@@ -15,7 +15,7 @@ import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
-    <BrowserRouter basename="/imperio-xcel">
+    <BrowserRouter basename="/interioxcel">
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>

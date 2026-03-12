@@ -149,7 +149,7 @@ const Competence = () => {
               Complete Interior Solutions
             </h2>
             <div className="w-20 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto" />
-            <p className="text-gray-600 text-sm max-w-2xl mx-auto mt-4">
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto mt-4">
               From civil work to final finishes, we handle every aspect of your
               interior project with precision and expertise
             </p>
@@ -161,23 +161,23 @@ const Competence = () => {
               <div className="text-2xl font-bold text-brand-gold-light">
                 18+
               </div>
-              <div className="text-xs text-gray-600">Specialized Domains</div>
+              <div className="text-base text-gray-600">Specialized Domains</div>
             </div>
             <div className="text-center bg-amber-50/50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-brand-gold-light">
                 50+
               </div>
-              <div className="text-xs text-gray-600">Expert Craftsmen</div>
+              <div className="text-base text-gray-600">Expert Craftsmen</div>
             </div>
             <div className="text-center bg-amber-50/50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-brand-gold-light">
                 100%
               </div>
-              <div className="text-xs text-gray-600">Quality Assured</div>
+              <div className="text-base text-gray-600">Quality Assured</div>
             </div>
             <div className="text-center bg-amber-50/50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-brand-gold-light">7+</div>
-              <div className="text-xs text-gray-600">Years Experience</div>
+              <div className="text-base text-gray-600">Years Experience</div>
             </div>
           </div>
 
@@ -222,7 +222,7 @@ const Competence = () => {
                     {/* Content */}
                     <div className="flex-1">
                       <h3
-                        className={`text-sm font-bold mb-2 transition-colors duration-300 ${
+                        className={`text-lg font-bold mb-2 transition-colors duration-300 ${
                           isHovered ? "text-brand-gold-light" : "text-gray-900"
                         }`}
                       >
@@ -232,7 +232,7 @@ const Competence = () => {
                         {item.items.map((subItem, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full"
+                            className=" px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full"
                           >
                             {subItem}
                           </span>
@@ -255,10 +255,10 @@ const Competence = () => {
           {/* Bottom CTA */}
           <div className="mt-16 text-center">
             <div className="inline-flex items-center gap-2 bg-amber-50/50 px-6 py-3 rounded-full border border-gray-200">
-              <span className="text-sm text-gray-700">
+              <span className=" text-gray-700">
                 Need a specific service?
               </span>
-              <button className="text-brand-gold-light hover:text-brand-gold text-sm font-medium transition-colors">
+              <button className="text-brand-gold-light hover:text-brand-gold text-lg font-medium transition-colors">
                 Let's discuss your project →
               </button>
             </div>
@@ -305,7 +305,7 @@ const Competence = () => {
                 <h3 className="text-base font-bold mb-2 text-gray-900">
                   {item.title}
                 </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-base text-gray-600 leading-relaxed">
                   {item.desc}
                 </p>
               </div>

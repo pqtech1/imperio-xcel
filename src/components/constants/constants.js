@@ -1,6 +1,6 @@
 // Brand Information
 export const BRAND = {
-  name: "Interio Xcel",
+  name: "InterioXcel",
   logo: `${import.meta.env.BASE_URL}interio-xcel-logo.png`,
 };
 

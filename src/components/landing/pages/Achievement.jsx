@@ -126,14 +126,14 @@ const pressMentions = [
   },
 ];
 
-// Blog posts (customized for ImperioXcel)
+// Blog posts (customized for InterioXcel)
 const blogPosts = [
   {
     id: 1,
     category: "Banking",
     subcategory: "Interior Design",
     title:
-      "How We Delivered 40+ Bank Models Across 8 Districts | ImperioXcel Case Study",
+      "How We Delivered 40+ Bank Models Across 8 Districts | InterioXcel Case Study",
     excerpt:
       "A comprehensive look at our execution strategy for Kashi Gomati Samyukt Grameen Bank projects, showcasing standardized design, quality control, and timely delivery across multiple locations...",
     img: "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg",
@@ -251,11 +251,11 @@ const VideoSection = () => {
                     "linear-gradient(to bottom, rgba(0,0,0,0.6), transparent)",
                 }}
               >
-                <div className="bg-brand-gold-light px-2 py-0.5 rounded text-white text-[10px] font-bold tracking-wide font-sans">
+                <div className="bg-brand-gold-light px-2 py-0.5 rounded text-white text-base font-bold tracking-wide font-sans">
                   FEATURED
                 </div>
-                <span className="text-[10px] text-white/80 font-sans">
-                  ImperioXcel • Established 2017
+                <span className="text-base text-white/80 font-sans">
+                  InterioXcel • Established 2017
                 </span>
                 {/* Logo */}
                 <div className="ml-auto flex items-center gap-1 bg-black/70 px-2 py-0.5 rounded">
@@ -263,7 +263,7 @@ const VideoSection = () => {
                     IX
                   </div>
                   <span className="text-white text-[8px] font-sans tracking-widest uppercase">
-                    ImperioXcel
+                    InterioXcel
                   </span>
                 </div>
               </div>
@@ -283,10 +283,10 @@ const VideoSection = () => {
                     "linear-gradient(to top, rgba(0,0,0,0.6), transparent)",
                 }}
               >
-                <span className="text-[10px] text-white/80 font-sans">
+                <span className="text-base text-white/80 font-sans">
                   Watch our journey →
                 </span>
-                <span className="text-[10px] text-white/40 font-mono">
+                <span className="text-base text-white/40 font-mono">
                   7+ years of excellence
                 </span>
               </div>
@@ -324,7 +324,7 @@ const AchievementCard = ({ item, delay }) => {
         <Icon className="w-8 h-8 mb-3 opacity-80" />
         <div className="text-2xl font-bold mb-1">{item.stat}</div>
         <h3 className="text-base font-bold mb-1">{item.title}</h3>
-        <p className="text-xs text-white/90 leading-relaxed">
+        <p className=" text-white/90 leading-relaxed">
           {item.description}
         </p>
 
@@ -367,7 +367,7 @@ const BlogCard = ({ post, delay }) => {
             transition: "filter 0.4s ease, transform 0.4s ease",
           }}
         />
-        <div className="absolute top-2 right-2 bg-brand-gold-light/90 px-1.5 py-0.5 text-[10px] font-bold text-white rounded">
+        <div className="absolute top-2 right-2 bg-brand-gold-light/90 px-1.5 py-0.5 text-base font-bold text-white rounded">
           IX
         </div>
       </div>
@@ -375,22 +375,22 @@ const BlogCard = ({ post, delay }) => {
       {/* Content */}
       <div className="px-4 py-4 flex flex-col flex-1">
         <div className="flex gap-1 mb-2 flex-wrap">
-          <span className="text-[10px] tracking-widest uppercase text-brand-gold-light font-semibold">
+          <span className="text-base tracking-widest uppercase text-brand-gold-light font-semibold">
             {post.category}
           </span>
-          <span className="text-gray-300 text-[10px]">/</span>
-          <span className="text-[10px] tracking-wide uppercase text-gray-500">
+          <span className="text-gray-300 text-base">/</span>
+          <span className="text-base tracking-wide uppercase text-gray-500">
             {post.subcategory}
           </span>
         </div>
-        <h3 className="text-xs font-bold font-serif leading-snug mb-2 flex-1">
+        <h3 className=" font-bold font-serif leading-snug mb-2 flex-1">
           {post.title}
         </h3>
-        <p className="text-[10px] leading-5 text-gray-600 font-sans mb-3 line-clamp-3">
+        <p className="text-base leading-5 text-gray-600 font-sans mb-3 line-clamp-3">
           {post.excerpt}
         </p>
         <span
-          className="text-[10px] tracking-widest uppercase font-sans font-bold self-start pb-0.5 transition-all duration-300"
+          className="text-base tracking-widest uppercase font-sans font-bold self-start pb-0.5 transition-all duration-300"
           style={{
             color: hovered ? "#b88a44" : "#1a1f26",
             borderBottom: `1px solid ${hovered ? "#b88a44" : "#1a1f26"}`,
@@ -439,13 +439,13 @@ const PressCard = ({ item, delay, className = "" }) => {
           transition: "opacity 0.4s ease",
         }}
       >
-        <span className="text-[10px] text-brand-gold-light font-sans tracking-widest uppercase mb-1">
+        <span className="text-base text-brand-gold-light font-sans tracking-widest uppercase mb-1">
           {item.publication}
         </span>
-        <span className="text-xs text-white font-semibold mb-1">
+        <span className=" text-white font-semibold mb-1">
           {item.title}
         </span>
-        <span className="text-[10px] text-gray-300">{item.date}</span>
+        <span className="text-base text-gray-300">{item.date}</span>
       </div>
     </div>
   );
@@ -464,7 +464,7 @@ const TimelineItem = ({ item, index, visible }) => {
     >
       <div className="relative">
         <div className="w-10 h-10 bg-brand-gold-light/10 rounded-full flex items-center justify-center">
-          <span className="text-xs font-bold text-brand-gold-light">
+          <span className=" font-bold text-brand-gold-light">
             {item.year}
           </span>
         </div>
@@ -473,7 +473,7 @@ const TimelineItem = ({ item, index, visible }) => {
         )}
       </div>
       <div className="flex-1 pb-6">
-        <p className="text-xs text-gray-700">{item.event}</p>
+        <p className=" text-gray-700">{item.event}</p>
       </div>
     </div>
   );
@@ -582,13 +582,13 @@ const Achievement = () => {
                   </h3>
                   <div className="flex items-center gap-1.5 mb-2">
                     <MapPinIcon className="w-3.5 h-3.5 text-brand-gold-light" />
-                    <span className="text-xs text-gray-600">
+                    <span className=" text-gray-600">
                       {project.locations.join(" • ")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <CheckCircleIcon className="w-3.5 h-3.5 text-green-500" />
-                    <span className="text-xs font-semibold">
+                    <span className=" font-semibold">
                       {project.count} locations
                     </span>
                   </div>
@@ -660,7 +660,7 @@ const Achievement = () => {
             <h2 className="text-white text-xl md:text-2xl font-bold mb-3">
               Ready to Create Your Success Story?
             </h2>
-            <p className="text-gray-300 text-xs mb-4 max-w-2xl mx-auto">
+            <p className="text-gray-300  mb-4 max-w-2xl mx-auto">
               Join our list of 50+ satisfied clients and let us transform your
               space with the same dedication and excellence.
             </p>

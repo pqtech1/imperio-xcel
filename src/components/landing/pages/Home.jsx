@@ -354,7 +354,7 @@ const Home = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 right-8 text-white/60 text-xs tracking-widest rotate-90 origin-bottom-right"
+          className="absolute bottom-8 right-8 text-white/60 text-base tracking-widest rotate-90 origin-bottom-right"
         >
           SCROLL
         </motion.div>
@@ -384,9 +384,7 @@ const Home = () => {
               className="!text-4xl md:!text-5xl font-light !mb-0"
             >
               Engineering <br />
-              <span className="font-serif italic text-gray-400">
-                Natural Efficiency.
-              </span>
+              <span className="font-serif italic ">Natural Efficiency.</span>
             </motion.h2>
 
             <motion.div
@@ -396,7 +394,7 @@ const Home = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:pt-2"
             >
-              <p className="text-gray-500 max-w-md !mb-0">
+              <p className="">
                 We translate the biological brilliance of the hive into a
                 blueprint for modern excellence. Hard work is expected;
                 perfection is the baseline.
@@ -426,7 +424,7 @@ const Home = () => {
                 </h3>
 
                 {/* Description */}
-                <p className="text-gray-400 text-sm leading-relaxed font-light transition-colors duration-500 group-hover:text-gray-600">
+                <p className="text-sm leading-relaxed font-light transition-colors duration-500 group-hover:text-gray-900">
                   {item.desc}
                 </p>
               </motion.div>
@@ -452,7 +450,7 @@ const Home = () => {
               </h2>
               <div className="w-16 h-[2px] bg-brand-gold-light mb-6"></div>
               <p>
-                ImperioXcel, established by Mrs. Meera Ramesh Vishwakarma, is
+                InterioXcel, established by Mrs. Meera Ramesh Vishwakarma, is
                 dedicated to creating comprehensive furnishing contracting
                 solutions within the interior design industry. Our founders
                 bring extensive wealth of experience, spanning decades, in the
@@ -468,11 +466,11 @@ const Home = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="border-l-4 border-brand-gold-light pl-4">
                   <p className="text-2xl font-bold">50+</p>
-                  <p className="text-xs text-gray-500">Projects Completed</p>
+                  <p className="text-base ">Projects Completed</p>
                 </div>
                 <div className="border-l-4 border-brand-gold-light pl-4">
                   <p className="text-2xl font-bold">40+</p>
-                  <p className="text-xs text-gray-500">Bank Models</p>
+                  <p className="text-base ">Bank Models</p>
                 </div>
               </div>
             </motion.div>
@@ -518,7 +516,7 @@ const Home = () => {
             <h6 className="!text-brand-gold">What We Offer</h6>
             <h2>Our Comprehensive Services</h2>
             <div className="w-12 h-[1px] bg-brand-gold mx-auto mb-6"></div>
-            <p className="text-gray-500 !mb-0">
+            <p className="!mb-0">
               Your ultimate one-stop solution provider for all interior
               furnishing contracting needs.
             </p>
@@ -540,7 +538,7 @@ const Home = () => {
                 >
                   {/* Icon */}
                   <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center mb-6 group-hover:border-brand-gold transition-colors duration-300">
-                    <Icon className="w-5 h-5 text-gray-500 group-hover:text-brand-gold transition-colors duration-300" />
+                    <Icon className="w-5 h-5  group-hover:text-brand-gold transition-colors duration-300" />
                   </div>
 
                   {/* Title */}
@@ -549,7 +547,7 @@ const Home = () => {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                  <p className=" text-sm leading-relaxed mb-4">
                     {service.description}
                   </p>
 
@@ -558,19 +556,13 @@ const Home = () => {
                     {service.features.map((feature, idx) => (
                       <li
                         key={idx}
-                        className="flex items-center gap-2 text-xs text-gray-400"
+                        className="flex items-center gap-2 text-base "
                       >
                         <CheckCircleIcon className="w-3 h-3 text-brand-gold" />
                         {feature}
                       </li>
                     ))}
                   </ul>
-
-                  {/* CTA */}
-                  <button className="text-xs font-medium text-gray-600 flex items-center gap-2 group-hover:text-brand-gold transition-colors duration-300">
-                    Learn More
-                    <ArrowRightIcon className="w-3 h-3 transition-transform group-hover:translate-x-1" />
-                  </button>
                 </motion.div>
               );
             })}
@@ -617,7 +609,7 @@ const Home = () => {
                   </div>
 
                   {/* Label */}
-                  <p className="text-xs uppercase tracking-widest text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
+                  <p className="text-base text-white uppercase tracking-widest  group-hover:text-gray-400 transition-colors duration-300">
                     {stat.label}
                   </p>
                 </motion.div>
@@ -660,7 +652,7 @@ const Home = () => {
                   {/* Icon */}
                   <div className="flex justify-center mb-4">
                     <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center group-hover:border-brand-gold transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-gray-500 group-hover:text-brand-gold transition-colors duration-300" />
+                      <Icon className="w-5 h-5  group-hover:text-brand-gold transition-colors duration-300" />
                     </div>
                   </div>
 
@@ -670,12 +662,12 @@ const Home = () => {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-xs text-gray-500 leading-relaxed mb-3">
+                  <p className="text-base  leading-relaxed mb-3">
                     {area.description}
                   </p>
 
                   {/* Projects Count */}
-                  <h6 className="!text-brand-gold !text-xs !mb-0">
+                  <h6 className="!text-brand-gold !text-base !mb-0">
                     {area.projects}
                   </h6>
                 </motion.div>
@@ -727,17 +719,17 @@ const Home = () => {
                         {project.name}
                       </h3>
                     </div>
-                    <p className="text-brand-gold-light text-xs mb-2">
+                    <p className="text-brand-gold-light text-base mb-2">
                       {project.locations}
                     </p>
-                    <div className="flex items-center gap-2 text-white/80 text-xs">
+                    <div className="flex items-center gap-2 text-white/80 text-base">
                       <MapPinIcon className="w-3 h-3" />
                       <span>{project.locations}</span>
                     </div>
                   </div>
 
                   {/* Project Badge */}
-                  <div className="absolute top-3 right-3 bg-brand-gold-light text-white px-3 py-1 rounded-full text-xs font-medium transform -translate-y-16 group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="absolute top-3 right-3 bg-brand-gold-light text-white px-3 py-1 rounded-full text-base font-medium transform -translate-y-16 group-hover:translate-y-0 transition-transform duration-500">
                     Featured
                   </div>
                 </motion.div>
@@ -791,7 +783,7 @@ const Home = () => {
                     {work.project}
                   </h3>
 
-                  <div className="flex items-center gap-2 text-gray-300 text-xs">
+                  <div className="flex items-center gap-2 text-gray-300 text-base">
                     <MapPinIcon className="w-3 h-3" />
                     <span>{work.location}</span>
                   </div>
@@ -841,7 +833,7 @@ const Home = () => {
                         ${
                           activeStep === index
                             ? "bg-brand-gold-light text-white shadow-md"
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            : "bg-gray-100  hover:bg-gray-200"
                         }
                       `}
                     >
@@ -850,10 +842,8 @@ const Home = () => {
 
                     {/* Label */}
                     <p
-                      className={`mt-3 text-xs font-medium transition-colors ${
-                        activeStep === index
-                          ? "text-brand-gold-light"
-                          : "text-gray-400"
+                      className={`mt-3 text-base font-medium transition-colors ${
+                        activeStep === index ? "text-brand-gold-light" : ""
                       }`}
                     >
                       {step}
@@ -921,7 +911,7 @@ const Home = () => {
                 We strictly follow industry standards to ensure exceptional
                 craftsmanship and a safe working environment.
               </p>
-              <p className="text-gray-400 !mb-0">
+              <p className=" text-white !mb-0">
                 From providing protective equipment to regular safety
                 inspections and continuous workforce training, every process is
                 designed to protect our team and maintain the highest quality
@@ -971,7 +961,7 @@ const Home = () => {
                   >
                     <Icon className="w-6 h-6 text-brand-gold-light mb-3" />
                     <h4 className="font-semibold mb-1 text-sm">{item.title}</h4>
-                    <p className="text-xs text-gray-400 leading-relaxed">
+                    <p className="text-base text-gray-300  leading-relaxed">
                       {item.desc}
                     </p>
                   </motion.div>
@@ -1079,12 +1069,12 @@ const Home = () => {
                 <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
 
                 {/* Role */}
-                <h6 className="!text-brand-gold-light !text-xs !mb-2">
+                <h6 className="!text-brand-gold-light !text-base !mb-2">
                   {member.role}
                 </h6>
 
                 {/* Description */}
-                <p className="text-xs text-gray-500">{member.desc}</p>
+                <p className="text-base ">{member.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -1110,7 +1100,7 @@ const Home = () => {
               <h3 className="text-xl font-bold mb-1">
                 Let's Create Something Amazing Together
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className=" text-gray-300 text-base">
                 Contact us today to discuss your project requirements
               </p>
             </motion.div>
@@ -1126,8 +1116,10 @@ const Home = () => {
                   <PhoneIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Call Us</p>
-                  <p className="text-white text-sm font-medium">+91-6393556220</p>
+                  <p className="text-base text-white">Call Us</p>
+                  <p className="text-white text-sm font-medium">
+                    +91-6393556220
+                  </p>
                 </div>
               </div>
 
@@ -1136,8 +1128,10 @@ const Home = () => {
                   <EnvelopeIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Email Us</p>
-                  <p className="text-white text-sm font-medium">kkentp2018@gmail.com</p>
+                  <p className="text-base text-white">Email Us</p>
+                  <p className="text-white text-sm font-medium">
+                    info@interioxcel.com
+                  </p>
                 </div>
               </div>
 
@@ -1146,7 +1140,7 @@ const Home = () => {
                   <MapPinIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Visit Us</p>
+                  <p className="text-base text-white">Visit Us</p>
                   <p className="text-white text-sm font-medium">Varanasi, UP</p>
                 </div>
               </div>

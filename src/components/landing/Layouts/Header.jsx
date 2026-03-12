@@ -13,9 +13,58 @@ import { Menu, Search, X, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 
+// Modern Minimal Loader Component
+const PageLoader = () => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          // Simulate loading progress with easing
+          return prev + (100 - prev) * 0.1;
+        });
+      }, 50);
+
+      return () => clearInterval(interval);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/95 backdrop-blur-sm">
+      <div className="text-center">
+        {/* Percentage Counter */}
+        <div className="text-7xl font-light text-brand-charcoal mb-2 font-heading">
+          {Math.min(100, Math.round(progress))}%
+        </div>
+
+        {/* Loading Text */}
+        <div className="text-sm uppercase tracking-[0.3em] text-brand-gold font-medium">
+          LOADING
+        </div>
+
+        {/* Minimal Progress Bar */}
+        <div className="w-48 h-[1px] bg-gray-200 mt-6 mx-auto overflow-hidden">
+          <div
+            className="h-full bg-brand-gold transition-all duration-300 ease-out"
+            style={{ width: `${Math.min(100, progress)}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -27,10 +76,30 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu when route changes
+  // Handle route changes with loader
   useEffect(() => {
     setIsMobileMenuOpen(false);
+
+    // Show loader on route change
+    setIsLoading(true);
+
+    // Simulate loading time (you can adjust this based on actual loading needs)
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
   }, [location]);
+
+  // Show loader on initial page load
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const navLinkStyle = ({ isActive }) =>
     `relative text-sm font-medium tracking-wide transition-colors duration-300 after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-brand-gold after:transition-all after:duration-300 hover:after:w-full ${
@@ -50,6 +119,9 @@ const Header = () => {
 
   return (
     <>
+      {/* Page Loader */}
+      {isLoading && <PageLoader />}
+
       {/* TOP BAR - Optional but adds premium feel */}
       {!isScrolled && (
         <div className="hidden lg:block fixed top-0 left-0 w-full bg-black/30 backdrop-blur-sm text-white/80 text-xs py-2 z-50">
@@ -69,37 +141,49 @@ const Header = () => {
         <div className="container mx-auto section-px">
           <div className="flex items-center justify-between">
             {/* LOGO */}
-            <Link to="/" className="relative z-10">
+            <Link
+              to="/"
+              className="relative z-10 flex items-center gap-3 group"
+            >
               <img
                 src={BRAND.logo}
                 alt={BRAND.name}
-                className={`h-10 md:h-12 object-contain transition-all duration-300 ${
+                className={`h-12 md:h-14 object-contain transition-all duration-300 ${
                   isScrolled ? "brightness-100" : "brightness-0 invert"
                 }`}
               />
+
+              <span
+                className={`italic font-heading text-lg md:text-2xl tracking-wide transition-colors duration-300 ${
+                  isScrolled ? "text-brand-charcoal" : "text-white"
+                }`}
+              >
+                - KK <span className="text-brand-gold">Enterprises</span>
+              </span>
             </Link>
 
-            {/* DESKTOP MENU - RESTRUCTURED */}
+            {/* DESKTOP MENU - WITH EVEN SPACING */}
             <div className="hidden lg:block">
               <NavigationMenu>
-                <NavigationMenuList className="flex gap-1 lg:gap-2 xl:gap-4">
-                  {/* Primary Navigation Items */}
-                  <NavigationMenuItem>
+                <NavigationMenuList className="flex items-center">
+                  {/* HOME - Fixed width for even spacing */}
+                  <NavigationMenuItem className="w-24 flex justify-center">
                     <NavLink to="/" className={navLinkStyle} end>
                       HOME
                     </NavLink>
                   </NavigationMenuItem>
 
-                  <NavigationMenuItem>
-                    <NavLink to="/about" className={navLinkStyle}>
-                      ABOUT
+                  {/* PORTFOLIO - Fixed width for even spacing */}
+                  <NavigationMenuItem className="w-24 flex justify-center">
+                    <NavLink to="/portfolio" className={navLinkStyle}>
+                      PORTFOLIO
                     </NavLink>
                   </NavigationMenuItem>
 
-                  {/* SERVICES Dropdown - Main Link */}
-                  <NavigationMenuItem>
+                  {/* SERVICES Dropdown - Fixed width for even spacing */}
+                  <NavigationMenuItem className="w-28 flex justify-center">
                     <NavigationMenuTrigger
-                      className={`bg-transparent px-3 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
+                      className={`bg-transparent px-0 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
                         isScrolled ? "text-gray-800" : "text-white"
                       }`}
                     >
@@ -113,7 +197,6 @@ const Header = () => {
                             to="/furniture-interior-services"
                             className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
                             onClick={() => {
-                              // Force close dropdown by triggering a click outside
                               document.body.click();
                             }}
                           >
@@ -209,46 +292,48 @@ const Header = () => {
                     </NavigationMenuContent>
                   </NavigationMenuItem>
 
-                  {/* COMPANY Dropdown - For less important links */}
-                  <NavigationMenuItem>
+                  {/* COMPANY Dropdown - Fixed width for even spacing */}
+                  <NavigationMenuItem className="w-28 flex justify-center">
                     <NavigationMenuTrigger
-                      className={`bg-transparent px-3 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
+                      className={`bg-transparent px-0 py-2 text-sm font-medium tracking-wide hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent ${
                         isScrolled ? "text-gray-800" : "text-white"
                       }`}
                     >
                       COMPANY
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <div className="w-140 p-2 bg-white rounded-lg shadow-xl border border-gray-100">
-                        <div className="flex space-x-2">
-                          {/* Card 1 */}
+                      <div className="w-180 p-2 bg-white rounded-lg shadow-xl border border-gray-100">
+                        <div className="grid grid-cols-3 gap-2">
+                          {/* About Card */}
                           <NavLink
-                            to="/portfolio"
-                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            to="/about"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
                             onClick={() => {
                               document.body.click();
                             }}
                           >
                             <div className="relative overflow-hidden rounded-md mb-2">
                               <img
-                                src="https://i.ytimg.com/vi/TwYKwaEjJd4/maxresdefault.jpg"
-                                alt="Portfolio"
-                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGFib3V0JTIwdXN8ZW58MHx8MHx8fDA%3D"
+                                alt="About Us"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                             </div>
                             <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
-                              Portfolio
+                              About Us
                             </span>
                             <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
-                              Our featured projects
+                              Our story & mission
                             </p>
                           </NavLink>
 
-                          {/* Card 2 */}
+                          
+
+                          {/* Achievements Card */}
                           <NavLink
                             to="/achievement"
-                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
                             onClick={() => {
                               document.body.click();
                             }}
@@ -257,7 +342,7 @@ const Header = () => {
                               <img
                                 src="https://thumbs.dreamstime.com/b/achievements-complex-like-puzzle-pictured-as-word-pieces-being-complicated-topic-to-show-needs-cooperating-fit-377102762.jpg"
                                 alt="Achievements"
-                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                             </div>
@@ -269,10 +354,10 @@ const Header = () => {
                             </p>
                           </NavLink>
 
-                          {/* Card 3 */}
+                          {/* Blog Card */}
                           <NavLink
                             to="/blog"
-                            className="flex-1 block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
                             onClick={() => {
                               document.body.click();
                             }}
@@ -281,7 +366,7 @@ const Header = () => {
                               <img
                                 src="https://plus.unsplash.com/premium_photo-1720744786849-a7412d24ffbf?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YmxvZ3xlbnwwfHwwfHx8MA%3D%3D"
                                 alt="Blog"
-                                className="w-full h-24 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                             </div>
@@ -292,16 +377,33 @@ const Header = () => {
                               Insights & updates
                             </p>
                           </NavLink>
+
+                          {/* Contact Card */}
+                          <NavLink
+                            to="/contact"
+                            className="block bg-white rounded-lg border border-gray-100 shadow hover:shadow-md transition-all duration-300 hover:scale-[1.02] hover:border-brand-gold/30 group p-2"
+                            onClick={() => {
+                              document.body.click();
+                            }}
+                          >
+                            <div className="relative overflow-hidden rounded-md mb-2">
+                              <img
+                                src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29udGFjdCUyMHVzfGVufDB8fDB8fHww"
+                                alt="Contact Us"
+                                className="w-full h-20 object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-brand-gold transition-colors duration-300">
+                              Contact Us
+                            </span>
+                            <p className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-700 transition-colors duration-300">
+                              Get in touch with us
+                            </p>
+                          </NavLink>
                         </div>
                       </div>
                     </NavigationMenuContent>
-                  </NavigationMenuItem>
-
-                  {/* CONTACT - Primary Link */}
-                  <NavigationMenuItem>
-                    <NavLink to="/contact" className={navLinkStyle}>
-                      CONTACT
-                    </NavLink>
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>
@@ -353,7 +455,7 @@ const Header = () => {
                       </button>
                     </div>
 
-                    {/* Mobile Navigation Links - RESTRUCTURED */}
+                    {/* Mobile Navigation Links */}
                     <div className="flex-1 overflow-y-auto py-6 px-4">
                       <div className="space-y-1">
                         <NavLink
@@ -366,11 +468,11 @@ const Header = () => {
                         </NavLink>
 
                         <NavLink
-                          to="/about"
+                          to="/portfolio"
                           className={mobileNavStyle}
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          ABOUT
+                          PORTFOLIO
                         </NavLink>
 
                         {/* Services Section */}
@@ -420,11 +522,11 @@ const Header = () => {
                         </div>
 
                         <NavLink
-                          to="/portfolio"
+                          to="/about"
                           className={mobileNavStyle}
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
-                          PORTFOLIO
+                          ABOUT
                         </NavLink>
 
                         <NavLink

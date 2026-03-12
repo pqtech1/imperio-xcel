@@ -52,7 +52,7 @@ const Contacts = () => {
       city: "Varanasi (Head Office)",
       address: ["Coraut Bazar, Kotwa Lohata", "Varanasi - 221107"],
       phones: ["+91-6393556220", "+91-9935550330"],
-      email: "kkentp2018@gmail.com",
+      email: "info@interioxcel.com",
     },
   ];
 
@@ -108,7 +108,7 @@ const Contacts = () => {
                 <h3 className="text-base font-bold text-gray-800 mb-1">
                   Message Sent!
                 </h3>
-                <p className="text-xs text-gray-600">
+                <p className=" text-gray-600">
                   Thank you for reaching out. We'll get back to you within 24
                   hours.
                 </p>
@@ -124,14 +124,14 @@ const Contacts = () => {
                     onFocus={() => setActiveField("name")}
                     onBlur={() => setActiveField(null)}
                     required
-                    className="w-full border-b border-gray-300 bg-transparent text-xs text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors peer"
+                    className="w-full border-b border-gray-300 bg-transparent  text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors peer"
                     placeholder=" "
                   />
                   <label
-                    className={`absolute left-0 text-[10px] tracking-widest text-gray-500 transition-all duration-300 ${
+                    className={`absolute left-0  tracking-widest text-gray-500 transition-all duration-300 ${
                       activeField === "name" || form.name
-                        ? "-top-4 text-[10px] text-brand-gold-light"
-                        : "top-2.5 text-xs"
+                        ? "-top-4  text-brand-gold-light"
+                        : "top-2.5 "
                     }`}
                   >
                     YOUR NAME *
@@ -147,14 +147,14 @@ const Contacts = () => {
                     onFocus={() => setActiveField("email")}
                     onBlur={() => setActiveField(null)}
                     required
-                    className="w-full border-b border-gray-300 bg-transparent text-xs text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors"
+                    className="w-full border-b border-gray-300 bg-transparent  text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors"
                     placeholder=" "
                   />
                   <label
-                    className={`absolute left-0 text-[10px] tracking-widest text-gray-500 transition-all duration-300 ${
+                    className={`absolute left-0  tracking-widest text-gray-500 transition-all duration-300 ${
                       activeField === "email" || form.email
-                        ? "-top-4 text-[10px] text-brand-gold-light"
-                        : "top-2.5 text-xs"
+                        ? "-top-4  text-brand-gold-light"
+                        : "top-2.5 "
                     }`}
                   >
                     YOUR EMAIL *
@@ -170,14 +170,14 @@ const Contacts = () => {
                     onFocus={() => setActiveField("phone")}
                     onBlur={() => setActiveField(null)}
                     required
-                    className="w-full border-b border-gray-300 bg-transparent text-xs text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors"
+                    className="w-full border-b border-gray-300 bg-transparent  text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors"
                     placeholder=" "
                   />
                   <label
-                    className={`absolute left-0 text-[10px] tracking-widest text-gray-500 transition-all duration-300 ${
+                    className={`absolute left-0  tracking-widest text-gray-500 transition-all duration-300 ${
                       activeField === "phone" || form.phone
-                        ? "-top-4 text-[10px] text-brand-gold-light"
-                        : "top-2.5 text-xs"
+                        ? "-top-4  text-brand-gold-light"
+                        : "top-2.5 "
                     }`}
                   >
                     YOUR PHONE *
@@ -191,7 +191,7 @@ const Contacts = () => {
                     onChange={handleChange}
                     onFocus={() => setActiveField("projectType")}
                     onBlur={() => setActiveField(null)}
-                    className="w-full border-b border-gray-300 bg-transparent text-xs text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors appearance-none cursor-pointer"
+                    className="w-full border-b border-gray-300 bg-transparent  text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors appearance-none cursor-pointer"
                   >
                     <option value="" disabled hidden></option>
                     {projectTypes.map((type) => (
@@ -201,10 +201,10 @@ const Contacts = () => {
                     ))}
                   </select>
                   <label
-                    className={`absolute left-0 text-[10px] tracking-widest text-gray-500 transition-all duration-300 ${
+                    className={`absolute left-0  tracking-widest text-gray-500 transition-all duration-300 ${
                       activeField === "projectType" || form.projectType
-                        ? "-top-4 text-[10px] text-brand-gold-light"
-                        : "top-2.5 text-xs"
+                        ? "-top-4  text-brand-gold-light"
+                        : "top-2.5 "
                     }`}
                   >
                     PROJECT TYPE *
@@ -220,14 +220,14 @@ const Contacts = () => {
                     onBlur={() => setActiveField(null)}
                     rows={3}
                     required
-                    className="w-full border-b border-gray-300 bg-transparent text-xs text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors resize-none"
+                    className="w-full border-b border-gray-300 bg-transparent  text-gray-700 py-2.5 outline-none focus:border-brand-gold-light transition-colors resize-none"
                     placeholder=" "
                   />
                   <label
-                    className={`absolute left-0 text-[10px] tracking-widest text-gray-500 transition-all duration-300 ${
+                    className={`absolute left-0  tracking-widest text-gray-500 transition-all duration-300 ${
                       activeField === "message" || form.message
-                        ? "-top-4 text-[10px] text-brand-gold-light"
-                        : "top-2.5 text-xs"
+                        ? "-top-4  text-brand-gold-light"
+                        : "top-2.5 "
                     }`}
                   >
                     YOUR MESSAGE *
@@ -237,7 +237,7 @@ const Contacts = () => {
                 <div className="mt-4">
                   <button
                     type="submit"
-                    className="group bg-brand-gold-light hover:bg-brand-gold text-white text-[10px] font-bold tracking-widest px-6 py-3 transition-all duration-300 flex items-center gap-2"
+                    className="group bg-brand-gold-light hover:bg-brand-gold text-white  font-bold tracking-widest px-6 py-3 transition-all duration-300 flex items-center gap-2"
                   >
                     SEND MESSAGE
                     <PaperAirplaneIcon className="w-3.5 h-3.5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
@@ -262,7 +262,7 @@ const Contacts = () => {
           </div>
 
           <div className="relative z-10 max-w-xl mx-auto lg:mx-0">
-            <p className="text-brand-gold-light text-[10px] tracking-widest mb-2 uppercase">
+            <p className="text-brand-gold-light  tracking-widest mb-2 uppercase">
               CONTACT INFORMATION
             </p>
             <h2 className="text-white !text-2xl md:!text-3xl !mb-6">
@@ -277,13 +277,13 @@ const Contacts = () => {
                     <BuildingOfficeIcon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-white text-[10px] font-bold tracking-widest uppercase mb-1">
+                    <p className="text-white  font-bold tracking-widest uppercase mb-1">
                       {office.city}
                     </p>
                     {office.address.map((line, i) => (
                       <p
                         key={i}
-                        className="text-gray-300 text-xs leading-relaxed"
+                        className="text-gray-300  leading-relaxed"
                       >
                         {line}
                       </p>
@@ -297,11 +297,11 @@ const Contacts = () => {
                     <PhoneIcon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-white text-[10px] font-bold tracking-widest uppercase mb-1">
+                    <p className="text-white  font-bold tracking-widest uppercase mb-1">
                       Call Us
                     </p>
                     {office.phones.map((phone, i) => (
-                      <p key={i} className="text-gray-300 text-xs">
+                      <p key={i} className="text-gray-300 ">
                         {phone}
                       </p>
                     ))}
@@ -314,10 +314,10 @@ const Contacts = () => {
                     <EnvelopeIcon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-white text-[10px] font-bold tracking-widest uppercase mb-1">
+                    <p className="text-white  font-bold tracking-widest uppercase mb-1">
                       Email Us
                     </p>
-                    <p className="text-gray-300 text-xs">{office.email}</p>
+                    <p className="text-gray-300 ">{office.email}</p>
                   </div>
                 </div>
               </div>
@@ -329,13 +329,13 @@ const Contacts = () => {
                 <ClockIcon className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-white text-[10px] font-bold tracking-widest uppercase mb-2">
+                <p className="text-white  font-bold tracking-widest uppercase mb-2">
                   Business Hours
                 </p>
                 {businessHours.map((item, i) => (
                   <div
                     key={i}
-                    className="flex justify-between gap-6 text-xs mb-1"
+                    className="flex justify-between gap-6  mb-1"
                   >
                     <span className="text-gray-300">{item.day}</span>
                     <span className="text-gray-300">{item.hours}</span>
@@ -346,7 +346,7 @@ const Contacts = () => {
 
             {/* Quick Response Guarantee */}
             <div className="bg-white/10 backdrop-blur-sm p-3 rounded border border-white/20 mb-6">
-              <p className="text-white text-xs">
+              <p className="text-white ">
                 <span className="text-brand-gold-light font-bold">⏤</span> We
                 typically respond within 24 hours on business days.
               </p>
@@ -378,21 +378,21 @@ const Contacts = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
             <div className="text-center">
               <div className="text-xl font-bold text-brand-gold-light">7+</div>
-              <div className="text-[10px] text-gray-500">Years Experience</div>
+              <div className=" text-gray-500">Years Experience</div>
             </div>
             <div className="text-center">
               <div className="text-xl font-bold text-brand-gold-light">50+</div>
-              <div className="text-[10px] text-gray-500">
+              <div className=" text-gray-500">
                 Projects Completed
               </div>
             </div>
             <div className="text-center">
               <div className="text-xl font-bold text-brand-gold-light">40+</div>
-              <div className="text-[10px] text-gray-500">Bank Models</div>
+              <div className=" text-gray-500">Bank Models</div>
             </div>
             <div className="text-center">
               <div className="text-xl font-bold text-brand-gold-light">8+</div>
-              <div className="text-[10px] text-gray-500">Districts</div>
+              <div className=" text-gray-500">Districts</div>
             </div>
           </div>
         </div>
@@ -401,7 +401,7 @@ const Contacts = () => {
       {/* Map Section */}
       <div className="w-full h-[350px] relative">
         <iframe
-          title="ImperioXcel Location - Varanasi"
+          title="InterioXcel Location - Varanasi"
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28860.88385283898!2d82.95606995!3d25.317645!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2f3b3f3b3f3b%3A0x1234567890abcdef!2sVaranasi%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
           width="100%"
           height="100%"
@@ -415,7 +415,7 @@ const Contacts = () => {
         <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded shadow">
           <div className="flex items-center gap-1.5">
             <MapPinIcon className="w-3.5 h-3.5 text-brand-gold-light" />
-            <span className="text-[10px] font-medium">
+            <span className=" font-medium">
               Varanasi Head Office
             </span>
           </div>
@@ -426,10 +426,10 @@ const Contacts = () => {
       <div className="bg-gray-50 py-8">
         <div className="container mx-auto section-px text-center">
           <h3 className="text-sm font-bold mb-1">Frequently Asked Questions</h3>
-          <p className="text-xs text-gray-600 mb-3">
+          <p className=" text-gray-600 mb-3">
             Find answers to common questions about our services and process
           </p>
-          <button className="text-brand-gold-light hover:text-brand-gold text-xs font-medium inline-flex items-center gap-1">
+          <button className="text-brand-gold-light hover:text-brand-gold  font-medium inline-flex items-center gap-1">
             Visit our FAQ page
             <span className="text-sm">→</span>
           </button>

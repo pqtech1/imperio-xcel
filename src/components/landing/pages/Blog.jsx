@@ -170,7 +170,7 @@ const BlogCard = ({ post }) => {
           } ${hovered ? "scale-105" : "scale-100"}`}
         />
         {post.featured && (
-          <div className="absolute top-2 left-2 bg-brand-gold-light text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">
+          <div className="absolute top-2 left-2 bg-brand-gold-light text-white  px-2 py-0.5 rounded-full font-semibold">
             Featured
           </div>
         )}
@@ -204,7 +204,7 @@ const BlogCard = ({ post }) => {
           </div>
         </div>
 
-        <h3 className="text-sm font-bold leading-snug hover:text-brand-gold-light cursor-pointer transition-colors line-clamp-2">
+        <h3 className=" font-bold leading-snug hover:text-brand-gold-light cursor-pointer transition-colors line-clamp-2">
           {post.title}
         </h3>
 
@@ -233,7 +233,7 @@ const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
     <button
       onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
       disabled={currentPage === 1}
-      className={`w-7 h-7 text-xs font-medium transition-all duration-300 rounded flex items-center justify-center ${
+      className={`w-7 h-7  font-medium transition-all duration-300 rounded flex items-center justify-center ${
         currentPage === 1
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
@@ -246,7 +246,7 @@ const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
       <button
         key={page}
         onClick={() => setCurrentPage(page)}
-        className={`w-7 h-7 text-xs font-medium transition-all duration-300 rounded ${
+        className={`w-7 h-7  font-medium transition-all duration-300 rounded ${
           currentPage === page
             ? "bg-brand-gold-light text-white"
             : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
@@ -259,7 +259,7 @@ const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
     <button
       onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
       disabled={currentPage === totalPages}
-      className={`w-7 h-7 text-xs font-medium transition-all duration-300 rounded flex items-center justify-center ${
+      className={`w-7 h-7  font-medium transition-all duration-300 rounded flex items-center justify-center ${
         currentPage === totalPages
           ? "text-gray-300 cursor-not-allowed"
           : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
@@ -314,7 +314,7 @@ const Blog = () => {
               <h1 className="text-white !mb-2">Our Blog</h1>
               <p className="text-gray-200 !mb-0">
                 Industry insights, project case studies, and design inspiration
-                from the ImperioXcel team
+                from the InterioXcel team
               </p>
             </div>
           </div>
@@ -329,7 +329,7 @@ const Blog = () => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <SparklesIcon className="w-4 h-4 text-brand-gold-light" />
-                <span className="text-xs text-gray-600">
+                <span className=" text-gray-600">
                   <strong className="text-brand-charcoal">
                     {blogPosts.length} articles
                   </strong>{" "}
@@ -344,7 +344,7 @@ const Blog = () => {
                   placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-brand-gold-light"
+                  className="w-full px-3 py-1.5  border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-brand-gold-light"
                 />
               </div>
             </div>
@@ -359,7 +359,7 @@ const Blog = () => {
                   setSelectedCategory(category);
                   setCurrentPage(1);
                 }}
-                className={`px-3 py-1.5 text-[10px] font-medium rounded-full transition-all duration-300 ${
+                className={`px-3 py-1.5  font-medium rounded-full transition-all duration-300 ${
                   selectedCategory === category
                     ? "bg-brand-gold-light text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -395,20 +395,20 @@ const Blog = () => {
                     </div>
                     <div className="md:w-2/3">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="bg-brand-gold-light text-white text-[10px] px-2 py-0.5 rounded-full">
+                        <span className="bg-brand-gold-light text-white  px-2 py-0.5 rounded-full">
                           FEATURED
                         </span>
-                        <span className="text-[10px] text-gray-300">
+                        <span className=" text-gray-300">
                           Latest Article
                         </span>
                       </div>
                       <h2 className="text-white text-base md:text-lg font-bold mb-2">
                         {blogPosts[0].title}
                       </h2>
-                      <p className="text-gray-300 text-xs mb-3">
+                      <p className="text-gray-300  mb-3">
                         {blogPosts[0].excerpt}
                       </p>
-                      <button className="flex items-center gap-1 text-brand-gold-light hover:text-white transition-colors duration-300 text-xs font-medium">
+                      <button className="flex items-center gap-1 text-brand-gold-light hover:text-white transition-colors duration-300  font-medium">
                         Read Full Article <ArrowRightIcon className="w-3 h-3" />
                       </button>
                     </div>
@@ -426,7 +426,7 @@ const Blog = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-xs text-gray-500">
+              <p className=" text-gray-500">
                 No articles found matching your criteria.
               </p>
             </div>
@@ -443,7 +443,7 @@ const Blog = () => {
 
           {/* Topics Cloud */}
           <div className="mt-10 pt-6 border-t border-gray-200">
-            <h3 className="text-xs font-semibold text-center mb-3">
+            <h3 className=" font-semibold text-center mb-3">
               POPULAR TOPICS
             </h3>
             <div className="flex flex-wrap justify-center gap-1.5">
@@ -459,7 +459,7 @@ const Blog = () => {
               ].map((topic) => (
                 <span
                   key={topic}
-                  className="px-2 py-1 bg-gray-100 text-gray-600 text-[10px] rounded-full hover:bg-brand-gold-light hover:text-white cursor-pointer transition-colors duration-300"
+                  className="px-2 py-1 bg-gray-100 text-gray-600  rounded-full hover:bg-brand-gold-light hover:text-white cursor-pointer transition-colors duration-300"
                 >
                   {topic}
                 </span>

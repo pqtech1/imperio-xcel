@@ -124,7 +124,7 @@ const About = () => {
         <div className="absolute inset-0">
           <img
             src="https://images.pexels.com/photos/2029665/pexels-photo-2029665.jpeg"
-            alt="About ImperioXcel"
+            alt="About InterioXcel"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-charcoal/90 via-brand-charcoal/70 to-transparent" />
@@ -159,7 +159,7 @@ const About = () => {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 text-xs tracking-widest"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 text-base tracking-widest"
         >
           SCROLL
         </motion.div>
@@ -198,8 +198,8 @@ const About = () => {
                         <Icon className="w-4 h-4 text-brand-gold-light" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-sm">{value.title}</h4>
-                        <p className="text-xs text-gray-500">{value.desc}</p>
+                        <h4 className="font-semibold text-base">{value.title}</h4>
+                        <p className="text-base text-gray-500">{value.desc}</p>
                       </div>
                     </div>
                   );
@@ -221,8 +221,8 @@ const About = () => {
                       <div className="w-10 h-10 bg-brand-gold-light/10 rounded-lg flex items-center justify-center mb-3">
                         <Icon className="w-5 h-5 text-brand-gold-light" />
                       </div>
-                      <h4 className="font-bold text-sm mb-1">{value.title}</h4>
-                      <p className="text-xs text-gray-500">{value.desc}</p>
+                      <h4 className="font-bold text-base mb-1">{value.title}</h4>
+                      <p className="text-base text-gray-500">{value.desc}</p>
                     </div>
                   );
                 })}
@@ -233,7 +233,7 @@ const About = () => {
                     "Adherence to values and principles of honesty and
                     transparency"
                   </p>
-                  <h6 className="!text-brand-gold-light !text-xs !mb-0">
+                  <h6 className="!text-brand-gold-light !text-base !mb-0">
                     — Mrs. Meera Ramesh Vishwakarma, Founder
                   </h6>
                 </div>
@@ -266,7 +266,7 @@ const About = () => {
                     </div>
                     <div>
                       <p className="text-xl font-bold">50+</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-base text-gray-500">
                         Projects Delivered
                       </p>
                     </div>
@@ -277,7 +277,7 @@ const About = () => {
                     </div>
                     <div>
                       <p className="text-xl font-bold">8+</p>
-                      <p className="text-xs text-gray-500">Districts Covered</p>
+                      <p className="text-base text-gray-500">Districts Covered</p>
                     </div>
                   </div>
                 </div>
@@ -298,7 +298,7 @@ const About = () => {
               <div className="w-16 h-[2px] bg-brand-gold-light mb-6" />
 
               <p className="!mb-4">
-                ImperioXcel, established by{" "}
+                InterioXcel, established by{" "}
                 <span className="font-semibold">
                   Mrs. Meera Ramesh Vishwakarma
                 </span>{" "}
@@ -321,15 +321,15 @@ const About = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                   <EyeIcon className="w-6 h-6 text-brand-gold-light mb-2" />
-                  <h4 className="font-bold text-sm mb-1">Our Vision</h4>
-                  <p className="text-xs text-gray-500">
+                  <h4 className="font-bold text-base mb-1">Our Vision</h4>
+                  <p className="text-base text-gray-500">
                     To be among the top of our field in interior design
                   </p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                   <EyeIcon className="w-6 h-6 text-brand-gold-light mb-2" />
-                  <h4 className="font-bold text-sm mb-1">Our Mission</h4>
-                  <p className="text-xs text-gray-500">
+                  <h4 className="font-bold text-base mb-1">Our Mission</h4>
+                  <p className="text-base text-gray-500">
                     To be professional and committed in achieving client quality
                   </p>
                 </div>
@@ -368,15 +368,15 @@ const About = () => {
                 >
                   <div className="relative z-10">
                     <div className="w-14 h-14 mx-auto mb-3 bg-brand-gold-light/10 rounded-full flex items-center justify-center">
-                      <h6 className="!text-brand-gold !text-sm !mb-0">
+                      <h6 className="!text-brand-gold !text-base !mb-0">
                         {milestone.year}
                       </h6>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow border border-gray-100">
-                      <h4 className="font-bold text-sm mb-1">
+                      <h4 className="font-bold text-base mb-1">
                         {milestone.title}
                       </h4>
-                      <p className="text-xs text-gray-500">{milestone.desc}</p>
+                      <p className="text-base text-gray-500">{milestone.desc}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -416,7 +416,7 @@ const About = () => {
                   <div className="text-2xl md:text-3xl font-bold text-brand-gold-light mb-1">
                     {stat.value}
                   </div>
-                  <p className="text-xs text-gray-400">{stat.label}</p>
+                  <p className="text-base text-gray-400">{stat.label}</p>
                 </motion.div>
               );
             })}
@@ -452,8 +452,8 @@ const About = () => {
                   <div className="w-14 h-14 mx-auto mb-3 bg-brand-gold-light/10 rounded-lg flex items-center justify-center group-hover:bg-brand-gold-light transition-colors duration-500">
                     <Icon className="w-6 h-6 text-brand-gold-light group-hover:text-white" />
                   </div>
-                  <h4 className="font-bold text-sm mb-1">{item.area}</h4>
-                  <h6 className="!text-brand-gold !text-xs !mb-0">
+                  <h4 className="font-bold text-base mb-1">{item.area}</h4>
+                  <h6 className="!text-brand-gold !text-base !mb-0">
                     {item.projects}
                   </h6>
                 </motion.div>
@@ -493,7 +493,7 @@ const About = () => {
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 className="bg-amber-50/50 p-4 rounded-lg text-center border border-gray-100 hover:border-brand-gold-light transition-colors duration-300"
               >
-                <p className="font-semibold text-xs">{brand}</p>
+                <p className="font-semibold text-base">{brand}</p>
               </motion.div>
             ))}
           </div>
@@ -510,18 +510,18 @@ const About = () => {
                 <h3 className="text-lg font-bold mb-1">
                   KASHI GOMATI SAMYUKT GRAMEEN BANK
                 </h3>
-                <p className="text-xs text-gray-300">
+                <p className="text-base text-gray-300">
                   Successfully delivered 40+ bank models across 8 districts
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="text-center">
                   <p className="text-xl font-bold text-brand-gold-light">40+</p>
-                  <p className="text-xs text-gray-400">Bank Models</p>
+                  <p className="text-base text-gray-400">Bank Models</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl font-bold text-brand-gold-light">8</p>
-                  <p className="text-xs text-gray-400">Districts</p>
+                  <p className="text-base text-gray-400">Districts</p>
                 </div>
               </div>
             </div>
@@ -592,12 +592,12 @@ const About = () => {
                 <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
 
                 {/* Role */}
-                <h6 className="!text-brand-gold-light !text-xs !mb-2">
+                <h6 className="!text-brand-gold-light !text-base !mb-2">
                   {member.role}
                 </h6>
 
                 {/* Description */}
-                <p className="text-xs text-gray-500">{member.desc}</p>
+                <p className="text-base text-gray-500">{member.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -616,12 +616,18 @@ const About = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
-                <p className="text-white text-sm font-semibold">TATA AIG LIFE INSURANCE</p>
-                <p className="text-white text-xs text-gray-300">Robertsgang, Sonbhadra</p>
+                <p className="text-white text-base font-semibold">
+                  TATA AIG LIFE INSURANCE
+                </p>
+                <p className="text-white text-base text-gray-300">
+                  Robertsgang, Sonbhadra
+                </p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/20">
-                <p className="text-white text-sm font-semibold">NYKAA LUX</p>
-                <p className="text-white text-xs text-gray-300">HLP Galleria, Mohali</p>
+                <p className="text-white text-base font-semibold">NYKAA LUX</p>
+                <p className="text-white text-base text-gray-300">
+                  HLP Galleria, Mohali
+                </p>
               </div>
             </div>
           </div>
@@ -656,15 +662,15 @@ const About = () => {
               <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
                 <div className="flex items-center gap-2">
                   <PhoneIcon className="w-4 h-4 text-brand-gold-light" />
-                  <span className="text-sm">+91-6393556220</span>
+                  <span className="text-base">+91-6393556220</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <EnvelopeIcon className="w-4 h-4 text-brand-gold-light" />
-                  <span className="text-sm">kkentp2018@gmail.com</span>
+                  <span className="text-base">info@interioxcel.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPinIcon className="w-4 h-4 text-brand-gold-light" />
-                  <span className="text-sm">Varanasi, Uttar Pradesh</span>
+                  <span className="text-base">Varanasi, Uttar Pradesh</span>
                 </div>
               </div>
             </motion.div>

@@ -180,7 +180,7 @@ const Turnkey = () => {
               <div className="w-16 h-[2px] bg-brand-gold-light mb-4" />
               <p className="text-gray-600 !mb-3">
                 <strong>
-                  ImperioXcel provides best turnkey interior solutions.
+                  InterioXcel provides best turnkey interior solutions.
                 </strong>{" "}
                 This type of solution is easy, effective, and cost-friendly for
                 homes, offices, retail sectors, and commercial spaces.
@@ -205,25 +205,25 @@ const Turnkey = () => {
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-4 h-4 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Single point of contact
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-4 h-4 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Better budget control
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-4 h-4 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Timely delivery guaranteed
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-4 h-4 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Expert vendor management
                   </span>
                 </li>
@@ -346,7 +346,7 @@ const Turnkey = () => {
                         <h3 className="text-base font-bold mb-1">
                           {benefit.title}
                         </h3>
-                        <p className="text-gray-600 text-xs leading-relaxed">
+                        <p className="text-gray-600 text-base leading-relaxed">
                           {benefit.desc}
                         </p>
                       </div>
@@ -370,7 +370,7 @@ const Turnkey = () => {
                 <span className="w-6 h-[2px] bg-brand-gold-light" />
                 Why You Should Go for Turnkey
               </h3>
-              <p className="text-gray-600 text-xs leading-relaxed mb-3">
+              <p className="text-gray-600 text-base leading-relaxed mb-3">
                 As it is the best option for your interior design project.
                 Whether you are starting a new project or simply applying
                 modifications to the current one, our turnkey solution provides:
@@ -378,25 +378,25 @@ const Turnkey = () => {
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Expert consultation on design ideas and requirements
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Personalized solutions tailored to your needs
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Complete project management from start to finish
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircleIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Quality assurance at every stage
                   </span>
                 </li>
@@ -414,13 +414,13 @@ const Turnkey = () => {
                 <span className="w-6 h-[2px] bg-brand-gold-light" />
                 Common Misconceptions
               </h3>
-              <p className="text-gray-600 text-xs leading-relaxed mb-3">
+              <p className="text-gray-600 text-base leading-relaxed mb-3">
                 One of the most seen misconceptions is that property owners
                 sometimes don't get the freedom to express themselves. But in
                 reality:
               </p>
               <div className="bg-amber-50/50 p-4 rounded-lg mb-3">
-                <p className="text-gray-700 text-xs italic">
+                <p className="text-gray-700 text-base italic">
                   "Turnkey projects are becoming more popular than self-managed
                   projects due to clear communication, one point of contact,
                   proper guidance, and dedication."
@@ -429,13 +429,13 @@ const Turnkey = () => {
               <ul className="space-y-1.5">
                 <li className="flex items-start gap-2">
                   <SparklesIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Full creative freedom with expert guidance
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <SparklesIcon className="w-3.5 h-3.5 text-brand-gold-light shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600">
+                  <span className="text-base text-gray-600">
                     Regular updates and transparent communication
                   </span>
                 </li>
@@ -472,12 +472,12 @@ const Turnkey = () => {
                         <div className="w-8 h-8 bg-brand-gold-light/10 rounded-lg flex items-center justify-center">
                           <Icon className="w-4 h-4 text-brand-gold-light" />
                         </div>
-                        <span className="text-xs font-semibold text-brand-gold-light tracking-wider">
+                        <span className="text-base font-semibold text-brand-gold-light tracking-wider">
                           {phase.phase}
                         </span>
                       </div>
                       <h3 className="font-bold text-sm mb-2">{phase.title}</h3>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <p className="text-base text-gray-600 leading-relaxed">
                         {phase.desc}
                       </p>
                     </div>
@@ -503,7 +503,7 @@ const Turnkey = () => {
               <h3 className="text-lg font-bold mb-1">
                 Completed Turnkey Projects
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-base text-gray-400">
                 Delivered with excellence across India
               </p>
             </div>
@@ -514,10 +514,10 @@ const Turnkey = () => {
                   <div className="text-xl font-bold text-brand-gold-light mb-1">
                     {project.count}+
                   </div>
-                  <div className="text-xs text-gray-400 mb-1">
+                  <div className="text-base text-gray-400 mb-1">
                     {project.type}
                   </div>
-                  <div className="text-xs font-semibold">{project.name}</div>
+                  <div className="text-base font-semibold">{project.name}</div>
                 </div>
               ))}
             </div>
@@ -547,7 +547,7 @@ const Turnkey = () => {
             <h3 className="text-lg font-bold mb-3">
               Ready for a Hassle-Free Interior Experience?
             </h3>
-            <p className="text-gray-600 text-xs mb-4 max-w-2xl mx-auto">
+            <p className="text-gray-600 text-base mb-4 max-w-2xl mx-auto">
               Let us handle your entire interior project from start to finish.
               Contact us for a free consultation.
             </p>

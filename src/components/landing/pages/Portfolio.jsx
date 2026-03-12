@@ -439,25 +439,25 @@ const Portfolio = () => {
                 <div className="text-xl font-bold text-brand-gold-light">
                   {totalProjects}+
                 </div>
-                <div className="text-xs text-gray-600">Total Projects</div>
+                <div className=" text-gray-600">Total Projects</div>
               </div>
               <div className="bg-amber-50/50 p-3 rounded-lg">
                 <div className="text-xl font-bold text-brand-gold-light">
                   {totalImages}+
                 </div>
-                <div className="text-xs text-gray-600">Images</div>
+                <div className=" text-gray-600">Images</div>
               </div>
               <div className="bg-amber-50/50 p-3 rounded-lg">
                 <div className="text-xl font-bold text-brand-gold-light">
                   40+
                 </div>
-                <div className="text-xs text-gray-600">Bank Models</div>
+                <div className=" text-gray-600">Bank Models</div>
               </div>
               <div className="bg-amber-50/50 p-3 rounded-lg">
                 <div className="text-xl font-bold text-brand-gold-light">
                   8+
                 </div>
-                <div className="text-xs text-gray-600">Districts</div>
+                <div className=" text-gray-600">Districts</div>
               </div>
             </div>
           </div>
@@ -466,7 +466,7 @@ const Portfolio = () => {
           <div className="flex flex-wrap justify-center gap-2 mb-6">
             <button
               onClick={() => setSelectedCategory("All")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 ${
+              className={`px-3 py-1.5  font-medium rounded-full transition-all duration-300 ${
                 selectedCategory === "All"
                   ? "bg-brand-gold-light text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -480,7 +480,7 @@ const Portfolio = () => {
                 <button
                   key={category.name}
                   onClick={() => setSelectedCategory(category.name)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 flex items-center gap-1 ${
+                  className={`px-3 py-1.5  font-medium rounded-full transition-all duration-300 flex items-center gap-1 ${
                     selectedCategory === category.name
                       ? "bg-brand-gold-light text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -497,7 +497,7 @@ const Portfolio = () => {
           <div className="flex flex-col md:flex-row gap-4 h-[500px]">
             {/* Left Side - Project Tabs with Scroll */}
             <div className="w-full md:w-1/3 lg:w-1/4 border border-gray-200 bg-gray-50 rounded-lg overflow-hidden">
-              <div className="p-3 text-sm font-semibold text-center border-b border-gray-200 bg-white">
+              <div className="p-3 text-base font-semibold text-center border-b border-gray-200 bg-white">
                 <span className="text-brand-gold-light">
                   {filteredProjects.length}
                 </span>{" "}
@@ -511,7 +511,7 @@ const Portfolio = () => {
                     <button
                       key={project.name}
                       onClick={() => setActiveProject(project.name)}
-                      className={`w-full text-left px-3 py-2 mb-1 text-xs font-medium transition-all duration-200 rounded-md ${
+                      className={`w-full text-left px-3 py-2 mb-1  font-medium transition-all duration-200 rounded-md ${
                         activeProject === project.name
                           ? "bg-brand-gold-light text-white shadow"
                           : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
@@ -519,11 +519,11 @@ const Portfolio = () => {
                     >
                       <div className="flex flex-col">
                         <div className="flex justify-between items-center mb-0.5">
-                          <span className="truncate font-semibold text-xs">
+                          <span className="truncate font-semibold ">
                             {project.name}
                           </span>
                           <span
-                            className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                            className={`ml-2  px-1.5 py-0.5 rounded-full ${
                               activeProject === project.name
                                 ? "bg-white/20 text-white"
                                 : "bg-gray-200 text-gray-600"
@@ -532,11 +532,11 @@ const Portfolio = () => {
                             {project.images.length}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1 text-xs opacity-80">
+                        <div className="flex items-center gap-1  opacity-80">
                           {CategoryIcon && (
                             <CategoryIcon className="w-2.5 h-2.5" />
                           )}
-                          <span className="truncate text-[10px]">
+                          <span className="truncate ">
                             {project.locations[0]}
                           </span>
                         </div>
@@ -555,14 +555,11 @@ const Portfolio = () => {
                     <h2 className="text-base font-bold text-brand-charcoal">
                       {currentProject.name}
                     </h2>
-                    <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
+                    <div className="flex items-center justify-center gap-1  text-gray-500">
                       <MapPinIcon className="w-3 h-3 text-brand-gold-light" />
                       <span>{currentProject.locations.join(" • ")}</span>
                     </div>
-                    <p className="text-text-main/60 text-[10px] mt-0.5">
-                      {currentProject.images.length} image
-                      {currentProject.images.length > 1 ? "s" : ""}
-                    </p>
+                  
                   </div>
 
                   <div className="flex-1 relative bg-gray-100 rounded-lg overflow-hidden">
@@ -594,16 +591,16 @@ const Portfolio = () => {
 
                                 {/* Hover overlay */}
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                                  <span className="bg-white/90 text-brand-charcoal px-3 py-1.5 rounded-full text-xs font-medium transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow flex items-center gap-1">
+                                  <span className="bg-white/90 text-brand-charcoal px-3 py-1.5 rounded-full  font-medium transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow flex items-center gap-1">
                                     <span>Click to expand</span>
-                                    <span className="text-brand-gold-light text-sm">
+                                    <span className="text-brand-gold-light text-base">
                                       +
                                     </span>
                                   </span>
                                 </div>
 
                                 {/* Image counter badge */}
-                                <div className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                <div className="absolute top-1 right-1 bg-black/60 text-white  px-1.5 py-0.5 rounded-full">
                                   {index + 1} / {currentProject.images.length}
                                 </div>
                               </div>
@@ -627,7 +624,7 @@ const Portfolio = () => {
                 <TrophyIcon className="w-8 h-8 text-brand-gold-light" />
                 <div>
                   <h3 className="text-base font-bold mb-1">Key Achievements</h3>
-                  <p className="text-xs text-gray-300">
+                  <p className=" text-gray-300">
                     Major projects delivered across multiple sectors
                   </p>
                 </div>
@@ -637,25 +634,25 @@ const Portfolio = () => {
                   <div className="text-lg font-bold text-brand-gold-light">
                     40+
                   </div>
-                  <div className="text-[10px] text-gray-400">Bank Models</div>
+                  <div className=" text-gray-400">Bank Models</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-brand-gold-light">
                     8
                   </div>
-                  <div className="text-[10px] text-gray-400">Districts</div>
+                  <div className=" text-gray-400">Districts</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-brand-gold-light">
                     25+
                   </div>
-                  <div className="text-[10px] text-gray-400">Retail Stores</div>
+                  <div className=" text-gray-400">Retail Stores</div>
                 </div>
                 <div className="text-center">
                   <div className="text-lg font-bold text-brand-gold-light">
                     9
                   </div>
-                  <div className="text-[10px] text-gray-400">Bank Branches</div>
+                  <div className=" text-gray-400">Bank Branches</div>
                 </div>
               </div>
             </div>
