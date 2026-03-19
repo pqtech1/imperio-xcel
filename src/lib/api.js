@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/";
+const API_URL = "https://techupgrad.in/interioxcel-backend/";
 const IMG_PATH = API_URL + "storage/";
 
 const api = axios.create({

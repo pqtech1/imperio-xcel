@@ -1,4 +1,4 @@
-export const IMG_PATH = "http://127.0.0.1:8000/storage";
+export const IMG_PATH = "https://techupgrad.in/interioxcel-backend/storage";
 
 export const getImageUrl = (path) => {
   if (!path) return null;
