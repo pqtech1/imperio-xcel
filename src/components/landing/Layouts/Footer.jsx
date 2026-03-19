@@ -11,6 +11,7 @@ import {
   FaMapMarkerAlt,
   FaArrowRight,
 } from "react-icons/fa";
+import { LineShadowText } from "@/components/ui/line-shadow-text";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -29,7 +30,6 @@ const Footer = () => {
     { name: "Architecture", path: "/architecture" },
     { name: "Turnkey Solutions", path: "/turnkey-solutions" },
     { name: "Competence", path: "/competence" },
-   
   ];
 
   const socialIcons = [
@@ -246,32 +246,61 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs sm:text-sm text-gray-500">
-              © {currentYear} {BRAND.name}. All rights reserved.
-            </p>
-            <div className="flex gap-6 text-xs text-gray-600">
-              <Link
-                to="/privacy-policy"
-                className="hover:text-brand-gold-light transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                to="/terms-of-service"
-                className="hover:text-brand-gold-light transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                to="/sitemap"
-                className="hover:text-brand-gold-light transition-colors"
-              >
-                Sitemap
-              </Link>
+      
+
+      {/* Glitch Effect Footer - Full Width with Larger Text */}
+      <div className="w-full bg-black/40 border-t border-gray-800/50">
+        <div className="w-full px-4">
+          <div className="flex flex-col items-center justify-center space-y-8">
+            {/* InterioXcel with Glitch Effect - Full Width Size */}
+            <div className="relative w-full overflow-hidden">
+              <h1 className="text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-center whitespace-nowrap leading-none">
+                <span className="relative inline-block">
+                  <span className="relative z-10 text-white/90">Interio</span>
+                  <span className="relative inline-block">
+                    <span className="relative z-10 text-white/90">Xcel</span>
+                    {/* Fast animation on Xcel using LineShadowText - Always visible */}
+                    <LineShadowText
+                      className="absolute inset-0 flex items-center justify-center text-brand-gold-light italic font-black text-[15vw] md:text-[12vw] lg:text-[10vw]"
+                      shadowColor="rgba(255,255,255,0.8)"
+                    >
+                      Xcel
+                    </LineShadowText>
+                  </span>
+                </span>
+              </h1>
+
+              {/* Glitch effect layers - Always visible */}
+              <div className="absolute inset-0 -z-10 opacity-70">
+                <div className="absolute top-0 left-0 text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-red-500/40 translate-x-2 translate-y-1 animate-pulse">
+                  InterioXcel
+                </div>
+                <div className="absolute top-0 left-0 text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-blue-500/40 -translate-x-2 -translate-y-1 animate-pulse [animation-delay:150ms]">
+                  InterioXcel
+                </div>
+                <div className="absolute top-0 left-0 text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-green-500/40 translate-x-1 -translate-y-2 animate-pulse [animation-delay:300ms]">
+                  InterioXcel
+                </div>
+                <div className="absolute top-0 left-0 text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-purple-500/40 -translate-x-1 translate-y-2 animate-pulse [animation-delay:450ms]">
+                  InterioXcel
+                </div>
+              </div>
+            </div>
+
+            {/* Developer Credit */}
+            <div className="text-center ">
+              <p className="text-xs text-gray-500">
+                © {currentYear} InterioXcel. <br className="hidden sm:inline" />
+                Design & Developed by{" "}
+                <a
+                  href="https://positivequadrant.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-gold-light hover:text-brand-gold transition-colors font-medium"
+                >
+                  Positive Quadrant Technologies LLP
+                </a>
+              </p>
             </div>
           </div>
         </div>

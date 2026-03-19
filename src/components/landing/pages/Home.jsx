@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 import {
   ArrowRightIcon,
@@ -29,11 +30,19 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 
-import { asset} from "@/components/constants/constants";
-
+import {
+  useServices,
+  useAreas,
+  useProjects,
+  useTeams,
+  useAchievements,
+  useBlogs,
+} from "@/hooks/useApiData";
+import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import Testimonial from "./Testimonial";
+import { PageLoader } from "../Layouts/Header";
 
-// Premium hero slides with fade effect
+// Hero slides (keep static as they're brand messaging)
 const heroSlides = [
   {
     image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg",
@@ -52,103 +61,6 @@ const heroSlides = [
     title: "Architecture That Inspires",
     subtitle: "Creating divine abodes with dedication and perfection",
     accent: "Luxury Interior Solutions",
-  },
-];
-
-const projectImages = [
-  {
-    image: "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
-    title: "NYKAA",
-    location: "Haldwani, Uttarakhand",
-  },
-  {
-    image: "https://images.pexels.com/photos/245208/pexels-photo-245208.jpeg",
-    title: "TANISHQ",
-    location: "Roorkee & Varanasi",
-  },
-  {
-    image: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg",
-    title: "ALLEN SOLLY",
-    location: "Rourkela",
-  },
-  {
-    image: "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg",
-    title: "PETER ENGLAND",
-    location: "Darbhanga",
-  },
-];
-
-const services = [
-  {
-    icon: SwatchIcon,
-    title: "Renovation & Detailing",
-    description:
-      "Meticulous interior detailing and seamless renovation solutions for complete transformation",
-    features: ["Interior Detailing", "Space Planning", "Material Selection"],
-  },
-  {
-    icon: Squares2X2Icon,
-    title: "Material Selection & Finishing",
-    description:
-      "Expert material selection with premium finishing for lasting elegance",
-    features: ["Premium Finishes", "Quality Assurance", "Custom Solutions"],
-  },
-  {
-    icon: CubeIcon,
-    title: "Furniture Procurement",
-    description:
-      "Curated furniture and accessories sourcing for perfect harmony",
-    features: ["Custom Furniture", "Accessories Curation", "Vendor Management"],
-  },
-];
-
-const stats = [
-  {
-    icon: TrophyIcon,
-    value: "7+",
-    label: "Years of Excellence",
-  },
-  {
-    icon: BriefcaseIcon,
-    value: "50+",
-    label: "Major Projects",
-  },
-  {
-    icon: BuildingOfficeIcon,
-    value: "40+",
-    label: "Bank Models",
-  },
-  {
-    icon: StarIcon,
-    value: "100%",
-    label: "Client Satisfaction",
-  },
-];
-
-const areasOfOperation = [
-  {
-    icon: BuildingStorefrontIcon,
-    title: "Retail Industry",
-    description: "Boutique stores, showrooms, and retail spaces",
-    projects: "15+ Projects",
-  },
-  {
-    icon: BuildingLibraryIcon,
-    title: "Insurance & Finance",
-    description: "Bank offices, insurance branches",
-    projects: "40+ Branches",
-  },
-  {
-    icon: BuildingOffice2Icon,
-    title: "Corporate Industry",
-    description: "Corporate offices, workspaces",
-    projects: "20+ Offices",
-  },
-  {
-    icon: HomeModernIcon,
-    title: "Hospitality Industry",
-    description: "Hotels, restaurants, luxury spaces",
-    projects: "10+ Properties",
   },
 ];
 
@@ -175,58 +87,27 @@ const principles = [
   },
 ];
 
-const majorProjects = [
-  {
-    name: "UNION BANK OF INDIA",
-    locations: "8 Branches",
-    icon: BuildingLibraryIcon,
-  },
-  {
-    name: "KASHI GOMATI GRAMEEN BANK",
-    locations: "40 Models in 8 Districts",
-    icon: BuildingOffice2Icon,
-  },
-  {
-    name: "TANISHQ SHOWROOM",
-    locations: "Varanasi - Swastic City",
-    icon: ShoppingBagIcon,
-  },
-  {
-    name: "NYKAA",
-    locations: "Haldwani, Uttarakhand",
-    icon: BuildingStorefrontIcon,
-  },
-  {
-    name: "ALLEN SOLLY",
-    locations: "Rourkela - 2 Locations",
-    icon: BuildingStorefrontIcon,
-  },
-  {
-    name: "PETER ENGLAND",
-    locations: "Darbhanga",
-    icon: BuildingStorefrontIcon,
-  },
-];
-
-const workInProgress = [
-  {
-    project: "TATA AIG LIFE INSURANCE",
-    location: "Robertsgang, Sonbhadra",
-    icon: BuildingLibraryIcon,
-    image: asset("/img/nykaa-haldwani-uttarakhand/30.jpg"), // ✅ using helper
-  },
-  {
-    project: "NYKAA LUX",
-    location: "HLP Galleria, Mohali",
-    icon: ShoppingBagIcon,
-    image: asset("/img/nykaa-haldwani-uttarakhand/32.jpg"), // ✅ call asset here too
-  },
-];
-
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [hoveredProject, setHoveredProject] = useState(null);
+
+  // Fetch all dynamic data
+  const { data: services, loading: servicesLoading } = useServices();
+  const { data: areas, loading: areasLoading } = useAreas();
+  const { data: projects, loading: projectsLoading } = useProjects();
+  const { data: teams, loading: teamsLoading } = useTeams();
+  const { data: achievements, loading: achievementsLoading } =
+    useAchievements();
+  const { data: blogs, loading: blogsLoading } = useBlogs();
+
+  const loading =
+    servicesLoading ||
+    areasLoading ||
+    projectsLoading ||
+    teamsLoading ||
+    achievementsLoading ||
+    blogsLoading;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -242,11 +123,138 @@ const Home = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Transform services for display (take first 3)
+  const displayedServices =
+    services?.slice(0, 3).map((service, index) => ({
+      icon: [SwatchIcon, Squares2X2Icon, CubeIcon][index % 3],
+      title: service.service_title || service.title || "Service",
+      description:
+        service.service_short_description ||
+        stripHtml(service.description || "").substring(0, 100) ||
+        "Comprehensive interior solutions",
+      features: service.what_we_do?.slice(0, 3).map((item) => item.title) || [
+        "Interior Detailing",
+        "Space Planning",
+        "Material Selection",
+      ],
+      slug: service.slug || service.id,
+    })) || [];
+
+  // Transform stats from achievements (take first 4)
+  const stats = achievements?.slice(0, 4).map((achievement) => ({
+    icon: TrophyIcon,
+    value: `${achievement.count}+`,
+    label: achievement.title,
+  })) || [
+    { icon: TrophyIcon, value: "7+", label: "Years of Excellence" },
+    { icon: BriefcaseIcon, value: "50+", label: "Major Projects" },
+    { icon: BuildingOfficeIcon, value: "40+", label: "Bank Models" },
+    { icon: StarIcon, value: "100%", label: "Client Satisfaction" },
+  ];
+
+  // Transform areas of operation
+  const displayedAreas =
+    areas?.slice(0, 4).map((area) => ({
+      icon: [
+        BuildingStorefrontIcon,
+        BuildingLibraryIcon,
+        BuildingOffice2Icon,
+        HomeModernIcon,
+      ][Math.floor(Math.random() * 4)],
+      title: area.title || "Area",
+      description: area.description || "Specialized interior solutions",
+      projects: `${area.projects_done || 0}+ Projects`,
+    })) || [];
+
+  // Transform projects for display (take first 6 for major projects)
+  const displayedProjects =
+    projects?.slice(0, 6).map((project) => ({
+      name: project.name || "Project",
+      locations:
+        [project.district, project.state, project.country]
+          .filter(Boolean)
+          .join(", ") || "Location",
+      icon: [
+        BuildingLibraryIcon,
+        BuildingOffice2Icon,
+        ShoppingBagIcon,
+        BuildingStorefrontIcon,
+      ][Math.floor(Math.random() * 4)],
+      image: project.images?.[0]?.image_path
+        ? getImageUrl(project.images[0].image_path)
+        : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
+      ongoing: project.ongoing,
+    })) || [];
+
+  // Transform work in progress (ongoing projects)
+  const workInProgress =
+    projects
+      ?.filter((p) => p.ongoing === 1)
+      .slice(0, 2)
+      .map((project) => ({
+        project: project.name || "Project",
+        location:
+          [project.district, project.state, project.country]
+            .filter(Boolean)
+            .join(", ") || "Location",
+        image: project.images?.[0]?.image_path
+          ? getImageUrl(project.images[0].image_path)
+          : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
+      })) || [];
+
+  // Transform team members (take first 3)
+  const displayedTeam =
+    teams?.map((member) => ({
+      name: member.name || "Team Member",
+      role: member.designation || "Professional",
+      desc: member.bio
+        ? stripHtml(member.bio).substring(0, 60)
+        : "Dedicated professional",
+      image:
+        getImageUrl(member.image) ||
+        "https://via.placeholder.com/300x400?text=Team+Member",
+    })) || [];
+
+  // Transform blogs for display (take first 3)
+  const displayedBlogs =
+    blogs
+      ?.filter((b) => b.is_published === 1)
+      .slice(0, 3)
+      .map((blog) => ({
+        title: blog.title,
+        excerpt: stripHtml(blog.content || "").substring(0, 120) + "...",
+        image:
+          getImageUrl(blog.image) ||
+          "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg",
+        slug: blog.slug || blog.id,
+        date: new Date(blog.created_at).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }),
+      })) || [];
+
+  // Calculate totals
+  const totalProjects = projects?.length || 50;
+  const totalBankModels =
+    projects?.filter(
+      (p) =>
+        p.name?.toLowerCase().includes("bank") ||
+        p.name?.toLowerCase().includes("finance"),
+    ).length || 40;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <PageLoader />
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* PREMIUM HERO BANNER WITH FADE EFFECT */}
+      {/* HERO SECTION - Static */}
       <section className="relative h-screen overflow-hidden bg-black">
-        {/* Background Images */}
         <div className="absolute inset-0">
           <AnimatePresence>
             <motion.img
@@ -260,11 +268,7 @@ const Home = () => {
               transition={{ duration: 1.4, ease: "easeInOut" }}
             />
           </AnimatePresence>
-
-          {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
-
-          {/* Pattern Overlay */}
           <div className="absolute inset-0 opacity-10">
             <div
               className="w-full h-full"
@@ -276,7 +280,6 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Hero Content */}
         <div className="relative z-10 h-full flex items-center">
           <div className="container mx-auto section-px">
             <motion.div
@@ -286,7 +289,6 @@ const Home = () => {
               transition={{ duration: 0.8 }}
               className="max-w-3xl"
             >
-              {/* Accent Line */}
               <motion.div
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -299,7 +301,6 @@ const Home = () => {
                 </h6>
               </motion.div>
 
-              {/* Title - Using h1 from index.css */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -309,7 +310,6 @@ const Home = () => {
                 {heroSlides[currentSlide].title}
               </motion.h1>
 
-              {/* Subtitle - Using p from index.css */}
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -319,25 +319,24 @@ const Home = () => {
                 {heroSlides[currentSlide].subtitle}
               </motion.p>
 
-              {/* Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
                 className="flex gap-4 mt-6"
               >
-                <button className="btn-primary group">
+                <Link to="/portfolio" className="btn-primary group">
                   Explore Our Work
                   <ArrowRightIcon className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                </button>
-
-                <button className="btn-outline">Contact Us</button>
+                </Link>
+                <Link to="/contact" className="btn-outline">
+                  Contact Us
+                </Link>
               </motion.div>
             </motion.div>
           </div>
         </div>
 
-        {/* Slide Indicators */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
           {heroSlides.map((_, index) => (
             <button key={index} onClick={() => setCurrentSlide(index)}>
@@ -350,7 +349,6 @@ const Home = () => {
           ))}
         </div>
 
-        {/* Scroll Indicator */}
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -360,10 +358,9 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* HONEYBEE PHILOSOPHY SECTION */}
+      {/* HONEYBEE PHILOSOPHY - Static */}
       <section className="pt-16 pb-12 bg-white">
         <div className="container mx-auto section-px max-w-7xl">
-          {/* Label */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -374,7 +371,6 @@ const Home = () => {
             <h6 className="!mb-0">The Honeybee Ethos</h6>
           </motion.div>
 
-          {/* Hero Section */}
           <div className="grid lg:grid-cols-2 gap-12 mb-16 items-start">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -384,7 +380,7 @@ const Home = () => {
               className="!text-4xl md:!text-5xl font-light !mb-0"
             >
               Engineering <br />
-              <span className="font-serif italic ">Natural Efficiency.</span>
+              <span className="font-serif italic">Natural Efficiency.</span>
             </motion.h2>
 
             <motion.div
@@ -394,7 +390,7 @@ const Home = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="lg:pt-2"
             >
-              <p className="">
+              <p>
                 We translate the biological brilliance of the hive into a
                 blueprint for modern excellence. Hard work is expected;
                 perfection is the baseline.
@@ -402,7 +398,6 @@ const Home = () => {
             </motion.div>
           </div>
 
-          {/* Principles Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-gray-100">
             {principles.map((item, index) => (
               <motion.div
@@ -413,17 +408,12 @@ const Home = () => {
                 transition={{ delay: index * 0.1 }}
                 className="pt-10 pb-12 md:pr-8 border-b border-gray-100 lg:border-b-0 lg:border-r last:border-r-0 group cursor-default"
               >
-                {/* Index */}
                 <h6 className="!text-brand-gold !mb-6 !text-[11px]">
                   [{item.id}]
                 </h6>
-
-                {/* Title */}
                 <h3 className="text-xl font-medium mb-4 transition-colors duration-300 group-hover:text-brand-gold">
                   {item.title}
                 </h3>
-
-                {/* Description */}
                 <p className="text-sm leading-relaxed font-light transition-colors duration-500 group-hover:text-gray-900">
                   {item.desc}
                 </p>
@@ -433,7 +423,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* INTRODUCTION SECTION */}
+      {/* INTRODUCTION SECTION - Static with dynamic stats */}
       <section className="pt-16 pb-12 bg-white">
         <div className="container mx-auto section-px">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -465,12 +455,12 @@ const Home = () => {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="border-l-4 border-brand-gold-light pl-4">
-                  <p className="text-2xl font-bold">50+</p>
-                  <p className="text-base ">Projects Completed</p>
+                  <p className="text-2xl font-bold">{totalProjects}+</p>
+                  <p className="text-base">Projects Completed</p>
                 </div>
                 <div className="border-l-4 border-brand-gold-light pl-4">
-                  <p className="text-2xl font-bold">40+</p>
-                  <p className="text-base ">Bank Models</p>
+                  <p className="text-2xl font-bold">{totalBankModels}+</p>
+                  <p className="text-base">Bank Models</p>
                 </div>
               </div>
             </motion.div>
@@ -482,7 +472,11 @@ const Home = () => {
             >
               <div className="relative">
                 <img
-                  src="https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
+                  src={
+                    projects?.[0]?.images?.[0]?.image_path
+                      ? getImageUrl(projects[0].images[0].image_path)
+                      : "https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
+                  }
                   alt="Interior Design"
                   className="w-full h-auto rounded-xl shadow-2xl"
                 />
@@ -503,77 +497,82 @@ const Home = () => {
       </section>
 
       {/* SERVICES SECTION */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h6 className="!text-brand-gold">What We Offer</h6>
-            <h2>Our Comprehensive Services</h2>
-            <div className="w-12 h-[1px] bg-brand-gold mx-auto mb-6"></div>
-            <p className="!mb-0">
-              Your ultimate one-stop solution provider for all interior
-              furnishing contracting needs.
-            </p>
-          </motion.div>
+      {displayedServices.length > 0 && (
+        <section className="pt-16 pb-12 bg-white">
+          <div className="container mx-auto section-px max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h6 className="!text-brand-gold">What We Offer</h6>
+              <h2>Our Comprehensive Services</h2>
+              <div className="w-12 h-[1px] bg-brand-gold mx-auto mb-6"></div>
+              <p className="!mb-0">
+                Your ultimate one-stop solution provider for all interior
+                furnishing contracting needs.
+              </p>
+            </motion.div>
 
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 border-t border-gray-100">
-            {services.map((service, index) => {
-              const Icon = service.icon;
+            <div className="grid grid-cols-1 md:grid-cols-3 border-t border-gray-100">
+              {displayedServices.map((service, index) => {
+                const Icon = service.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group pt-10 pb-12 px-6 border-b md:border-b-0 md:border-r border-gray-100 last:border-r-0"
+                  >
+                    <Link to={`/${service.slug}`}>
+                      <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center mb-6 group-hover:border-brand-gold transition-colors duration-300">
+                        <Icon className="w-5 h-5 group-hover:text-brand-gold transition-colors duration-300" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-3 group-hover:text-brand-gold transition-colors duration-300">
+                        {service.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed mb-4">
+                        {service.description}
+                      </p>
+                      <ul className="space-y-2 mb-6">
+                        {service.features.map((feature, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-center gap-2 text-base"
+                          >
+                            <CheckCircleIcon className="w-3 h-3 text-brand-gold" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group pt-10 pb-12 px-6 border-b md:border-b-0 md:border-r border-gray-100 last:border-r-0"
-                >
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center mb-6 group-hover:border-brand-gold transition-colors duration-300">
-                    <Icon className="w-5 h-5  group-hover:text-brand-gold transition-colors duration-300" />
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-xl font-medium mb-3 group-hover:text-brand-gold transition-colors duration-300">
-                    {service.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className=" text-sm leading-relaxed mb-4">
-                    {service.description}
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center gap-2 text-base "
-                      >
-                        <CheckCircleIcon className="w-3 h-3 text-brand-gold" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              );
-            })}
+            {/* View All Services Link */}
+            <div className="text-center mt-8">
+              <Link
+                to="/services"
+                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
+              >
+                View All Services
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* STATS SECTION */}
       <section className="py-12 bg-brand-charcoal text-white relative overflow-hidden">
-        {/* Subtle Pattern */}
-        <div className="absolute inset-0 opacity-[0.04]">
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
+          {" "}
           <div
             className="w-full h-full"
             style={{
@@ -584,11 +583,9 @@ const Home = () => {
         </div>
 
         <div className="container mx-auto section-px max-w-7xl relative z-10">
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 border-t border-white/10">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
-
               return (
                 <motion.div
                   key={index}
@@ -598,18 +595,13 @@ const Home = () => {
                   transition={{ delay: index * 0.1 }}
                   className="pt-8 pb-10 px-4 text-center border-b md:border-b-0 md:border-r border-white/10 last:border-r-0 group"
                 >
-                  {/* Icon */}
                   <div className="flex justify-center mb-4">
                     <Icon className="w-5 h-5 text-brand-gold-light opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-
-                  {/* Value */}
                   <div className="text-3xl md:text-4xl font-light text-white mb-2 tracking-tight">
                     {stat.value}
                   </div>
-
-                  {/* Label */}
-                  <p className="text-base text-white uppercase tracking-widest  group-hover:text-gray-400 transition-colors duration-300">
+                  <p className="text-base text-white uppercase tracking-widest group-hover:text-gray-400 transition-colors duration-300">
                     {stat.label}
                   </p>
                 </motion.div>
@@ -617,187 +609,203 @@ const Home = () => {
             })}
           </div>
         </div>
+
+        {/* View All Achievements Link */}
+        <div className="text-center mt-4">
+          <Link
+            to="/achievement"
+            className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors text-sm font-semibold"
+          >
+            View All Achievements
+            <ArrowRightIcon className="w-4 h-4" />
+          </Link>
+        </div>
       </section>
 
       {/* AREAS OF OPERATION */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h6 className="!text-brand-gold">Where We Excel</h6>
-            <h2>Areas of Operation</h2>
-            <div className="w-12 h-[1px] bg-brand-gold mx-auto"></div>
-          </motion.div>
+      {displayedAreas.length > 0 && (
+        <section className="pt-16 pb-12 bg-white">
+          <div className="container mx-auto section-px max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h6 className="!text-brand-gold">Where We Excel</h6>
+              <h2>Areas of Operation</h2>
+              <div className="w-12 h-[1px] bg-brand-gold mx-auto"></div>
+            </motion.div>
 
-          {/* Areas Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-gray-100">
-            {areasOfOperation.map((area, index) => {
-              const Icon = area.icon;
-
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group pt-8 pb-10 px-6 border-b lg:border-b-0 lg:border-r border-gray-100 last:border-r-0 text-center"
-                >
-                  {/* Icon */}
-                  <div className="flex justify-center mb-4">
-                    <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center group-hover:border-brand-gold transition-colors duration-300">
-                      <Icon className="w-5 h-5  group-hover:text-brand-gold transition-colors duration-300" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-gray-100">
+              {displayedAreas.map((area, index) => {
+                const Icon = area.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group pt-8 pb-10 px-6 border-b lg:border-b-0 lg:border-r border-gray-100 last:border-r-0 text-center"
+                  >
+                    <div className="flex justify-center mb-4">
+                      <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center group-hover:border-brand-gold transition-colors duration-300">
+                        <Icon className="w-5 h-5 group-hover:text-brand-gold transition-colors duration-300" />
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-lg font-medium mb-2 group-hover:text-brand-gold transition-colors duration-300">
-                    {area.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-base  leading-relaxed mb-3">
-                    {area.description}
-                  </p>
-
-                  {/* Projects Count */}
-                  <h6 className="!text-brand-gold !text-base !mb-0">
-                    {area.projects}
-                  </h6>
-                </motion.div>
-              );
-            })}
+                    <h3 className="text-lg font-medium mb-2 group-hover:text-brand-gold transition-colors duration-300">
+                      {area.title}
+                    </h3>
+                    <p className="text-base leading-relaxed mb-3">
+                      {area.description}
+                    </p>
+                    <h6 className="!text-brand-gold !text-base !mb-0">
+                      {area.projects}
+                    </h6>
+                  </motion.div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-8">
+              <Link
+                to="/areas-we-serve"
+                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
+              >
+                View All Areas
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* MAJOR PROJECTS SHOWCASE */}
-      <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
-        <div className="container mx-auto section-px">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h6 className="!text-brand-gold-light">OUR PORTFOLIO</h6>
-            <h2>Major Projects</h2>
-            <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto mb-6"></div>
-          </motion.div>
+      {displayedProjects.length > 0 && (
+        <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
+          <div className="container mx-auto section-px">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h6 className="!text-brand-gold-light">OUR PORTFOLIO</h6>
+              <h2>Major Projects</h2>
+              <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto mb-6"></div>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {majorProjects.map((project, index) => {
-              const Icon = project.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  onHoverStart={() => setHoveredProject(index)}
-                  onHoverEnd={() => setHoveredProject(null)}
-                  className="group relative h-72 rounded-xl overflow-hidden cursor-pointer"
-                >
-                  <img
-                    src={projectImages[index % projectImages.length].image}
-                    alt={project.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {displayedProjects.map((project, index) => {
+                const Icon = project.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    onHoverStart={() => setHoveredProject(index)}
+                    onHoverEnd={() => setHoveredProject(null)}
+                    className="group relative h-72 rounded-xl overflow-hidden cursor-pointer"
+                  >
+                    <img
+                      src={project.image}
+                      alt={project.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  {/* Project Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon className="w-5 h-5 text-brand-gold-light" />
-                      <h3 className="text-white font-bold text-lg">
-                        {project.name}
-                      </h3>
+                    <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Icon className="w-5 h-5 text-brand-gold-light" />
+                        <h3 className="text-white font-bold text-lg">
+                          {project.name}
+                        </h3>
+                      </div>
+                      <p className="text-brand-gold-light text-base mb-2">
+                        {project.locations}
+                      </p>
+                      <div className="flex items-center gap-2 text-white/80 text-base">
+                        <MapPinIcon className="w-3 h-3" />
+                        <span>{project.locations}</span>
+                      </div>
                     </div>
-                    <p className="text-brand-gold-light text-base mb-2">
-                      {project.locations}
-                    </p>
-                    <div className="flex items-center gap-2 text-white/80 text-base">
-                      <MapPinIcon className="w-3 h-3" />
-                      <span>{project.locations}</span>
-                    </div>
-                  </div>
 
-                  {/* Project Badge */}
-                  <div className="absolute top-3 right-3 bg-brand-gold-light text-white px-3 py-1 rounded-full text-base font-medium transform -translate-y-16 group-hover:translate-y-0 transition-transform duration-500">
-                    Featured
-                  </div>
-                </motion.div>
-              );
-            })}
+                    <div className="absolute top-3 right-3 bg-brand-gold-light text-white px-3 py-1 rounded-full text-base font-medium">
+                      {project.ongoing ? "Ongoing" : "Completed"}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* View All Projects Link */}
+            <div className="text-center mt-8">
+              <Link
+                to="/portfolio"
+                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
+              >
+                View All Projects
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* WORK IN PROGRESS */}
-      <section className="pt-16 pb-12 bg-brand-charcoal text-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-10"
-          >
-            <h6 className="!text-brand-gold-light !mb-2">
-              CURRENTLY WORKING ON
-            </h6>
-            <h2 className="text-white">Work in Progress</h2>
-          </motion.div>
+      {workInProgress.length > 0 && (
+        <section className="pt-16 pb-12 bg-brand-charcoal text-white">
+          <div className="container mx-auto section-px max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-10"
+            >
+              <h6 className="!text-brand-gold-light !mb-2">
+                CURRENTLY WORKING ON
+              </h6>
+              <h2 className="text-white">Work in Progress</h2>
+            </motion.div>
 
-          {/* Projects */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {workInProgress.map((work, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                className="group relative overflow-hidden rounded-lg"
-              >
-                {/* Image */}
-                <img
-                  src={work.image}
-                  alt={work.project}
-                  className="w-full h-[320px] object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-
-                {/* Dark Overlay */}
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition duration-500" />
-
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-xl font-semibold mb-1 text-white">
-                    {work.project}
-                  </h3>
-
-                  <div className="flex items-center gap-2 text-gray-300 text-base">
-                    <MapPinIcon className="w-3 h-3" />
-                    <span>{work.location}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {workInProgress.map((work, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                  className="group relative overflow-hidden rounded-lg"
+                >
+                  <img
+                    src={work.image}
+                    alt={work.project}
+                    className="w-full h-[320px] object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition duration-500" />
+                  <div className="absolute bottom-0 left-0 p-6">
+                    <h3 className="text-xl font-semibold mb-1 text-white">
+                      {work.project}
+                    </h3>
+                    <div className="flex items-center gap-2 text-gray-300 text-base">
+                      <MapPinIcon className="w-3 h-3" />
+                      <span>{work.location}</span>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* OUR PROCESS */}
+      {/* OUR PROCESS - Static */}
       <section className="pt-16 pb-12 bg-white">
         <div className="container mx-auto section-px max-w-6xl">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -810,11 +818,8 @@ const Home = () => {
             <div className="w-12 h-[1px] bg-brand-gold-light mx-auto"></div>
           </motion.div>
 
-          {/* Steps */}
           <div className="max-w-4xl mx-auto">
-            {/* Timeline */}
             <div className="flex justify-between items-center mb-10 relative">
-              {/* Line */}
               <div className="absolute left-0 right-0 h-[1px] bg-gray-200 top-1/2 -translate-y-1/2"></div>
 
               {["Planning & Design", "Documentation", "Execution"].map(
@@ -826,21 +831,18 @@ const Home = () => {
                     transition={{ delay: index * 0.2 }}
                     className="relative z-10 text-center"
                   >
-                    {/* Step Circle */}
                     <div
                       onClick={() => setActiveStep(index)}
                       className={`w-12 h-12 flex items-center justify-center rounded-full text-sm font-semibold cursor-pointer transition-all duration-300
                         ${
                           activeStep === index
                             ? "bg-brand-gold-light text-white shadow-md"
-                            : "bg-gray-100  hover:bg-gray-200"
+                            : "bg-gray-100 hover:bg-gray-200"
                         }
                       `}
                     >
                       {index + 1}
                     </div>
-
-                    {/* Label */}
                     <p
                       className={`mt-3 text-base font-medium transition-colors ${
                         activeStep === index ? "text-brand-gold-light" : ""
@@ -853,7 +855,6 @@ const Home = () => {
               )}
             </div>
 
-            {/* Content */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -887,11 +888,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* QUALITY & SAFETY */}
+      {/* QUALITY & SAFETY - Static */}
       <section className="pt-16 pb-12 bg-brand-charcoal text-white">
         <div className="container mx-auto section-px max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
-            {/* LEFT CONTENT */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -911,7 +911,7 @@ const Home = () => {
                 We strictly follow industry standards to ensure exceptional
                 craftsmanship and a safe working environment.
               </p>
-              <p className=" text-white !mb-0">
+              <p className="text-white !mb-0">
                 From providing protective equipment to regular safety
                 inspections and continuous workforce training, every process is
                 designed to protect our team and maintain the highest quality
@@ -919,7 +919,6 @@ const Home = () => {
               </p>
             </motion.div>
 
-            {/* RIGHT GRID */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -950,7 +949,6 @@ const Home = () => {
                 },
               ].map((item, index) => {
                 const Icon = item.icon;
-
                 return (
                   <motion.div
                     key={index}
@@ -961,7 +959,7 @@ const Home = () => {
                   >
                     <Icon className="w-6 h-6 text-brand-gold-light mb-3" />
                     <h4 className="font-semibold mb-1 text-sm">{item.title}</h4>
-                    <p className="text-base text-gray-300  leading-relaxed">
+                    <p className="text-base text-gray-300 leading-relaxed">
                       {item.desc}
                     </p>
                   </motion.div>
@@ -976,7 +974,11 @@ const Home = () => {
       <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
+            src={
+              projects?.[1]?.images?.[0]?.image_path
+                ? getImageUrl(projects[1].images[0].image_path)
+                : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
+            }
             alt="Background"
             className="w-full h-full object-cover"
           />
@@ -998,97 +1000,135 @@ const Home = () => {
               Let's bring your vision to life with our expertise and dedication
               to excellence
             </p>
-            <button className="btn-primary group bg-brand-gold-light hover:bg-brand-gold text-white !px-8 !py-3 mx-auto">
+            <Link
+              to="/contact"
+              className="btn-primary group bg-brand-gold-light hover:bg-brand-gold text-white !px-8 !py-3 mx-auto"
+            >
               SCHEDULE A DESIGN CONSULTATION
               <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
 
       {/* TEAM SECTION */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h6 className="!text-brand-gold-light">Our Leadership</h6>
-            <h2>Meet the Team</h2>
-            <div className="w-12 h-[1px] bg-brand-gold-light mx-auto"></div>
-          </motion.div>
+      {displayedTeam.length > 0 && (
+        <section className="pt-16 pb-12 bg-white">
+          <div className="container mx-auto section-px max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h6 className="!text-brand-gold-light">Our Leadership</h6>
+              <h2>Meet the Team</h2>
+              <div className="w-12 h-[1px] bg-brand-gold-light mx-auto"></div>
+            </motion.div>
 
-          {/* Team */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                name: "Abhishek Vishwakarma",
-                role: "Owner",
-                desc: "Leading with vision",
-                image:
-                  "https://st5.depositphotos.com/4218696/72817/i/450/depositphotos_728179600-stock-photo-image-shows-smiling-man-standing.jpg",
-              },
-              {
-                name: "Kajal Vishwakarma",
-                role: "Architect",
-                desc: "Creative excellence",
-                image:
-                  "https://img.freepik.com/premium-photo/happy-millennial-indian-business-lady-using-laptop-home-office_116547-79022.jpg",
-              },
-              {
-                name: "Ramesh Prasad Vishwakarma",
-                role: "Senior Advisor",
-                desc: "Decades of expertise",
-                image:
-                  "https://img.freepik.com/free-photo/happy-indian-business-man-using-tablet-cafe_1262-3224.jpg?semt=ais_rp_50_assets&w=740&q=80",
-              },
-            ].map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-                className="text-center group"
-              >
-                {/* Image */}
-                <div className="relative mb-4 overflow-hidden rounded-lg">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 border border-transparent group-hover:border-brand-gold-light transition-all duration-500"></div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {displayedTeam.map((member, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15 }}
+                  className="text-center group"
+                >
+                  <div className="relative mb-4 overflow-hidden rounded-lg">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 border border-transparent group-hover:border-brand-gold-light transition-all duration-500"></div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
+                  <h6 className="!text-brand-gold-light !text-base !mb-2">
+                    {member.role}
+                  </h6>
+                  <p className="text-base">{member.desc}</p>
+                </motion.div>
+              ))}
+            </div>
 
-                {/* Name */}
-                <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
-
-                {/* Role */}
-                <h6 className="!text-brand-gold-light !text-base !mb-2">
-                  {member.role}
-                </h6>
-
-                {/* Description */}
-                <p className="text-base ">{member.desc}</p>
-              </motion.div>
-            ))}
+            
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* BLOG PREVIEW SECTION */}
+      {displayedBlogs.length > 0 && (
+        <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
+          <div className="container mx-auto section-px">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto mb-12"
+            >
+              <h6 className="!text-brand-gold-light">INSIGHTS</h6>
+              <h2>Latest from Our Blog</h2>
+              <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto mb-6"></div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {displayedBlogs.map((blog, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Link to={`/blog/${blog.slug}`} className="block">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={blog.image}
+                        alt={blog.title}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-5">
+                      <p className="text-xs text-brand-gold-light mb-2">
+                        {blog.date}
+                      </p>
+                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                        {blog.excerpt}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-brand-gold-light hover:text-brand-gold transition-colors text-sm font-semibold">
+                        Read More
+                        <ArrowRightIcon className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* View All Blog Link */}
+            <div className="text-center mt-8">
+              <Link
+                to="/blog"
+                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
+              >
+                View All Articles
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* TESTIMONIAL SECTION */}
-      <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
-        <div className="container mx-auto section-px">
-          <Testimonial />
-        </div>
-      </section>
+      <Testimonial />
 
-      {/* CONTACT SECTION - Only section with py (both top and bottom padding) */}
+      {/* CONTACT SECTION */}
       <section className="py-8 bg-brand-charcoal text-white border-t border-white/10">
         <div className="container mx-auto section-px">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
@@ -1100,7 +1140,7 @@ const Home = () => {
               <h3 className="text-xl font-bold mb-1">
                 Let's Create Something Amazing Together
               </h3>
-              <p className=" text-gray-300 text-base">
+              <p className="text-gray-300 text-base">
                 Contact us today to discuss your project requirements
               </p>
             </motion.div>
