@@ -111,13 +111,13 @@ const App = () => {
         </Route>
 
         {/* ================= ADMIN ================= */}
-        <Route path="/admin">
+        <Route path="admin">
           {/* Login */}
           <Route index element={<Login />} />
 
           {/* Dashboard Protected */}
           <Route
-            path="/admin/dashboard"
+            path="dashboard"
             element={
               <ProtectedRoute>
                 <AdminLayout />
