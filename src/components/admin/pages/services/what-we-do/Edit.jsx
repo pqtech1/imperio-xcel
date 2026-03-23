@@ -13,7 +13,12 @@ import TiptapEditor from "@/components/editor/TiptapEditor";
 
 export default function WhatWeDoEdit() {
   const navigate = useNavigate();
-  const { id: serviceId, whatWeDoId } = useParams();
+  const params = useParams();
+  const serviceId = params.id; // Service ID from URL
+  const whatWeDoId = params.whatWeDoId; // WhatWeDo ID from URL
+
+  console.log("Edit - Service ID:", serviceId);
+  console.log("Edit - WhatWeDo ID:", whatWeDoId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -24,13 +29,21 @@ export default function WhatWeDoEdit() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!whatWeDoId) {
+        toast.error("Invalid what we do ID");
+        setLoadingData(false);
+        return;
+      }
+
       try {
+        console.log("Fetching what-we-do with ID:", whatWeDoId);
         const res = await api.get(`/what-we-do/${whatWeDoId}`);
         const data = res.data.data;
         setTitle(data.title);
         setDescription(data.description);
         setServices(data.services?.length ? data.services : [""]);
       } catch (err) {
+        console.error("Failed to fetch data:", err);
         toast.error("Failed to fetch data");
       } finally {
         setLoadingData(false);
@@ -58,21 +71,32 @@ export default function WhatWeDoEdit() {
     setLoading(true);
     setErrors({});
 
+    // Filter out empty service items
+    const filteredServices = services.filter(
+      (service) => service.trim() !== "",
+    );
+
+    const payload = {
+      title,
+      description,
+      services: filteredServices,
+      service_id: parseInt(serviceId), // Ensure it's sent as integer
+    };
+
+    console.log("Update payload:", payload); // Debug log
+
     try {
-      await api.put(`/what-we-do/${whatWeDoId}`, {
-        title,
-        description,
-        services,
-        service_id: serviceId,
-      });
-      toast.success("Updated successfully");
+      const res = await api.put(`/what-we-do/${whatWeDoId}`, payload);
+      console.log("Update response:", res.data); // Debug log
+      toast.success(res.data.message || "Updated successfully");
       navigate(`/admin/dashboard/services/${serviceId}/what-we-do`);
     } catch (err) {
+      console.error("Update error details:", err.response?.data); // Debug log
       if (err.response?.status === 422) {
         setErrors(err.response.data.errors);
         toast.error("Please fix validation errors");
       } else {
-        toast.error("Something went wrong");
+        toast.error(err.response?.data?.message || "Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -145,7 +169,9 @@ export default function WhatWeDoEdit() {
                   Description <span className="text-red-500">*</span>
                 </Label>
 
-                <div className="border border-gray-300">
+                <div
+                  className={`border ${errors.description ? "border-red-500" : "border-gray-300"}`}
+                >
                   <TiptapEditor
                     key={description}
                     content={description}
@@ -231,7 +257,7 @@ export default function WhatWeDoEdit() {
             <Button
               type="submit"
               disabled={loading}
-              className="h-11 px-8 bg-gray-900 text-white hover:bg-gray-800 text-base font-medium rounded-none min-w-[120px]"
+              className="h-11 px-8 bg-gray-900 text-white hover:bg-gray-800 text-base font-medium rounded-none min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Updating..." : "Update"}
             </Button>

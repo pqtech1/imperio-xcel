@@ -13,7 +13,11 @@ import TiptapEditor from "@/components/editor/TiptapEditor";
 
 export default function WhatWeDoCreate() {
   const navigate = useNavigate();
-  const { serviceId } = useParams(); // Get serviceId from URL params
+  const params = useParams();
+  const serviceId = params.id; // Extract service ID from URL params
+
+  // Debug log to verify serviceId
+  console.log("Service ID from URL:", serviceId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -26,11 +30,19 @@ export default function WhatWeDoCreate() {
   // Fetch service details to display the service name
   useEffect(() => {
     const fetchService = async () => {
+      if (!serviceId) {
+        console.error("No service ID found");
+        toast.error("Service ID is missing");
+        return;
+      }
+
       try {
+        console.log("Fetching service with ID:", serviceId);
         const res = await api.get(`/services/${serviceId}`);
         setServiceName(res.data.data?.title || res.data.title || "Service");
       } catch (err) {
         console.error("Failed to fetch service:", err);
+        toast.error("Failed to load service details");
       }
     };
 
@@ -70,29 +82,40 @@ export default function WhatWeDoCreate() {
     setLoading(true);
     setErrors({});
 
+    // Validate serviceId
+    if (!serviceId) {
+      toast.error("Service ID is missing. Please go back and try again.");
+      setLoading(false);
+      return;
+    }
+
     // Filter out empty service items
     const filteredServices = services.filter(
       (service) => service.trim() !== "",
     );
 
-    try {
-      const res = await api.post("/what-we-do", {
-        title,
-        description,
-        services: filteredServices,
-        service_id: serviceId, // Pass the service ID from URL params
-      });
+    const payload = {
+      title,
+      description,
+      services: filteredServices,
+      service_id: parseInt(serviceId), // Ensure it's sent as integer
+    };
 
+    console.log("Submitting payload:", payload); // Debug log
+
+    try {
+      const res = await api.post("/what-we-do", payload);
+      console.log("Response:", res.data); // Debug log
       toast.success(res.data.message || "Created successfully");
       navigate(`/admin/dashboard/services/${serviceId}/what-we-do`);
     } catch (err) {
+      console.error("Creation error details:", err.response?.data); // Debug log
       if (err.response?.status === 422) {
         setErrors(err.response.data.errors);
         toast.error("Please fix validation errors");
       } else {
         toast.error(err.response?.data?.message || "Something went wrong");
       }
-      console.error("Creation error:", err);
     } finally {
       setLoading(false);
     }
@@ -280,7 +303,6 @@ export default function WhatWeDoCreate() {
               {loading ? (
                 <>
                   <span className="mr-2">Creating...</span>
-                  <span className="animate-spin">⚪</span>
                 </>
               ) : (
                 "Create"

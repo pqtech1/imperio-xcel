@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   BuildingOfficeIcon,
   BuildingStorefrontIcon,
@@ -26,7 +26,16 @@ import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import { useServices, useFAQs } from "@/hooks/useApiData";
 import { PageLoader } from "../Layouts/Header";
 
-// Reusable hooks and components from your Interior page
+// Import shadcn carousel components
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+
+// Reusable hooks
 const useInView = (threshold = 0.15) => {
   const ref = React.useRef(null);
   const [visible, setVisible] = React.useState(false);
@@ -148,19 +157,16 @@ const FAQItem = ({ item, index }) => {
   );
 };
 
-// Service Card Component
-const ServiceCard = ({ service, index }) => {
+// Service Card Component for What We Do
+const ServiceCard = ({ item, index }) => {
   const [ref, visible] = useInView(0.2);
   const [hovered, setHovered] = useState(false);
   const isEven = index % 2 === 1;
-  const fromLeft = service.slideFrom === "left";
 
-  // Get image from service_overview if available
-  const imageUrl = service.services_over_view?.[0]?.images?.[0]
-    ? getImageUrl(service.services_over_view[0].images[0])
-    : service.service_banner_img
-      ? getImageUrl(service.service_banner_img)
-      : "https://images.pexels.com/photos/1631049/pexels-photo-1631049.jpeg";
+  // Get image from the item if available
+  const imageUrl = item.image
+    ? getImageUrl(item.image)
+    : "https://images.pexels.com/photos/1631049/pexels-photo-1631049.jpeg";
 
   return (
     <div
@@ -171,11 +177,7 @@ const ServiceCard = ({ service, index }) => {
       <div
         className="w-full md:w-1/2 relative overflow-hidden cursor-pointer min-h-56 md:min-h-0"
         style={{
-          transform: visible
-            ? "translateX(0)"
-            : fromLeft
-              ? "translateX(-40px)"
-              : "translateX(40px)",
+          transform: visible ? "translateX(0)" : "translateX(-40px)",
           opacity: visible ? 1 : 0,
           transition:
             "transform 0.7s cubic-bezier(0.23,1,0.32,1), opacity 0.7s ease",
@@ -185,7 +187,7 @@ const ServiceCard = ({ service, index }) => {
       >
         <img
           src={imageUrl}
-          alt={service.service_title}
+          alt={item.title}
           className="w-full h-full object-cover block"
           style={{
             filter: hovered
@@ -209,11 +211,7 @@ const ServiceCard = ({ service, index }) => {
       <div
         className="w-full md:w-1/2 bg-brand-charcoal px-5 md:px-8 py-6 md:py-8 flex flex-col justify-center"
         style={{
-          transform: visible
-            ? "translateX(0)"
-            : fromLeft
-              ? "translateX(40px)"
-              : "translateX(-40px)",
+          transform: visible ? "translateX(0)" : "translateX(40px)",
           opacity: visible ? 1 : 0,
           transition:
             "transform 0.7s cubic-bezier(0.23,1,0.32,1) 0.1s, opacity 0.7s ease 0.1s",
@@ -226,21 +224,23 @@ const ServiceCard = ({ service, index }) => {
             background: "#b88a44",
           }}
         />
-        <h3 className="text-white text-lg md:text-xl font-bold font-serif tracking-wide mb-2">
-          {service.service_title || service.title}
+        <h3 className="text-white text-lg md:text-xl font-bold font-serif tracking-wide mb-3">
+          {item.title}
         </h3>
-        <p className="text-gray-300 text-base leading-6 font-sans mb-3">
-          {service.service_short_description ||
-            stripHtml(service.description || "").substring(0, 200)}
-        </p>
+        {item.description && (
+          <div
+            className="text-gray-300 text-base leading-6 font-sans mb-4"
+            dangerouslySetInnerHTML={{ __html: item.description }}
+          />
+        )}
 
-        {/* Features from what_we_do */}
-        {service.what_we_do && service.what_we_do.length > 0 && (
-          <ul className="list-none p-0 m-0 space-y-1">
-            {service.what_we_do.slice(0, 5).map((item, i) => (
+        {/* Services list */}
+        {item.services && item.services.length > 0 && (
+          <ul className="list-none p-0 m-0 space-y-2">
+            {item.services.map((service, i) => (
               <li
                 key={i}
-                className="flex items-center gap-2 text-gray-300 font-sans"
+                className="flex items-start gap-2 text-gray-300 font-sans"
                 style={{
                   opacity: visible ? 1 : 0,
                   transform: visible ? "translateX(0)" : "translateX(12px)",
@@ -248,18 +248,88 @@ const ServiceCard = ({ service, index }) => {
                 }}
               >
                 <span
-                  className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-white font-bold"
+                  className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-white font-bold mt-1"
                   style={{ background: "#b88a44" }}
                 >
                   ✓
                 </span>
-                {item.title || item}
+                <span>{service}</span>
               </li>
             ))}
           </ul>
         )}
       </div>
     </div>
+  );
+};
+
+// Image Carousel Component
+const ImageCarousel = ({ images }) => {
+  if (!images || images.length === 0) return null;
+
+  const validImages = images.filter((img) => img && img.src);
+
+  if (validImages.length === 1) {
+    return (
+      <div className="w-full rounded-lg overflow-hidden">
+        <img
+          src={validImages[0].src}
+          alt={validImages[0].alt}
+          className="w-full h-full object-cover"
+          style={{ maxHeight: "400px" }}
+          onError={(e) => {
+            e.target.src =
+              "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (validImages.length === 2) {
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {validImages.map((img, idx) => (
+          <div key={idx} className="rounded-lg overflow-hidden">
+            <img
+              src={img.src}
+              alt={img.alt}
+              className="w-full h-full object-cover"
+              style={{ maxHeight: "400px" }}
+              onError={(e) => {
+                e.target.src =
+                  "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <Carousel className="w-full">
+      <CarouselContent>
+        {validImages.map((img, idx) => (
+          <CarouselItem key={idx}>
+            <div className="rounded-lg overflow-hidden">
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-full object-cover"
+                style={{ maxHeight: "500px", minHeight: "300px" }}
+                onError={(e) => {
+                  e.target.src =
+                    "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
+                }}
+              />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious className="left-4" />
+      <CarouselNext className="right-4" />
+    </Carousel>
   );
 };
 
@@ -274,7 +344,7 @@ const ServiceDetail = () => {
   const { data: faqs } = useFAQs();
 
   // Fetch all services to find the current one
-  const { data: services } = useServices();
+  const { data: services, isLoading: servicesLoading } = useServices();
 
   useEffect(() => {
     if (services && services.length > 0) {
@@ -293,10 +363,10 @@ const ServiceDetail = () => {
     }
   }, [services, slug]);
 
-  if (loading) {
+  if (loading || servicesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-         <PageLoader />
+        <PageLoader />
       </div>
     );
   }
@@ -322,14 +392,14 @@ const ServiceDetail = () => {
     );
   }
 
-  // Prepare why work with us data
+  // Prepare why work with us data from API
   const whyWorkData =
     service.why_work_with_us?.length > 0
-      ? service.why_work_with_us.map((item, index) => ({
-          id: index + 1,
+      ? service.why_work_with_us.map((item) => ({
+          id: item.id,
           title: item.title,
           desc:
-            item.tagline || stripHtml(item.description || "").substring(0, 100),
+            item.tagline || stripHtml(item.description || "").substring(0, 120),
         }))
       : [
           {
@@ -349,12 +419,12 @@ const ServiceDetail = () => {
           },
         ];
 
-  // Prepare process data
+  // Prepare process data from what_we_do
   const processData =
     service.what_we_do?.length > 0
       ? service.what_we_do.slice(0, 3).map((item, index) => ({
           id: index + 1,
-          title: item.title || `Process Step ${index + 1}`,
+          title: item.title,
           desc: stripHtml(item.description || "").substring(0, 100),
         }))
       : [
@@ -375,35 +445,15 @@ const ServiceDetail = () => {
           },
         ];
 
-  // Get slider images from service_overview
-  const sliderImages = service.services_over_view?.flatMap((ov) =>
-    ov.images?.map((img) => ({
-      id: img,
-      src: getImageUrl(img),
-      alt: ov.title || "Service image",
-    })),
-  ) || [
-    {
-      id: 1,
-      src: "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
-      alt: "Modern office interior",
-    },
-    {
-      id: 2,
-      src: "https://images.pexels.com/photos/245208/pexels-photo-245208.jpeg",
-      alt: "Luxury showroom",
-    },
-    {
-      id: 3,
-      src: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg",
-      alt: "Retail store design",
-    },
-    {
-      id: 4,
-      src: "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg",
-      alt: "Bank interior",
-    },
-  ];
+  // Get slider images from services_over_view
+  const sliderImages =
+    service.services_over_view?.flatMap((ov) =>
+      ov.images?.map((img) => ({
+        id: img,
+        src: getImageUrl(img),
+        alt: ov.title || "Service image",
+      })),
+    ) || [];
 
   // Get hero image
   const heroImage = service.service_banner_img
@@ -417,14 +467,15 @@ const ServiceDetail = () => {
         <img
           src={heroImage}
           alt={service.service_title}
-          className="w-full object-cover block max-h-80 md:max-h-120"
+          className="w-full object-cover block max-h-80 md:max-h-96 lg:max-h-[500px]"
           onError={(e) => {
             e.target.src =
               "https://images.pexels.com/photos/3741314/pexels-photo-3741314.jpeg";
           }}
         />
+
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent flex items-center">
-          <div className="container mt-30 mx-auto section-px">
+          <div className="container mx-auto px-4 md:px-8 lg:px-16">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -433,18 +484,17 @@ const ServiceDetail = () => {
             >
               <div className="flex items-center gap-3 mb-3">
                 <span className="w-10 h-[2px] bg-brand-gold-light" />
-                <h6 className="!text-brand-gold-light !mb-0">
+                <h6 className="text-brand-gold-light mb-0 text-sm md:text-base uppercase tracking-wider">
                   {service.service_tagline || "Our Services"}
                 </h6>
               </div>
 
-              <h1 className="text-white !mb-2">
-                {service.service_title || service.title}
+              <h1 className="text-white mb-3 text-3xl md:text-4xl lg:text-5xl font-bold">
+                {service.service_title}
               </h1>
 
-              <p className="text-gray-200 !mb-0">
-                {service.service_short_description ||
-                  stripHtml(service.description || "").substring(0, 150)}
+              <p className="text-gray-200 mb-0 text-base md:text-lg">
+                {service.service_short_description}
               </p>
             </motion.div>
           </div>
@@ -452,107 +502,67 @@ const ServiceDetail = () => {
       </div>
 
       {/* Intro Text */}
-      <div className="mt-8 md:mt-10 section-px">
+      <div className="mt-10 md:mt-16 px-4 md:px-8 lg:px-16">
         <div className="max-w-6xl mx-auto">
-          <h1 className="!mb-3">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             {service.service_intro_title || "Service Excellence"}
-          </h1>
-          <p className="text-gray-600 !mb-0">
+          </h2>
+          <p className="text-gray-600 mb-0 text-base md:text-lg leading-relaxed">
             <strong className="text-brand-charcoal">
-              {service.service_tagline ||
-                "Delivering excellence in every project."}
+              {service.service_tagline}
             </strong>
-            <br />
-            <br />
-            {service.description ? (
-              <span dangerouslySetInnerHTML={{ __html: service.description }} />
-            ) : (
-              `At InterioXcel, we offer comprehensive ${service.service_title || "service"} solutions. 
-              Our team of skilled professionals ensures every project meets the highest standards 
-              of quality and excellence. From conceptual development to final execution, we manage 
-              every aspect with precision and dedication.`
-            )}
           </p>
+          {service.description && (
+            <div
+              className="text-gray-600 mt-4 text-base md:text-lg leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: service.description }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Image Slider */}
-      {sliderImages.length > 1 && (
-        <div className="section-px mt-8">
+      {/* Image Slider/Carousel */}
+      {sliderImages.length > 0 && (
+        <div className="px-4 md:px-8 lg:px-16 mt-12 md:mt-16">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-center w-full py-8 md:py-10 bg-white gap-2 select-none rounded-lg shadow-sm">
-              {/* Slider component - simplified version */}
-              <div className="flex gap-2 md:gap-3 w-full max-w-xs md:max-w-4xl">
-                {sliderImages.slice(0, 2).map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="w-1/2 overflow-hidden bg-gray-200 rounded-md"
-                    style={{ aspectRatio: "4/3" }}
-                  >
-                    <img
-                      src={img.src}
-                      alt={img.alt}
-                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ImageCarousel images={sliderImages} />
           </div>
         </div>
       )}
 
       {/* Why Work With Us */}
-      <div className="section-px mt-10 md:mt-14">
+      <div className="px-4 md:px-8 lg:px-16 mt-12 md:mt-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-light text-2xl md:text-3xl !mb-2">
+          <h2 className="text-2xl md:text-3xl font-light mb-2">
             Why Work With Us
           </h2>
-          <p className="text-base md:text-base leading-7 text-brand-charcoal font-semibold mb-2 italic">
+          <p className="text-base md:text-lg leading-relaxed text-brand-charcoal font-semibold mb-4 italic">
             "We shape our spaces, and then, our spaces shape us."
           </p>
-          <p className="text-gray-600 !mb-0">
-            At InterioXcel, we offer customized interior solutions and devoted
-            customer care with personal assistance. Our team of skilled
-            architects and interior designers plan, research, manage and
-            coordinate every aspect of the design, adding your vision combined
-            with our creativity to accomplish the task magnificently within
-            time.
+          <p className="text-gray-600 mb-0 text-base md:text-lg leading-relaxed">
+            {service.why_work_with_us?.[0]?.description
+              ? stripHtml(service.why_work_with_us[0].description)
+              : "At InterioXcel, we offer customized interior solutions and devoted customer care with personal assistance. Our team of skilled architects and interior designers plan, research, manage and coordinate every aspect of the design, adding your vision combined with our creativity to accomplish the task magnificently within time."}
           </p>
         </div>
       </div>
 
       {/* Service Cards from what_we_do */}
       {service.what_we_do && service.what_we_do.length > 0 && (
-        <div className="bg-bg-soft pt-12 md:pt-14">
-          <div className="text-center mb-8 section-px">
-            <h6 className="text-brand-gold-light">What We Do</h6>
-            <h2 className="!mt-2">Our Services</h2>
-            <div className="w-10 h-0.5 bg-brand-gold-light mx-auto mt-3 rounded" />
+        <div className="bg-gray-50 pt-12 md:pt-16 pb-8 mt-12 md:mt-16">
+          <div className="text-center mb-8 md:mb-12 px-4">
+            <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
+              What We Do
+            </h6>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
+              Our Services
+            </h2>
+            <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
           </div>
-          <div className="section-px">
+          <div className="px-4 md:px-8 lg:px-16">
             <div className="max-w-5xl mx-auto">
               {service.what_we_do.map((item, i) => (
-                <ServiceCard
-                  key={item.id || i}
-                  service={{
-                    ...item,
-                    service_title: item.title,
-                    service_short_description: stripHtml(
-                      item.description || "",
-                    ).substring(0, 100),
-                    services_over_view: [
-                      {
-                        images: item.image ? [item.image] : [],
-                      },
-                    ],
-                  }}
-                  index={i}
-                />
+                <ServiceCard key={item.id || i} item={item} index={i} />
               ))}
             </div>
           </div>
@@ -560,14 +570,18 @@ const ServiceDetail = () => {
       )}
 
       {/* Why Choose Us */}
-      <div className="bg-white pt-10 pb-8 section-px">
-        <div className="text-center mb-8">
-          <h6 className="text-brand-gold-light">Why Us</h6>
-          <h2 className="!mt-2">Why Choose Us</h2>
-          <div className="w-10 h-0.5 bg-brand-gold-light mx-auto mt-3 rounded" />
+      <div className="bg-white pt-12 md:pt-16 pb-12 px-4 md:px-8 lg:px-16">
+        <div className="text-center mb-8 md:mb-12">
+          <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
+            Why Us
+          </h6>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
+            Why Choose Us
+          </h2>
+          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
         </div>
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-6">
             {whyWorkData.map((item, i) => (
               <WhyCard key={item.id} item={item} delay={i * 0.1} />
             ))}
@@ -576,26 +590,32 @@ const ServiceDetail = () => {
       </div>
 
       {/* Process */}
-      <div className="bg-white pt-12 pb-14 md:pt-14 md:pb-16 section-px">
-        <div className="text-center mb-8 md:mb-10">
-          <h6 className="text-brand-gold-light">How We Work</h6>
-          <h2 className="!mt-2">Our Process</h2>
-          <div className="w-10 h-0.5 bg-brand-gold-light mx-auto mt-3 rounded" />
+      <div className="bg-gray-50 pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
+        <div className="text-center mb-8 md:mb-12">
+          <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
+            How We Work
+          </h6>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
+            Our Process
+          </h2>
+          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
         </div>
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {processData.map((item, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {processData.map((item) => (
               <div
                 key={item.id}
-                className="bg-gray-50 p-6 rounded-lg border border-gray-200"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
-                <div className="w-10 h-10 mb-3 bg-brand-gold-light/10 rounded-lg flex items-center justify-center">
-                  <span className="text-lg font-bold text-brand-gold-light">
+                <div className="w-12 h-12 mb-4 bg-brand-gold-light/10 rounded-lg flex items-center justify-center">
+                  <span className="text-xl font-bold text-brand-gold-light">
                     {item.id}
                   </span>
                 </div>
-                <h3 className="text-base font-bold mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
+                <h3 className="text-lg font-bold mb-3">{item.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {item.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -604,15 +624,19 @@ const ServiceDetail = () => {
 
       {/* FAQ */}
       {faqs && faqs.length > 0 && (
-        <div className="bg-bg-soft pt-12 pb-14 md:pt-14 md:pb-16 section-px">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8 md:mb-10">
-              <h6 className="text-brand-gold-light !mb-2">FAQ</h6>
-              <h2 className="!mb-2">Frequently Asked Questions</h2>
-              <div className="w-10 h-0.5 bg-brand-gold-light mx-auto rounded" />
+        <div className="bg-white pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-8 md:mb-12">
+              <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
+                FAQ
+              </h6>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
+                Frequently Asked Questions
+              </h2>
+              <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
             </div>
             <div>
-              {faqs.slice(0, 5).map((item, i) => (
+              {faqs.slice(0, 6).map((item, i) => (
                 <FAQItem key={i} item={item} index={i} />
               ))}
             </div>
@@ -621,31 +645,33 @@ const ServiceDetail = () => {
       )}
 
       {/* Quality & Safety */}
-      <div className="pt-12 pb-14 md:pt-14 md:pb-16 section-px bg-white">
+      <div className="bg-gray-50 pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-8">
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
             <div className="lg:w-1/2">
-              <h6 className="text-brand-gold-light !mb-3">OUR COMMITMENT</h6>
-              <h2 className="!mb-4">
+              <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-3">
+                OUR COMMITMENT
+              </h6>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
                 Quality & Safety{" "}
                 <span className="text-brand-gold-light">First</span>
               </h2>
               <div className="w-16 h-[2px] bg-brand-gold-light mb-6" />
-              <p className="text-gray-600 !mb-4">
+              <p className="text-gray-600 mb-4 text-base md:text-lg leading-relaxed">
                 At our construction site, quality and safety are our top
                 priorities for all laborers involved in interior work. We
                 maintain strict adherence to industry standards and regulations
                 to ensure the highest quality of craftsmanship and safety for
                 our team.
               </p>
-              <p className="text-gray-500 !mb-0">
+              <p className="text-gray-500 mb-0 text-base leading-relaxed">
                 We provide comprehensive training, personal protective equipment
                 (PPE), and regularly inspect and maintain equipment to mitigate
                 risks.
               </p>
             </div>
 
-            <div className="lg:w-1/2 grid grid-cols-2 gap-3">
+            <div className="lg:w-1/2 grid grid-cols-2 gap-4">
               {[
                 {
                   icon: ShieldCheckIcon,
@@ -672,11 +698,15 @@ const ServiceDetail = () => {
                 return (
                   <div
                     key={index}
-                    className="bg-amber-50/50 p-4 rounded-lg text-center"
+                    className="bg-amber-50/50 p-4 md:p-6 rounded-lg text-center hover:shadow-md transition-shadow"
                   >
-                    <Icon className="w-8 h-8 mx-auto text-brand-gold-light mb-2" />
-                    <h4 className="font-bold mb-1">{item.title}</h4>
-                    <p className="text-gray-500">{item.desc}</p>
+                    <Icon className="w-8 h-8 md:w-10 md:h-10 mx-auto text-brand-gold-light mb-3" />
+                    <h4 className="font-bold mb-2 text-sm md:text-base">
+                      {item.title}
+                    </h4>
+                    <p className="text-gray-500 text-xs md:text-sm">
+                      {item.desc}
+                    </p>
                   </div>
                 );
               })}
@@ -686,16 +716,16 @@ const ServiceDetail = () => {
       </div>
 
       {/* Get A Quote */}
-      <div className="bg-white section-px py-8">
+      <div className="bg-white px-4 md:px-8 lg:px-16 py-12 md:py-16">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-center text-2xl md:text-3xl font-bold font-sans mb-2">
+          <h2 className="text-center text-2xl md:text-3xl font-bold font-sans mb-3">
             GET A QUOTE
           </h2>
-          <div className="w-10 h-0.5 bg-brand-gold-light mx-auto mb-8" />
+          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mb-8 md:mb-12" />
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-16 items-start">
             {/* Contact Info */}
-            <div className="w-full md:w-64 md:shrink-0 space-y-6 md:space-y-8">
+            <div className="w-full md:w-72 md:shrink-0 space-y-6 md:space-y-8">
               {[
                 {
                   icon: MapPinIcon,
@@ -717,14 +747,16 @@ const ServiceDetail = () => {
                 return (
                   <div key={i} className="flex items-start gap-3 md:gap-4">
                     <div className="shrink-0 mt-0.5 text-brand-gold-light">
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="font-bold font-sans mb-1">{c.label}</p>
+                      <p className="font-bold font-sans mb-2 text-sm md:text-base">
+                        {c.label}
+                      </p>
                       {c.lines.map((l, j) => (
                         <p
                           key={j}
-                          className="text-text-main/70 font-sans leading-5 m-0"
+                          className="text-text-main/70 font-sans leading-6 m-0 text-sm"
                         >
                           {l}
                         </p>
@@ -737,14 +769,14 @@ const ServiceDetail = () => {
 
             {/* Form */}
             <div className="flex-1 w-full">
-              <form className="space-y-4">
+              <form className="space-y-5">
                 {[
                   { name: "name", label: "YOUR NAME *", type: "text" },
                   { name: "email", label: "YOUR EMAIL *", type: "email" },
                   { name: "phone", label: "YOUR PHONE", type: "tel" },
                 ].map((f) => (
                   <div key={f.name}>
-                    <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-1">
+                    <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-2 text-xs md:text-sm">
                       {f.label}
                     </label>
                     <input
@@ -755,7 +787,7 @@ const ServiceDetail = () => {
                   </div>
                 ))}
                 <div>
-                  <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-1">
+                  <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-2 text-xs md:text-sm">
                     PROJECT DETAILS...
                   </label>
                   <textarea
@@ -766,7 +798,7 @@ const ServiceDetail = () => {
                 </div>
                 <button
                   type="button"
-                  className="btn-primary bg-brand-gold-light hover:bg-brand-gold text-white !px-6 !py-2.5"
+                  className="bg-brand-gold-light hover:bg-brand-gold text-white px-6 py-3 rounded-md transition-colors font-medium"
                 >
                   SEND MESSAGE
                 </button>
