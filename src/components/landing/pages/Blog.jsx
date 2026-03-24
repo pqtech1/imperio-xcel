@@ -9,11 +9,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useBlogs } from "@/hooks/useApiData";
 import { getImageUrl, stripHtml } from "@/lib/imageUtils";
+import { PageLoader } from "../Layouts/Header";
+import SEO from "./SEO";
 
 const BlogCard = ({ post }) => {
   const [hovered, setHovered] = useState(false);
 
-  // Format date
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -26,7 +27,6 @@ const BlogCard = ({ post }) => {
       .toUpperCase();
   };
 
-  // Estimate read time
   const getReadTime = (content) => {
     if (!content) return "1 min read";
     const wordCount = stripHtml(content).split(/\s+/).length;
@@ -38,7 +38,7 @@ const BlogCard = ({ post }) => {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="flex flex-col bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-all duration-500 border border-gray-100 h-full"
+      className="flex flex-col bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-500 border border-brand-gold/10 h-full group"
     >
       <div className="relative overflow-hidden h-48">
         <img
@@ -56,49 +56,47 @@ const BlogCard = ({ post }) => {
           }}
         />
         {post.is_published === 1 && (
-          <div className="absolute top-2 left-2 bg-brand-gold-light text-white px-2 py-0.5 rounded-full font-semibold text-[10px]">
+          <div className="absolute top-2 left-2 bg-brand-gold text-white px-2 py-0.5 rounded-full text-[10px] font-semibold">
             Published
           </div>
         )}
       </div>
 
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        <div className="flex items-center gap-2 text-[9px] text-gray-500 tracking-widest uppercase font-medium flex-wrap">
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        <div className="flex items-center gap-2 text-xs text-brand-charcoal/50 uppercase font-medium flex-wrap">
           <div className="flex items-center gap-1">
-            <CalendarIcon className="w-2.5 h-2.5" />
+            <CalendarIcon className="w-3 h-3" />
             <span>{formatDate(post.created_at)}</span>
           </div>
-          <span className="text-gray-300">|</span>
+          <span className="text-brand-charcoal/20">|</span>
           <div className="flex items-center gap-1">
-            <UserIcon className="w-2.5 h-2.5" />
+            <UserIcon className="w-3 h-3" />
             <span>InterioXcel</span>
           </div>
-          <span className="text-gray-300">|</span>
+          <span className="text-brand-charcoal/20">|</span>
           <div className="flex items-center gap-1">
-            <ClockIcon className="w-2.5 h-2.5" />
+            <ClockIcon className="w-3 h-3" />
             <span>{getReadTime(post.content)}</span>
           </div>
         </div>
 
-        <h3 className="font-bold leading-snug hover:text-brand-gold-light cursor-pointer transition-colors line-clamp-2">
+        <h4 className="leading-snug hover:text-brand-gold transition-colors cursor-pointer line-clamp-2">
           <Link to={`/blog/${post.slug || post.id}`}>{post.title}</Link>
-        </h3>
+        </h4>
 
-        <p className="text-[11px] text-gray-600 leading-relaxed line-clamp-3">
+        <p className="text-brand-charcoal/60 text-sm leading-relaxed line-clamp-3">
           {stripHtml(post.content || "").substring(0, 150)}...
         </p>
 
         <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="text-[9px] text-brand-gold-light font-semibold uppercase">
-            Article
-          </span>
+          <h6 className="mb-0">Article</h6>
           <Link
             to={`/blog/${post.slug || post.id}`}
-            className="flex items-center gap-1 text-[9px] font-bold tracking-widest uppercase text-brand-charcoal hover:text-brand-gold-light transition-all duration-300 group"
+            className="flex items-center gap-1 text-xs font-medium uppercase text-brand-charcoal hover:text-brand-gold transition-all duration-300 group"
           >
             READ MORE
             <ArrowRightIcon
-              className={`w-2.5 h-2.5 transition-transform duration-300 ${hovered ? "translate-x-1" : ""}`}
+              className={`w-3 h-3 transition-transform duration-300 ${hovered ? "translate-x-1" : ""}`}
             />
           </Link>
         </div>
@@ -108,14 +106,14 @@ const BlogCard = ({ post }) => {
 };
 
 const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
-  <div className="flex items-center justify-center gap-2 mt-8">
+  <div className="flex items-center justify-center gap-2 mt-12">
     <button
       onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
       disabled={currentPage === 1}
-      className={`w-7 h-7 font-medium transition-all duration-300 rounded flex items-center justify-center ${
+      className={`w-8 h-8 font-medium transition-all duration-300 rounded flex items-center justify-center ${
         currentPage === 1
-          ? "text-gray-300 cursor-not-allowed"
-          : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
+          ? "text-brand-charcoal/30 cursor-not-allowed"
+          : "text-brand-charcoal/60 hover:text-brand-gold hover:bg-bg-soft"
       }`}
     >
       ←
@@ -125,10 +123,10 @@ const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
       <button
         key={page}
         onClick={() => setCurrentPage(page)}
-        className={`w-7 h-7 font-medium transition-all duration-300 rounded ${
+        className={`w-8 h-8 font-medium transition-all duration-300 rounded ${
           currentPage === page
-            ? "bg-brand-gold-light text-white"
-            : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
+            ? "bg-brand-gold text-white"
+            : "text-brand-charcoal/60 hover:text-brand-gold hover:bg-bg-soft"
         }`}
       >
         {page}
@@ -138,10 +136,10 @@ const Pagination = ({ currentPage, setCurrentPage, totalPages }) => (
     <button
       onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
       disabled={currentPage === totalPages}
-      className={`w-7 h-7 font-medium transition-all duration-300 rounded flex items-center justify-center ${
+      className={`w-8 h-8 font-medium transition-all duration-300 rounded flex items-center justify-center ${
         currentPage === totalPages
-          ? "text-gray-300 cursor-not-allowed"
-          : "text-gray-600 hover:text-brand-gold-light hover:bg-gray-100"
+          ? "text-brand-charcoal/30 cursor-not-allowed"
+          : "text-brand-charcoal/60 hover:text-brand-gold hover:bg-bg-soft"
       }`}
     >
       →
@@ -156,7 +154,6 @@ const Blog = () => {
 
   const postsPerPage = 6;
 
-  // Filter only published posts and apply search
   const filteredPosts =
     blogs?.filter((post) => {
       if (post.is_published !== 1) return false;
@@ -171,7 +168,6 @@ const Blog = () => {
       return matchesSearch;
     }) || [];
 
-  // Sort by date (newest first)
   const sortedPosts = [...filteredPosts].sort(
     (a, b) => new Date(b.created_at) - new Date(a.created_at),
   );
@@ -182,43 +178,49 @@ const Blog = () => {
     currentPage * postsPerPage,
   );
 
-  // Get featured post (latest published post)
   const featuredPost = sortedPosts.length > 0 ? sortedPosts[0] : null;
 
   if (loading) {
     return (
       <>
-        {/* Hero Section */}
-        <div className="w-full relative">
-          <img
-            src="https://images.pexels.com/photos/439227/pexels-photo-439227.jpeg"
-            alt="Blog Hero"
-            className="w-full object-cover h-64 sm:h-72 md:h-120"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent flex items-center">
-            <div className="container mx-auto section-px">
-              <div className="max-w-2xl">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="w-10 h-[2px] bg-brand-gold-light" />
-                  <h6 className="!text-brand-gold-light !mb-0">
-                    INSIGHTS & IDEAS
-                  </h6>
+        <SEO
+          title="Blog - Interior Design Insights & Ideas | InterioXcel"
+          description="Explore industry insights, project case studies, and design inspiration from the InterioXcel team. Expert interior design tips and trends."
+          keywords="blog, interior design, design inspiration, case studies, Varanasi"
+          image="https://interioxcel.com/blog-og-image.jpg"
+          url="https://interioxcel.com/blog"
+        />
+        <div className="bg-white">
+          <section className="relative h-[50vh] min-h-[400px] overflow-hidden">
+            <div className="absolute inset-0">
+              <img
+                src="https://images.pexels.com/photos/439227/pexels-photo-439227.jpeg"
+                alt="Blog Hero"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+            </div>
+            <div className="relative z-10 h-full flex items-center">
+              <div className="container mx-auto section-px">
+                <div className="max-w-2xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-px bg-brand-gold-light" />
+                    <h6 className="text-brand-gold-light mb-0">
+                      INSIGHTS & IDEAS
+                    </h6>
+                  </div>
+                  <h1 className="text-white mb-2">Our Blog</h1>
+                  <p className="text-white/80 mb-0">
+                    Industry insights, project case studies, and design
+                    inspiration
+                  </p>
                 </div>
-                <h1 className="text-white !mb-2">Our Blog</h1>
-                <p className="text-gray-200 !mb-0">
-                  Industry insights, project case studies, and design
-                  inspiration from the InterioXcel team
-                </p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Loading State */}
-        <div className="section-px pt-10 pb-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex justify-center py-12">
-              <div className="animate-spin h-8 w-8 border-2 border-brand-gold border-t-transparent rounded-full" />
+          </section>
+          <div className="container mx-auto section-px py-16">
+            <div className="flex justify-center">
+              <PageLoader />
             </div>
           </div>
         </div>
@@ -228,50 +230,59 @@ const Blog = () => {
 
   return (
     <>
-      {/* Hero Section */}
-      <div className="w-full relative">
-        <img
-          src="https://images.pexels.com/photos/439227/pexels-photo-439227.jpeg"
-          alt="Blog Hero"
-          className="w-full object-cover h-64 sm:h-72 md:h-120"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent flex items-center">
-          <div className="container mx-auto section-px">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="w-10 h-[2px] bg-brand-gold-light" />
-                <h6 className="!text-brand-gold-light !mb-0">
-                  INSIGHTS & IDEAS
-                </h6>
+      <SEO
+        title={`Blog - ${sortedPosts.length} Articles on Interior Design | InterioXcel`}
+        description={`Explore ${sortedPosts.length} articles on interior design, industry insights, and project case studies from the InterioXcel team.`}
+        keywords="blog, interior design, design inspiration, case studies, Varanasi, home decor, commercial interiors"
+        image="https://interioxcel.com/blog-og-image.jpg"
+        url="https://interioxcel.com/blog"
+      />
+      <div className="bg-white">
+        {/* Hero Section */}
+        <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
+          <div className="absolute inset-0">
+            <img
+              src="https://images.pexels.com/photos/439227/pexels-photo-439227.jpeg"
+              alt="Blog Hero"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+          </div>
+          <div className="relative z-10 h-full flex items-center">
+            <div className="container mx-auto section-px">
+              <div className="max-w-2xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-px bg-brand-gold-light" />
+                  <h6 className="text-brand-gold-light mb-0">
+                    INSIGHTS & IDEAS
+                  </h6>
+                </div>
+                <h1 className="text-white mb-3">Our Blog</h1>
+                <p className="text-white/80 mb-0">
+                  Industry insights, project case studies, and design
+                  inspiration from the InterioXcel team
+                </p>
               </div>
-              <h1 className="text-white !mb-2">Our Blog</h1>
-              <p className="text-gray-200 !mb-0">
-                Industry insights, project case studies, and design inspiration
-                from the InterioXcel team
-              </p>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Blog Content */}
-      <div className="section-px pt-10 pb-12">
-        <div className="max-w-7xl mx-auto">
+        {/* Blog Content */}
+        <div className="container mx-auto section-px pt-12 pb-16">
           {/* Stats Bar */}
-          <div className="bg-white rounded-lg shadow p-4 mb-6 border border-gray-100">
+          <div className="bg-bg-soft rounded-lg p-4 mb-8 border border-brand-gold/10">
             <div className="flex flex-col md:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <SparklesIcon className="w-4 h-4 text-brand-gold-light" />
-                <span className="text-gray-600">
+                <SparklesIcon className="w-4 h-4 text-brand-gold" />
+                <p className="text-brand-charcoal/60 mb-0">
                   <strong className="text-brand-charcoal">
                     {sortedPosts.length} articles
                   </strong>{" "}
                   published
-                </span>
+                </p>
               </div>
 
-              {/* Search */}
-              <div className="relative w-full md:w-56">
+              <div className="relative w-full md:w-64">
                 <input
                   type="text"
                   placeholder="Search articles..."
@@ -280,7 +291,7 @@ const Blog = () => {
                     setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full px-3 py-1.5 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-brand-gold-light"
+                  className="w-full px-3 py-2 border border-brand-gold/20 rounded focus:outline-none focus:ring-1 focus:ring-brand-gold focus:border-brand-gold text-brand-charcoal text-sm"
                 />
               </div>
             </div>
@@ -288,9 +299,9 @@ const Blog = () => {
 
           {/* Featured Post */}
           {currentPage === 1 && searchQuery === "" && featuredPost && (
-            <div className="mb-8">
-              <div className="relative bg-gradient-to-r from-brand-charcoal to-black text-white rounded-lg overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
+            <div className="mb-10">
+              <div className="relative bg-brand-charcoal text-white rounded-lg overflow-hidden">
+                <div className="absolute inset-0 opacity-5">
                   <div
                     className="w-full h-full"
                     style={{
@@ -307,7 +318,7 @@ const Blog = () => {
                         "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg"
                       }
                       alt={featuredPost.title}
-                      className="w-full h-36 object-cover rounded shadow-xl"
+                      className="w-full h-40 object-cover rounded shadow-xl"
                       onError={(e) => {
                         e.target.src =
                           "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg";
@@ -315,24 +326,22 @@ const Blog = () => {
                     />
                   </div>
                   <div className="md:w-2/3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-brand-gold-light text-white px-2 py-0.5 rounded-full text-xs">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="bg-brand-gold text-white px-2 py-0.5 rounded-full text-xs font-semibold">
                         FEATURED
                       </span>
-                      <span className="text-gray-300 text-sm">
+                      <span className="text-white/60 text-sm">
                         Latest Article
                       </span>
                     </div>
-                    <h2 className="text-white text-base md:text-lg font-bold mb-2">
-                      {featuredPost.title}
-                    </h2>
-                    <p className="text-gray-300 text-sm mb-3 line-clamp-2">
+                    <h3 className="text-white mb-2">{featuredPost.title}</h3>
+                    <p className="text-white/70 text-sm mb-4 line-clamp-2">
                       {stripHtml(featuredPost.content || "").substring(0, 120)}
                       ...
                     </p>
                     <Link
                       to={`/blog/${featuredPost.slug || featuredPost.id}`}
-                      className="flex items-center gap-1 text-brand-gold-light hover:text-white transition-colors duration-300 text-sm font-medium"
+                      className="inline-flex items-center gap-1 text-brand-gold hover:text-brand-gold-light transition-colors duration-300 text-sm font-medium"
                     >
                       Read Full Article <ArrowRightIcon className="w-3 h-3" />
                     </Link>
@@ -344,14 +353,14 @@ const Blog = () => {
 
           {/* Blog Grid */}
           {currentPosts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentPosts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500">
+            <div className="text-center py-16">
+              <p className="text-brand-charcoal/60">
                 No articles found matching your criteria.
               </p>
             </div>

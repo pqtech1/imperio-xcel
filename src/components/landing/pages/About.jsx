@@ -193,12 +193,12 @@ const About = () => {
                   <div className="w-12 h-px bg-brand-gold opacity-70" />
                   <h6 className="mb-0">EST. 2017</h6>
                 </motion.div>
-                <h1>
+                <h1 className="text-white">
                   Crafting Spaces,
                   <br />
                   Creating <span className="text-brand-gold">Legacies</span>
                 </h1>
-                <p className="mb-0">
+                <p className="mb-0 text-white">
                   A comprehensive furnishing contracting solutions organization
                   dedicated to excellence in interior design.
                 </p>

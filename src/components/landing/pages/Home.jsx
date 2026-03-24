@@ -213,6 +213,7 @@ const ServiceCard = ({ service, index }) => {
 /* ─────── PROJECT CARD ─────── */
 const ProjectCard = ({ project, index }) => {
   const [hov, setHov] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -221,45 +222,52 @@ const ProjectCard = ({ project, index }) => {
       transition={{ duration: 0.7, delay: index * 0.08 }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      className="relative overflow-hidden cursor-pointer bg-bg-soft"
+      className="relative overflow-hidden cursor-pointer bg-black group" // Added group for easier child styling
     >
+      {/* Image Container */}
       <div className="h-72 overflow-hidden">
         <img
           src={project.image}
           alt={project.name}
           className={`w-full h-full object-cover block transition-transform duration-1000 ${
-            hov ? "scale-105" : "scale-100"
+            hov ? "scale-110" : "scale-100"
           }`}
           onError={(e) => {
             e.target.src = "/img/services/1.webp";
           }}
         />
       </div>
+
+      {/* Dark Overlay - Gradient from transparent to black at the bottom */}
       <div
-        className={`absolute inset-0 transition-all duration-600 ${
-          hov
-            ? "bg-gradient-to-t from-white/95 via-white/30 to-transparent"
-            : "bg-gradient-to-t from-white/70 to-transparent"
+        className={`absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-black/80 via-black/20 to-transparent ${
+          hov ? "opacity-100" : "opacity-70"
         }`}
       />
+
+      {/* Status Badge */}
       <div
-        className={`absolute top-4 right-4 px-3 py-1 border text-xs uppercase tracking-wider ${
+        className={`absolute top-4 right-4 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-sm border ${
           project.ongoing
-            ? "border-brand-gold text-brand-gold"
-            : "border-brand-charcoal/25 text-brand-charcoal/60"
+            ? "bg-amber-500/10 border-amber-500 text-amber-500" // Ongoing: Subtle Gold
+            : "bg-emerald-600 border-emerald-600 text-white" // Completed: Solid Green
         }`}
       >
         {project.ongoing ? "Ongoing" : "Completed"}
       </div>
+
+      {/* Text Content */}
       <div
-        className={`absolute bottom-0 left-0 right-0 p-5 transition-all duration-500 ${
-          hov ? "translate-y-0 opacity-100" : "translate-y-2 opacity-90"
+        className={`absolute bottom-0 left-0 right-0 p-6 transition-all duration-500 transform ${
+          hov ? "translate-y-0" : "translate-y-1"
         }`}
       >
-        <h4 className="mb-1.5">{project.name}</h4>
-        <div className="flex items-center gap-1.5 text-sm text-brand-gold font-medium">
-          <MapPinIcon className="w-2.5 h-2.5" />
-          <span>{project.locations}</span>
+        <h4 className="text-white text-xl font-semibold mb-1 drop-shadow-md">
+          {project.name}
+        </h4>
+        <div className="flex items-center gap-1.5 text-sm text-gray-300 font-medium">
+          <MapPinIcon className="w-3.5 h-3.5 text-brand-gold" />
+          <span className="drop-shadow-sm">{project.locations}</span>
         </div>
       </div>
     </motion.div>
@@ -537,7 +545,7 @@ const Home = () => {
                 <h6 className="mb-0">{heroSlides[slide].sub}</h6>
               </motion.div>
               <h1>
-                <span className="block">{heroSlides[slide].line1}</span>
+                <span className="block text-white">{heroSlides[slide].line1}</span>
                 <em className="italic text-brand-gold not-italic">
                   {heroSlides[slide].line2}
                 </em>

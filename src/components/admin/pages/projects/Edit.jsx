@@ -199,7 +199,7 @@ export default function EditProject() {
               {/* Description */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   name="description"

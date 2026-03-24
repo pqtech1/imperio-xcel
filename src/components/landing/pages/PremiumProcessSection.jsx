@@ -233,7 +233,7 @@ const PremiumProcessSection = () => {
                       textOrientation: "mixed",
                       transform: "rotate(180deg)",
                       color: "rgba(255,255,255,0.7)",
-                      fontSize: "13px",
+                      fontSize: "16px",
                       fontWeight: 500,
                       letterSpacing: "0.12em",
                       textTransform: "uppercase",
@@ -286,7 +286,7 @@ const PremiumProcessSection = () => {
 
                   <p
                     style={{
-                      fontSize: "13px",
+                      fontSize: "16px",
                       color: "rgba(245,240,232,0.68)",
                       lineHeight: 1.65,
                       margin: "0 0 18px",
@@ -324,7 +324,7 @@ const PremiumProcessSection = () => {
                         <span
                           style={{
                             fontSize: "11.5px",
-                            color: "rgba(245,240,232,0.5)",
+                            color: "white",
                             letterSpacing: "0.02em",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
