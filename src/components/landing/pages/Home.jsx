@@ -1,35 +1,31 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { Link } from "react-router-dom";
-
 import {
   ArrowRightIcon,
   MapPinIcon,
   EnvelopeIcon,
   PhoneIcon,
-  CheckCircleIcon,
-  BuildingOfficeIcon,
   BuildingStorefrontIcon,
   HomeModernIcon,
   UsersIcon,
-  BriefcaseIcon,
-  StarIcon,
   Squares2X2Icon,
   ShieldCheckIcon,
   WrenchScrewdriverIcon,
   CubeIcon,
   SwatchIcon,
-  TrophyIcon,
 } from "@heroicons/react/24/outline";
-
 import {
   BuildingLibraryIcon,
   BuildingOffice2Icon,
-  ShoppingBagIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-
 import {
   useServices,
   useAreas,
@@ -41,26 +37,27 @@ import {
 import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import Testimonial from "./Testimonial";
 import { PageLoader } from "../Layouts/Header";
+import SEO from "./SEO";
 
-// Hero slides (keep static as they're brand messaging)
+/* ─────── HERO SLIDES ─────── */
 const heroSlides = [
   {
     image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg",
-    title: "Crafting Excellence in Interior Design",
-    subtitle: "Transforming spaces into masterpieces since 2017",
-    accent: "Premium Furnishing Contracting",
+    line1: "Crafting",
+    line2: "Excellence.",
+    sub: "Premium Furnishing Contracting · Est. 2017",
   },
   {
     image: "https://images.pexels.com/photos/276514/pexels-photo-276514.jpeg",
-    title: "Where Vision Meets Precision",
-    subtitle: "Comprehensive furnishing contracting solutions",
-    accent: "Architecture & Design Excellence",
+    line1: "Where Vision",
+    line2: "Meets Precision.",
+    sub: "Architecture & Design Excellence",
   },
   {
     image: "https://images.pexels.com/photos/2079246/pexels-photo-2079246.jpeg",
-    title: "Architecture That Inspires",
-    subtitle: "Creating divine abodes with dedication and perfection",
-    accent: "Luxury Interior Solutions",
+    line1: "Architecture",
+    line2: "That Inspires.",
+    sub: "Luxury Interior Solutions",
   },
 ];
 
@@ -87,247 +84,473 @@ const principles = [
   },
 ];
 
+/* ─────── TINY HELPERS ─────── */
+const Cap = ({ children, className = "" }) => (
+  <h6 className={className}>{children}</h6>
+);
+
+const HR = ({ w = 40, className = "" }) => (
+  <div className={`w-[${w}px] h-px bg-brand-gold opacity-65 ${className}`} />
+);
+
+/* ─────── SECTION WRAPPER ─────── */
+const Inner = ({ children, className = "" }) => (
+  <div className={`container mx-auto section-px relative z-10 ${className}`}>
+    {children}
+  </div>
+);
+
+/* ─────── ANIMATED TEXT REVEAL ─────── */
+const Reveal = ({ children, delay = 0, y = 30 }) => (
+  <motion.div
+    initial={{ opacity: 0, y }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8, delay, ease: [0.76, 0, 0.24, 1] }}
+  >
+    {children}
+  </motion.div>
+);
+
+/* ─────── PARALLAX IMAGE ─────── */
+const ParallaxImg = ({ src, alt, speed = 0.15, className = "" }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", `${speed * 100}%`]);
+  return (
+    <div ref={ref} className={`overflow-hidden relative ${className}`}>
+      <motion.img
+        src={src}
+        alt={alt}
+        style={{ y }}
+        className="w-full h-[115%] object-cover block top-[-7.5%]"
+      />
+    </div>
+  );
+};
+
+/* ─────── STAT COUNTER ─────── */
+const StatItem = ({ value, label, bordered }) => {
+  const [ref, setVis] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const o = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) setVis(true);
+      },
+      { threshold: 0.3 },
+    );
+    if (containerRef.current) o.observe(containerRef.current);
+    return () => o.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`py-8 text-center ${bordered ? "border-r border-brand-charcoal/10" : ""}`}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: ref ? 1 : 0, y: ref ? 0 : 20 }}
+        transition={{ duration: 0.7 }}
+      >
+        <div className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-brand-gold leading-none mb-2">
+          {value}
+        </div>
+        <h6 className="mb-0">{label}</h6>
+      </motion.div>
+    </div>
+  );
+};
+
+/* ─────── SERVICE CARD ─────── */
+const ServiceCard = ({ service, index }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay: index * 0.12 }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className={`relative cursor-default transition-all duration-500 border-t border-brand-charcoal/10 p-6 md:p-8 ${
+        hov ? "bg-bg-soft" : "bg-transparent"
+      }`}
+    >
+      <div
+        className={`absolute top-0 left-0 h-px bg-gradient-to-r from-brand-gold to-transparent transition-all duration-600 ${
+          hov ? "w-full" : "w-0"
+        }`}
+      />
+      <h6 className="mb-4">0{index + 1}</h6>
+      <h3 className="mb-3">{service.title}</h3>
+      <p className="mb-5">{service.description}</p>
+      {service.features?.length > 0 && (
+        <ul className="list-none p-0 m-0 mb-6 flex flex-col gap-2">
+          {service.features.map((f, i) => (
+            <li key={i} className="flex items-center gap-2.5 list-none">
+              <div className="w-1 h-1 rounded-full bg-brand-gold flex-shrink-0" />
+              <span className="text-base text-brand-charcoal/60">{f}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link
+        to={`/${service.slug}`}
+        className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline transition-all duration-300 hover:gap-3.5 hover:text-brand-gold-light"
+      >
+        Explore <ArrowRightIcon className="w-3 h-3" />
+      </Link>
+    </motion.div>
+  );
+};
+
+/* ─────── PROJECT CARD ─────── */
+const ProjectCard = ({ project, index }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay: index * 0.08 }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="relative overflow-hidden cursor-pointer bg-bg-soft"
+    >
+      <div className="h-72 overflow-hidden">
+        <img
+          src={project.image}
+          alt={project.name}
+          className={`w-full h-full object-cover block transition-transform duration-1000 ${
+            hov ? "scale-105" : "scale-100"
+          }`}
+          onError={(e) => {
+            e.target.src = "/img/services/1.webp";
+          }}
+        />
+      </div>
+      <div
+        className={`absolute inset-0 transition-all duration-600 ${
+          hov
+            ? "bg-gradient-to-t from-white/95 via-white/30 to-transparent"
+            : "bg-gradient-to-t from-white/70 to-transparent"
+        }`}
+      />
+      <div
+        className={`absolute top-4 right-4 px-3 py-1 border text-xs uppercase tracking-wider ${
+          project.ongoing
+            ? "border-brand-gold text-brand-gold"
+            : "border-brand-charcoal/25 text-brand-charcoal/60"
+        }`}
+      >
+        {project.ongoing ? "Ongoing" : "Completed"}
+      </div>
+      <div
+        className={`absolute bottom-0 left-0 right-0 p-5 transition-all duration-500 ${
+          hov ? "translate-y-0 opacity-100" : "translate-y-2 opacity-90"
+        }`}
+      >
+        <h4 className="mb-1.5">{project.name}</h4>
+        <div className="flex items-center gap-1.5 text-sm text-brand-gold font-medium">
+          <MapPinIcon className="w-2.5 h-2.5" />
+          <span>{project.locations}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* ─────── BLOG CARD ─────── */
+const BlogCard = ({ blog, index }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay: index * 0.1 }}
+    >
+      <Link
+        to={`/blog/${blog.slug}`}
+        className="no-underline block group"
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+      >
+        <div className="h-60 overflow-hidden mb-4">
+          <img
+            src={blog.image}
+            alt={blog.title}
+            className={`w-full h-full object-cover block transition-transform duration-800 ${
+              hov ? "scale-105" : "scale-100"
+            }`}
+          />
+        </div>
+        <h6 className="mb-2">{blog.date}</h6>
+        <h4
+          className={`transition-colors duration-300 group-hover:text-brand-gold`}
+        >
+          {blog.title}
+        </h4>
+        <p className="mb-4">{blog.excerpt}</p>
+        <div className="inline-flex items-center gap-2 text-brand-gold font-medium uppercase tracking-wide transition-all duration-300 group-hover:gap-3.5 group-hover:text-brand-gold-light">
+          Read More <ArrowRightIcon className="w-2.5 h-2.5" />
+        </div>
+      </Link>
+    </motion.div>
+  );
+};
+
+/* ─────── TEAM CARD ─────── */
+const TeamCard = ({ member, index }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, delay: index * 0.12 }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <div className="relative overflow-hidden mb-4">
+        <img
+          src={member.image}
+          alt={member.name}
+          className={`w-full h-[340px] object-cover block transition-all duration-800 ${
+            hov ? "scale-105 brightness-95" : "scale-100 brightness-100"
+          }`}
+          onError={(e) => {
+            e.target.src =
+              "https://via.placeholder.com/400x500/111/333?text=Team";
+          }}
+        />
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-white/80 to-transparent transition-opacity duration-500 ${
+            hov ? "opacity-100" : "opacity-0"
+          }`}
+        />
+        <div
+          className={`absolute bottom-4 left-4 transition-all duration-400 delay-100 ${
+            hov ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2.5"
+          }`}
+        >
+          <HR className="mb-2" />
+        </div>
+      </div>
+      <h4 className="mb-1">{member.name}</h4>
+      <h6 className="mb-2">{member.role}</h6>
+      <p className="text-sm text-brand-charcoal/60 leading-relaxed m-0">
+        {member.desc}
+      </p>
+    </motion.div>
+  );
+};
+
+/* ═══════════════════════════════════════
+   MAIN COMPONENT
+═══════════════════════════════════════ */
 const Home = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slide, setSlide] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
-  const [hoveredProject, setHoveredProject] = useState(null);
 
-  // Fetch all dynamic data
-  const { data: services, loading: servicesLoading } = useServices();
-  const { data: areas, loading: areasLoading } = useAreas();
-  const { data: projects, loading: projectsLoading } = useProjects();
-  const { data: teams, loading: teamsLoading } = useTeams();
-  const { data: achievements, loading: achievementsLoading } =
-    useAchievements();
-  const { data: blogs, loading: blogsLoading } = useBlogs();
+  const { data: services, loading: sl } = useServices();
+  const { data: areas, loading: al } = useAreas();
+  const { data: projects, loading: pl } = useProjects();
+  const { data: teams, loading: tl } = useTeams();
+  const { data: achievements, loading: ahl } = useAchievements();
+  const { data: blogs, loading: bl } = useBlogs();
 
-  const loading =
-    servicesLoading ||
-    areasLoading ||
-    projectsLoading ||
-    teamsLoading ||
-    achievementsLoading ||
-    blogsLoading;
+  const loading = sl || al || pl || tl || ahl || bl;
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    const t = setInterval(
+      () => setSlide((p) => (p + 1) % heroSlides.length),
+      6000,
+    );
+    return () => clearInterval(t);
   }, []);
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 3);
-    }, 3000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setActiveStep((p) => (p + 1) % 3), 3000);
+    return () => clearInterval(t);
   }, []);
 
-  // Transform services for display (take first 3)
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <PageLoader />
+      </div>
+    );
+
   const displayedServices =
-    services?.slice(0, 3).map((service, index) => ({
-      icon: [SwatchIcon, Squares2X2Icon, CubeIcon][index % 3],
-      title: service.service_title || service.title || "Service",
+    services?.slice(0, 3).map((s, i) => ({
+      icon: [SwatchIcon, Squares2X2Icon, CubeIcon][i % 3],
+      title: s.service_title || s.title || "Service",
       description:
-        service.service_short_description ||
-        stripHtml(service.description || "").substring(0, 100) ||
+        s.service_short_description ||
+        stripHtml(s.description || "").substring(0, 120) ||
         "Comprehensive interior solutions",
-      features: service.what_we_do?.slice(0, 3).map((item) => item.title) || [
+      features: s.what_we_do?.slice(0, 3).map((w) => w.title) || [
         "Interior Detailing",
         "Space Planning",
         "Material Selection",
       ],
-      slug: service.slug || service.id,
+      slug: s.slug || s.id,
     })) || [];
 
-  // Transform stats from achievements (take first 4)
-  const stats = achievements?.slice(0, 4).map((achievement) => ({
-    icon: TrophyIcon,
-    value: `${achievement.count}+`,
-    label: achievement.title,
-  })) || [
-    { icon: TrophyIcon, value: "7+", label: "Years of Excellence" },
-    { icon: BriefcaseIcon, value: "50+", label: "Major Projects" },
-    { icon: BuildingOfficeIcon, value: "40+", label: "Bank Models" },
-    { icon: StarIcon, value: "100%", label: "Client Satisfaction" },
+  const stats = achievements
+    ?.slice(0, 4)
+    .map((a) => ({ value: `${a.count}+`, label: a.title })) || [
+    { value: "7+", label: "Years of Excellence" },
+    { value: "50+", label: "Major Projects" },
+    { value: "40+", label: "Bank Models" },
+    { value: "100%", label: "Client Satisfaction" },
   ];
 
-  // Transform areas of operation
   const displayedAreas =
-    areas?.slice(0, 4).map((area) => ({
+    areas?.slice(0, 4).map((a, i) => ({
       icon: [
         BuildingStorefrontIcon,
         BuildingLibraryIcon,
         BuildingOffice2Icon,
         HomeModernIcon,
-      ][Math.floor(Math.random() * 4)],
-      title: area.title || "Area",
-      description: area.description || "Specialized interior solutions",
-      projects: `${area.projects_done || 0}+ Projects`,
+      ][i % 4],
+      title: a.title || "Area",
+      description: a.description || "Specialized solutions",
+      projects: `${a.projects_done || 0}+`,
     })) || [];
 
-  // Transform projects for display (take first 6 for major projects)
   const displayedProjects =
-    projects?.slice(0, 6).map((project) => ({
-      name: project.name || "Project",
+    projects?.slice(0, 6).map((p) => ({
+      name: p.name || "Project",
       locations:
-        [project.district, project.state, project.country]
-          .filter(Boolean)
-          .join(", ") || "Location",
-      icon: [
-        BuildingLibraryIcon,
-        BuildingOffice2Icon,
-        ShoppingBagIcon,
-        BuildingStorefrontIcon,
-      ][Math.floor(Math.random() * 4)],
-      image: project.images?.[0]?.image_path
-        ? getImageUrl(project.images[0].image_path)
+        [p.district, p.state, p.country].filter(Boolean).join(", ") || "India",
+      image: p.images?.[0]?.image_path
+        ? getImageUrl(p.images[0].image_path)
         : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
-      ongoing: project.ongoing,
+      ongoing: p.ongoing,
     })) || [];
 
-  // Transform work in progress (ongoing projects)
   const workInProgress =
     projects
       ?.filter((p) => p.ongoing === 1)
       .slice(0, 2)
-      .map((project) => ({
-        project: project.name || "Project",
+      .map((p) => ({
+        project: p.name || "Project",
         location:
-          [project.district, project.state, project.country]
-            .filter(Boolean)
-            .join(", ") || "Location",
-        image: project.images?.[0]?.image_path
-          ? getImageUrl(project.images[0].image_path)
+          [p.district, p.state, p.country].filter(Boolean).join(", ") ||
+          "India",
+        image: p.images?.[0]?.image_path
+          ? getImageUrl(p.images[0].image_path)
           : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
       })) || [];
 
-  // Transform team members (take first 3)
   const displayedTeam =
-    teams?.map((member) => ({
-      name: member.name || "Team Member",
-      role: member.designation || "Professional",
-      desc: member.bio
-        ? stripHtml(member.bio).substring(0, 60)
+    teams?.map((m) => ({
+      name: m.name || "Team Member",
+      role: m.designation || "Professional",
+      desc: m.bio
+        ? stripHtml(m.bio).substring(0, 80)
         : "Dedicated professional",
-      image:
-        getImageUrl(member.image) ||
-        "https://via.placeholder.com/300x400?text=Team+Member",
+      image: getImageUrl(m.image) || "https://via.placeholder.com/400x500",
     })) || [];
 
-  // Transform blogs for display (take first 3)
   const displayedBlogs =
     blogs
       ?.filter((b) => b.is_published === 1)
       .slice(0, 3)
-      .map((blog) => ({
-        title: blog.title,
-        excerpt: stripHtml(blog.content || "").substring(0, 120) + "...",
+      .map((b) => ({
+        title: b.title,
+        excerpt: stripHtml(b.content || "").substring(0, 110) + "…",
         image:
-          getImageUrl(blog.image) ||
+          getImageUrl(b.image) ||
           "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg",
-        slug: blog.slug || blog.id,
-        date: new Date(blog.created_at).toLocaleDateString("en-US", {
+        slug: b.slug || b.id,
+        date: new Date(b.created_at).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
           year: "numeric",
         }),
       })) || [];
 
-  // Calculate totals
   const totalProjects = projects?.length || 50;
   const totalBankModels =
-    projects?.filter(
-      (p) =>
-        p.name?.toLowerCase().includes("bank") ||
-        p.name?.toLowerCase().includes("finance"),
-    ).length || 40;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <PageLoader />
-      </div>
-    );
-  }
+    projects?.filter((p) => p.name?.toLowerCase().includes("bank")).length ||
+    40;
 
   return (
     <>
-      {/* HERO SECTION - Static */}
-      <section className="relative h-screen overflow-hidden bg-black">
-        <div className="absolute inset-0">
+      <SEO
+        title="InterioXcel - Premium Furnishing Contracting & Interior Design | Varanasi"
+        description="InterioXcel is a premier furnishing contracting company specializing in luxury interior design, architecture, and turnkey solutions. With 7+ years of excellence, we transform spaces with precision and craftsmanship."
+        keywords="interior design, furnishing contracting, luxury interiors, architecture, Varanasi, home renovation, office interior, commercial interiors, bank models, turnkey solutions"
+        image="https://interioxcel.com/og-image.jpg"
+        url="https://interioxcel.com"
+      />
+      <div className="bg-white">
+        {/* ══════ HERO ══════ */}
+        <section className="relative h-screen min-h-[640px] overflow-hidden">
           <AnimatePresence>
             <motion.img
-              key={heroSlides[currentSlide].image}
-              src={heroSlides[currentSlide].image}
-              alt={heroSlides[currentSlide].title}
+              key={heroSlides[slide].image}
+              src={heroSlides[slide].image}
+              alt={heroSlides[slide].line1}
               className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0, scale: 1.05 }}
+              initial={{ opacity: 0, scale: 1.06 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeInOut" }}
+              transition={{ duration: 1.6, ease: "easeInOut" }}
             />
           </AnimatePresence>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
-          <div className="absolute inset-0 opacity-10">
-            <div
-              className="w-full h-full"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='%23b88a44' fill-opacity='0.1'/%3E%3C/svg%3E")`,
-                backgroundSize: "60px 60px",
-              }}
-            />
-          </div>
-        </div>
 
-        <div className="relative z-10 h-full flex items-center">
-          <div className="container mx-auto section-px">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+
+          <div className="absolute top-1/2 right-10 -translate-y-1/2 [writing-mode:vertical-rl] text-xs tracking-wider text-brand-charcoal/60 flex flex-col items-center gap-3">
+            <span>{String(slide + 1).padStart(2, "0")}</span>
+            <div className="w-px h-10 bg-brand-gold opacity-40" />
+            <span className="opacity-40">
+              {String(heroSlides.length).padStart(2, "0")}
+            </span>
+          </div>
+
+          <div className="absolute inset-0 flex items-end section-px pb-20">
             <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, y: 40 }}
+              key={slide}
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-3xl"
+              transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+              className="max-w-[820px]"
             >
               <motion.div
-                initial={{ opacity: 0, x: -40 }}
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center gap-3 mb-4"
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="flex items-center gap-4 mb-6"
               >
-                <span className="w-12 h-[2px] bg-brand-gold"></span>
-                <h6 className="text-brand-gold !mb-0">
-                  {heroSlides[currentSlide].accent}
-                </h6>
+                <HR w={52} />
+                <h6 className="mb-0">{heroSlides[slide].sub}</h6>
               </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-white"
-              >
-                {heroSlides[currentSlide].title}
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="text-gray-200 !mb-0"
-              >
-                {heroSlides[currentSlide].subtitle}
-              </motion.p>
-
+              <h1>
+                <span className="block">{heroSlides[slide].line1}</span>
+                <em className="italic text-brand-gold not-italic">
+                  {heroSlides[slide].line2}
+                </em>
+              </h1>
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="flex gap-4 mt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="flex gap-4 flex-wrap mt-8"
               >
-                <Link to="/portfolio" className="btn-primary group">
+                <Link to="/portfolio" className="btn-primary inline-flex">
                   Explore Our Work
-                  <ArrowRightIcon className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                  <ArrowRightIcon className="w-4 h-4 ml-2" />
                 </Link>
                 <Link to="/contact" className="btn-outline">
                   Contact Us
@@ -335,522 +558,477 @@ const Home = () => {
               </motion.div>
             </motion.div>
           </div>
-        </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-          {heroSlides.map((_, index) => (
-            <button key={index} onClick={() => setCurrentSlide(index)}>
-              <div
-                className={`w-12 h-[2px] transition-all ${
-                  currentSlide === index ? "bg-brand-gold" : "bg-white/40"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="absolute bottom-8 right-8 text-white/60 text-base tracking-widest rotate-90 origin-bottom-right"
-        >
-          SCROLL
-        </motion.div>
-      </section>
-
-      {/* HONEYBEE PHILOSOPHY - Static */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-3 mb-8"
-          >
-            <div className="w-8 h-[1px] bg-brand-gold"></div>
-            <h6 className="!mb-0">The Honeybee Ethos</h6>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-2 gap-12 mb-16 items-start">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="!text-4xl md:!text-5xl font-light !mb-0"
-            >
-              Engineering <br />
-              <span className="font-serif italic">Natural Efficiency.</span>
-            </motion.h2>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:pt-2"
-            >
-              <p>
-                We translate the biological brilliance of the hive into a
-                blueprint for modern excellence. Hard work is expected;
-                perfection is the baseline.
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-t border-gray-100">
-            {principles.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="pt-10 pb-12 md:pr-8 border-b border-gray-100 lg:border-b-0 lg:border-r last:border-r-0 group cursor-default"
+          <div className="absolute bottom-10 section-px flex gap-2.5 z-10">
+            {heroSlides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlide(i)}
+                className="bg-none border-none cursor-pointer py-1"
+                aria-label={`Go to slide ${i + 1}`}
               >
-                <h6 className="!text-brand-gold !mb-6 !text-[11px]">
-                  [{item.id}]
-                </h6>
-                <h3 className="text-xl font-medium mb-4 transition-colors duration-300 group-hover:text-brand-gold">
-                  {item.title}
-                </h3>
-                <p className="text-sm leading-relaxed font-light transition-colors duration-500 group-hover:text-gray-900">
-                  {item.desc}
-                </p>
-              </motion.div>
+                <div
+                  className={`h-px transition-all duration-400 ${
+                    i === slide
+                      ? "w-10 bg-brand-gold"
+                      : "w-4 bg-brand-charcoal/25"
+                  }`}
+                />
+              </button>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* INTRODUCTION SECTION - Static with dynamic stats */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px">
-          <div className="flex flex-col lg:flex-row gap-12 items-center">
+          <div className="absolute bottom-11 right-20 flex flex-col items-center gap-2">
+            <h6 className="[writing-mode:vertical-rl] tracking-[0.25em] mb-0">
+              Scroll
+            </h6>
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:w-1/2"
-            >
-              <h6 className="!text-brand-gold-light">EST. 2017</h6>
-              <h2>
-                Crafting Excellence{" "}
-                <span className="text-brand-gold-light">Since a Decade</span>
-              </h2>
-              <div className="w-16 h-[2px] bg-brand-gold-light mb-6"></div>
-              <p>
-                InterioXcel, established by Mrs. Meera Ramesh Vishwakarma, is
-                dedicated to creating comprehensive furnishing contracting
-                solutions within the interior design industry. Our founders
-                bring extensive wealth of experience, spanning decades, in the
-                interior solutions sector.
-              </p>
-              <p className="!mb-6">
-                Having collaborated with esteemed architects and PMC companies,
-                we've successfully delivered numerous interior projects
-                encompassing thousands of square feet. Today, under the
-                leadership of Abhishek Vishwakarma, we continue our commitment
-                to excellence.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="border-l-4 border-brand-gold-light pl-4">
-                  <p className="text-2xl font-bold">{totalProjects}+</p>
-                  <p className="text-base">Projects Completed</p>
-                </div>
-                <div className="border-l-4 border-brand-gold-light pl-4">
-                  <p className="text-2xl font-bold">{totalBankModels}+</p>
-                  <p className="text-base">Bank Models</p>
-                </div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="lg:w-1/2 relative"
-            >
-              <div className="relative">
-                <img
-                  src={
-                    projects?.[0]?.images?.[0]?.image_path
-                      ? getImageUrl(projects[0].images[0].image_path)
-                      : "https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
-                  }
-                  alt="Interior Design"
-                  className="w-full h-auto rounded-xl shadow-2xl"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-brand-charcoal text-white p-6 rounded-xl max-w-sm shadow-2xl">
-                  <CheckCircleIcon className="w-8 h-8 text-brand-gold-light mb-3" />
-                  <p className="text-white text-base font-light italic">
-                    "Adherence to values and principles of honesty and
-                    transparency"
-                  </p>
-                  <p className="mt-3 text-brand-gold-light text-sm">
-                    — Our Philosophy
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* SERVICES SECTION */}
-      {displayedServices.length > 0 && (
-        <section className="pt-16 pb-12 bg-white">
-          <div className="container mx-auto section-px max-w-7xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h6 className="!text-brand-gold">What We Offer</h6>
-              <h2>Our Comprehensive Services</h2>
-              <div className="w-12 h-[1px] bg-brand-gold mx-auto mb-6"></div>
-              <p className="!mb-0">
-                Your ultimate one-stop solution provider for all interior
-                furnishing contracting needs.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 border-t border-gray-100">
-              {displayedServices.map((service, index) => {
-                const Icon = service.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group pt-10 pb-12 px-6 border-b md:border-b-0 md:border-r border-gray-100 last:border-r-0"
-                  >
-                    <Link to={`/${service.slug}`}>
-                      <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center mb-6 group-hover:border-brand-gold transition-colors duration-300">
-                        <Icon className="w-5 h-5 group-hover:text-brand-gold transition-colors duration-300" />
-                      </div>
-                      <h3 className="text-xl font-medium mb-3 group-hover:text-brand-gold transition-colors duration-300">
-                        {service.title}
-                      </h3>
-                      <p className="text-sm leading-relaxed mb-4">
-                        {service.description}
-                      </p>
-                      <ul className="space-y-2 mb-6">
-                        {service.features.map((feature, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center gap-2 text-base"
-                          >
-                            <CheckCircleIcon className="w-3 h-3 text-brand-gold" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* View All Services Link */}
-            <div className="text-center mt-8">
-              <Link
-                to="/services"
-                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
-              >
-                View All Services
-                <ArrowRightIcon className="w-4 h-4" />
-              </Link>
-            </div>
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity }}
+              className="w-px h-12 bg-gradient-to-b from-brand-gold to-transparent opacity-50"
+            />
           </div>
         </section>
-      )}
 
-      {/* STATS SECTION */}
-      <section className="py-12 bg-brand-charcoal text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
-          {" "}
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z' fill='%23b88a44'/%3E%3C/svg%3E")`,
-              backgroundSize: "60px 60px",
-            }}
-          />
-        </div>
+        {/* ══════ PHILOSOPHY ══════ */}
+        <section>
+          <div className="bg-bg-soft border-t border-brand-gold/15 border-b border-brand-gold/15 overflow-hidden py-3">
+            <motion.div
+              animate={{ x: [0, -1200] }}
+              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+              className="flex gap-15 whitespace-nowrap"
+            >
+              {Array(6)
+                .fill([
+                  "Interior Excellence",
+                  "Premium Craftsmanship",
+                  "Est. 2017",
+                  "Varanasi, India",
+                  "Luxury Design",
+                  "Space Transformation",
+                ])
+                .flat()
+                .map((t, i) => (
+                  <span
+                    key={i}
+                    className={`text-sm uppercase tracking-wider ${
+                      i % 6 === 0 ? "text-brand-gold" : "text-brand-charcoal/60"
+                    }`}
+                  >
+                    {t} <span className="text-brand-gold ml-[30px]">✦</span>
+                  </span>
+                ))}
+            </motion.div>
+          </div>
 
-        <div className="container mx-auto section-px max-w-7xl relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 border-t border-white/10">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
+          <Inner className="pt-12 pb-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-end mb-12">
+              <Reveal>
+                <h6 className="mb-4">The Honeybee Ethos</h6>
+                <h2>
+                  Engineering
+                  <br />
+                  <em className="italic text-brand-gold not-italic">
+                    Natural Efficiency.
+                  </em>
+                </h2>
+              </Reveal>
+              <Reveal delay={0.2}>
+                <p className="mb-5">
+                  We translate the biological brilliance of the hive into a
+                  blueprint for modern excellence. Hard work is expected;
+                  perfection is the baseline.
+                </p>
+                <HR />
+              </Reveal>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-brand-charcoal/10">
+              {principles.map((p, i) => (
                 <motion.div
-                  key={index}
+                  key={p.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="pt-8 pb-10 px-4 text-center border-b md:border-b-0 md:border-r border-white/10 last:border-r-0 group"
+                  transition={{ delay: i * 0.1 }}
+                  className={`py-8 px-6 pb-10 ${
+                    i < 3 && "lg:border-r border-brand-charcoal/10"
+                  }`}
                 >
-                  <div className="flex justify-center mb-4">
-                    <Icon className="w-5 h-5 text-brand-gold-light opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-                  <div className="text-3xl md:text-4xl font-light text-white mb-2 tracking-tight">
-                    {stat.value}
-                  </div>
-                  <p className="text-base text-white uppercase tracking-widest group-hover:text-gray-400 transition-colors duration-300">
-                    {stat.label}
+                  <h6 className="mb-4">[{p.id}]</h6>
+                  <h5 className="mb-2">{p.title}</h5>
+                  <p className="text-sm text-brand-charcoal/60 leading-relaxed m-0">
+                    {p.desc}
                   </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* View All Achievements Link */}
-        <div className="text-center mt-4">
-          <Link
-            to="/achievement"
-            className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors text-sm font-semibold"
-          >
-            View All Achievements
-            <ArrowRightIcon className="w-4 h-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* AREAS OF OPERATION */}
-      {displayedAreas.length > 0 && (
-        <section className="pt-16 pb-12 bg-white">
-          <div className="container mx-auto section-px max-w-7xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h6 className="!text-brand-gold">Where We Excel</h6>
-              <h2>Areas of Operation</h2>
-              <div className="w-12 h-[1px] bg-brand-gold mx-auto"></div>
-            </motion.div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-gray-100">
-              {displayedAreas.map((area, index) => {
-                const Icon = area.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group pt-8 pb-10 px-6 border-b lg:border-b-0 lg:border-r border-gray-100 last:border-r-0 text-center"
-                  >
-                    <div className="flex justify-center mb-4">
-                      <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center group-hover:border-brand-gold transition-colors duration-300">
-                        <Icon className="w-5 h-5 group-hover:text-brand-gold transition-colors duration-300" />
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-medium mb-2 group-hover:text-brand-gold transition-colors duration-300">
-                      {area.title}
-                    </h3>
-                    <p className="text-base leading-relaxed mb-3">
-                      {area.description}
-                    </p>
-                    <h6 className="!text-brand-gold !text-base !mb-0">
-                      {area.projects}
-                    </h6>
-                  </motion.div>
-                );
-              })}
-            </div>
-            <div className="text-center mt-8">
-              <Link
-                to="/areas-we-serve"
-                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
-              >
-                View All Areas
-                <ArrowRightIcon className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* MAJOR PROJECTS SHOWCASE */}
-      {displayedProjects.length > 0 && (
-        <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
-          <div className="container mx-auto section-px">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h6 className="!text-brand-gold-light">OUR PORTFOLIO</h6>
-              <h2>Major Projects</h2>
-              <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto mb-6"></div>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displayedProjects.map((project, index) => {
-                const Icon = project.icon;
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    onHoverStart={() => setHoveredProject(index)}
-                    onHoverEnd={() => setHoveredProject(null)}
-                    className="group relative h-72 rounded-xl overflow-hidden cursor-pointer"
-                  >
-                    <img
-                      src={project.image}
-                      alt={project.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                    <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Icon className="w-5 h-5 text-brand-gold-light" />
-                        <h3 className="text-white font-bold text-lg">
-                          {project.name}
-                        </h3>
-                      </div>
-                      <p className="text-brand-gold-light text-base mb-2">
-                        {project.locations}
-                      </p>
-                      <div className="flex items-center gap-2 text-white/80 text-base">
-                        <MapPinIcon className="w-3 h-3" />
-                        <span>{project.locations}</span>
-                      </div>
-                    </div>
-
-                    <div className="absolute top-3 right-3 bg-brand-gold-light text-white px-3 py-1 rounded-full text-base font-medium">
-                      {project.ongoing ? "Ongoing" : "Completed"}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* View All Projects Link */}
-            <div className="text-center mt-8">
-              <Link
-                to="/portfolio"
-                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
-              >
-                View All Projects
-                <ArrowRightIcon className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* WORK IN PROGRESS */}
-      {workInProgress.length > 0 && (
-        <section className="pt-16 pb-12 bg-brand-charcoal text-white">
-          <div className="container mx-auto section-px max-w-7xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="mb-10"
-            >
-              <h6 className="!text-brand-gold-light !mb-2">
-                CURRENTLY WORKING ON
-              </h6>
-              <h2 className="text-white">Work in Progress</h2>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {workInProgress.map((work, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  className="group relative overflow-hidden rounded-lg"
-                >
-                  <img
-                    src={work.image}
-                    alt={work.project}
-                    className="w-full h-[320px] object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition duration-500" />
-                  <div className="absolute bottom-0 left-0 p-6">
-                    <h3 className="text-xl font-semibold mb-1 text-white">
-                      {work.project}
-                    </h3>
-                    <div className="flex items-center gap-2 text-gray-300 text-base">
-                      <MapPinIcon className="w-3 h-3" />
-                      <span>{work.location}</span>
-                    </div>
-                  </div>
                 </motion.div>
               ))}
             </div>
+          </Inner>
+        </section>
+
+        {/* ══════ INTRODUCTION ══════ */}
+        <section className="bg-bg-soft">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="py-12 lg:py-16 section-px flex flex-col justify-center">
+              <Reveal>
+                <h6 className="mb-4">Est. 2017</h6>
+                <h2 className="mb-4">
+                  Crafting Excellence
+                  <br />
+                  <em className="italic text-brand-gold not-italic">
+                    Since a Decade
+                  </em>
+                </h2>
+                <HR className="mb-6" />
+                <p className="mb-3">
+                  InterioXcel, established by Mrs. Meera Ramesh Vishwakarma, is
+                  dedicated to creating comprehensive furnishing contracting
+                  solutions. Our founders bring decades of experience in the
+                  interior solutions sector.
+                </p>
+                <p className="mb-8">
+                  Having collaborated with esteemed architects and PMC
+                  companies, we've successfully delivered numerous interior
+                  projects. Under the leadership of Abhishek Vishwakarma, we
+                  continue our commitment to excellence.
+                </p>
+                <div className="grid grid-cols-2 gap-5 mb-8">
+                  {[
+                    { v: `${totalProjects}+`, l: "Projects Completed" },
+                    { v: `${totalBankModels}+`, l: "Bank Models" },
+                  ].map((s, i) => (
+                    <div key={i} className="border-l border-brand-gold pl-4">
+                      <div className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-brand-gold leading-none">
+                        {s.v}
+                      </div>
+                      <h6 className="mb-0 mt-1">{s.l}</h6>
+                    </div>
+                  ))}
+                </div>
+                <Link to="/about" className="btn-primary inline-flex w-fit">
+                  Our Story
+                  <ArrowRightIcon className="w-4 h-4 ml-2" />
+                </Link>
+              </Reveal>
+            </div>
+            <div className="relative overflow-hidden h-[500px] lg:h-auto">
+              <ParallaxImg
+                src={
+                  projects?.[0]?.images?.[0]?.image_path
+                    ? getImageUrl(projects[0].images[0].image_path)
+                    : "https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
+                }
+                alt="Interior Design"
+                className="h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-bg-soft/30 to-transparent" />
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="absolute bottom-10 -left-7 bg-white p-6 max-w-[300px] border-l-2 border-brand-gold shadow-md"
+              >
+                <p className="text-sm text-brand-charcoal italic leading-relaxed mb-2 font-serif">
+                  "Adherence to values and principles of honesty and
+                  transparency"
+                </p>
+                <h6 className="mb-0">— Our Philosophy</h6>
+              </motion.div>
+            </div>
           </div>
         </section>
-      )}
 
-      {/* OUR PROCESS - Static */}
-      <section className="pt-16 pb-12 bg-white">
-        <div className="container mx-auto section-px max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-12"
-          >
-            <h6 className="!text-brand-gold-light">HOW WE WORK</h6>
-            <h2>Our Execution Strategy</h2>
-            <div className="w-12 h-[1px] bg-brand-gold-light mx-auto"></div>
-          </motion.div>
+        {/* ══════ ACHIEVEMENTS / STATS ══════ */}
+        <section className="bg-bg-soft">
+          <Inner className="pt-12 pb-8">
+            <div className="text-center mb-8">
+              <Reveal>
+                <h6 className="mb-3">Our Achievements</h6>
+              </Reveal>
+              <Reveal delay={0.1}>
+                <h2>
+                  Numbers That{" "}
+                  <em className="italic text-brand-gold not-italic">Speak</em>
+                </h2>
+              </Reveal>
+              <Reveal delay={0.2}>
+                <HR className="mx-auto mt-4" />
+              </Reveal>
+            </div>
+          </Inner>
+          <div className="border-t border-brand-gold/15 border-b border-brand-gold/15">
+            <Inner className="py-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                {stats.map((s, i) => (
+                  <StatItem
+                    key={i}
+                    value={s.value}
+                    label={s.label}
+                    bordered={i < 3}
+                  />
+                ))}
+              </div>
+            </Inner>
+          </div>
+          <Inner className="pt-4 pb-6 flex justify-end">
+            <Link
+              to="/achievement"
+              className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+            >
+              All Achievements <ArrowRightIcon className="w-2.5 h-2.5" />
+            </Link>
+          </Inner>
+        </section>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-10 relative">
-              <div className="absolute left-0 right-0 h-[1px] bg-gray-200 top-1/2 -translate-y-1/2"></div>
+        {/* ══════ SERVICES ══════ */}
+        {displayedServices.length > 0 && (
+          <section>
+            <Inner className="pt-12 pb-8">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-15 items-end mb-12">
+                <Reveal>
+                  <h6 className="mb-4">What We Offer</h6>
+                  <h2>
+                    Our Comprehensive
+                    <br />
+                    <em className="italic text-brand-gold not-italic">
+                      Services
+                    </em>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.2} y={15}>
+                  <p className="mb-4">
+                    Your ultimate one-stop solution for all interior furnishing
+                    contracting needs — from conception to flawless completion.
+                  </p>
+                  <Link
+                    to="/services"
+                    className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+                  >
+                    View All Services <ArrowRightIcon className="w-2.5 h-2.5" />
+                  </Link>
+                </Reveal>
+              </div>
+            </Inner>
+            <Inner className="pb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+                {displayedServices.map((s, i) => (
+                  <ServiceCard key={i} service={s} index={i} />
+                ))}
+              </div>
+            </Inner>
+          </section>
+        )}
 
+        {/* ══════ AREAS ══════ */}
+        {displayedAreas.length > 0 && (
+          <section className="bg-bg-soft">
+            <Inner className="py-12">
+              <div className="text-center mb-10">
+                <Reveal>
+                  <h6 className="mb-3">Where We Excel</h6>
+                </Reveal>
+                <Reveal delay={0.1}>
+                  <h2>
+                    Areas of{" "}
+                    <em className="italic text-brand-gold not-italic">
+                      Operation
+                    </em>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.2}>
+                  <HR className="mx-auto mt-4" />
+                </Reveal>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-brand-charcoal/10">
+                {displayedAreas.map((area, i) => {
+                  const Icon = area.icon;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className={`py-10 px-6 text-center ${
+                        i < 3 && "lg:border-r border-brand-charcoal/10"
+                      }`}
+                    >
+                      <div className="w-11 h-11 border border-brand-gold/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon className="w-4.5 h-4.5 text-brand-gold" />
+                      </div>
+                      <h4 className="mb-2">{area.title}</h4>
+                      <p className="text-sm text-brand-charcoal/60 leading-relaxed mb-3">
+                        {area.description}
+                      </p>
+                      <h6 className="mb-0">{area.projects} Projects</h6>
+                    </motion.div>
+                  );
+                })}
+              </div>
+              <div className="text-center mt-8">
+                <Link
+                  to="/areas-we-serve"
+                  className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+                >
+                  All Areas <ArrowRightIcon className="w-2.5 h-2.5" />
+                </Link>
+              </div>
+            </Inner>
+          </section>
+        )}
+
+        {/* ══════ PROJECTS ══════ */}
+        {displayedProjects.length > 0 && (
+          <section>
+            <Inner className="pt-12 pb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10">
+                <div>
+                  <Reveal>
+                    <h6 className="mb-3">Our Portfolio</h6>
+                  </Reveal>
+                  <Reveal delay={0.1}>
+                    <h2>
+                      Major{" "}
+                      <em className="italic text-brand-gold not-italic">
+                        Projects
+                      </em>
+                    </h2>
+                  </Reveal>
+                </div>
+                <Reveal delay={0.2}>
+                  <Link
+                    to="/portfolio"
+                    className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+                  >
+                    View All <ArrowRightIcon className="w-2.5 h-2.5" />
+                  </Link>
+                </Reveal>
+              </div>
+            </Inner>
+            <Inner className="pb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2px]">
+                {displayedProjects.map((p, i) => (
+                  <ProjectCard key={i} project={p} index={i} />
+                ))}
+              </div>
+            </Inner>
+          </section>
+        )}
+
+        {/* ══════ WORK IN PROGRESS ══════ */}
+        {workInProgress.length > 0 && (
+          <section className="bg-bg-soft">
+            <Inner className="py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20 items-start">
+                <div>
+                  <Reveal>
+                    <h6 className="mb-4">Currently Working On</h6>
+                    <h2 className="mb-5">
+                      Work in
+                      <br />
+                      <em className="italic text-brand-gold not-italic">
+                        Progress
+                      </em>
+                    </h2>
+                    <HR />
+                    <p className="mt-4">
+                      We take immense pride in our ongoing projects, each a
+                      testament to our commitment to craft and precision.
+                    </p>
+                  </Reveal>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[2px]">
+                  {workInProgress.map((w, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.15 }}
+                      className="relative overflow-hidden h-[380px]"
+                    >
+                      <img
+                        src={w.image}
+                        alt={w.project}
+                        className="w-full h-full object-cover block"
+                        onError={(e) => {
+                          e.target.src = "/img/services/1.webp";
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-5">
+                        <div className="inline-block px-2.5 py-0.75 border border-brand-gold mb-2">
+                          <h6 className="mb-0">Live Project</h6>
+                        </div>
+                        <h4 className="mb-1">{w.project}</h4>
+                        <div className="flex items-center gap-1.5 text-sm text-brand-charcoal/60">
+                          <MapPinIcon className="w-2.5 h-2.5 text-brand-gold" />
+                          <span>{w.location}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </Inner>
+          </section>
+        )}
+
+        {/* ══════ PROCESS ══════ */}
+        <section className="bg-bg-soft">
+          <Inner className="py-12">
+            <div className="text-center mb-10">
+              <Reveal>
+                <h6 className="mb-3">How We Work</h6>
+              </Reveal>
+              <Reveal delay={0.1}>
+                <h2>
+                  Our Execution{" "}
+                  <em className="italic text-brand-gold not-italic">
+                    Strategy
+                  </em>
+                </h2>
+              </Reveal>
+              <Reveal delay={0.2}>
+                <HR className="mx-auto mt-4" />
+              </Reveal>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-t border-brand-charcoal/10 mb-10">
               {["Planning & Design", "Documentation", "Execution"].map(
-                (step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.2 }}
-                    className="relative z-10 text-center"
+                (step, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setActiveStep(i)}
+                    className={`py-7 px-6 cursor-pointer transition-all duration-400 relative ${
+                      i < 2 && "md:border-r border-brand-charcoal/10"
+                    } ${activeStep === i ? "bg-white" : "bg-transparent"}`}
                   >
                     <div
-                      onClick={() => setActiveStep(index)}
-                      className={`w-12 h-12 flex items-center justify-center rounded-full text-sm font-semibold cursor-pointer transition-all duration-300
-                        ${
-                          activeStep === index
-                            ? "bg-brand-gold-light text-white shadow-md"
-                            : "bg-gray-100 hover:bg-gray-200"
-                        }
-                      `}
+                      className={`absolute top-0 left-0 right-0 h-px transition-all duration-400 ${
+                        activeStep === i ? "bg-brand-gold" : "bg-transparent"
+                      }`}
+                    />
+                    <h6
+                      className={`mb-2 ${
+                        activeStep === i
+                          ? "text-brand-gold"
+                          : "text-brand-charcoal/60"
+                      }`}
                     >
-                      {index + 1}
-                    </div>
-                    <p
-                      className={`mt-3 text-base font-medium transition-colors ${
-                        activeStep === index ? "text-brand-gold-light" : ""
+                      {String(i + 1).padStart(2, "0")}
+                    </h6>
+                    <h5
+                      className={`m-0 transition-colors duration-300 ${
+                        activeStep === i
+                          ? "text-brand-charcoal"
+                          : "text-brand-charcoal/60"
                       }`}
                     >
                       {step}
-                    </p>
-                  </motion.div>
+                    </h5>
+                  </div>
                 ),
               )}
             </div>
@@ -858,336 +1036,271 @@ const Home = () => {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                exit={{ opacity: 0, y: -16 }}
                 transition={{ duration: 0.4 }}
-                className="bg-gray-50 p-8 rounded-lg border border-gray-100"
+                className="max-w-[640px] mx-auto text-center"
               >
-                <h3 className="text-xl font-semibold mb-3">
+                <p className="m-0">
                   {
                     [
-                      "Planning and Design",
-                      "Construction Documentation",
-                      "Project Completion",
+                      "Understanding designs and drawings, allocating resources for optimal project execution. We collaborate closely with architects and designers to ensure every detail is precisely planned.",
+                      "Detailed documentation, estimates, and technical drawings are prepared to ensure seamless implementation and efficient project management across all workstreams.",
+                      "Final execution, quality checks, and project delivery with strict quality standards to ensure complete client satisfaction and zero compromise on craftsmanship.",
                     ][activeStep]
                   }
-                </h3>
-
-                <p className="text-gray-600 leading-relaxed text-base">
-                  {activeStep === 0 &&
-                    "Understanding designs and drawings, allocating resources for optimal project execution. We collaborate closely with architects and designers to ensure every detail is precisely planned."}
-                  {activeStep === 1 &&
-                    "Detailed documentation, estimates, and technical drawings are prepared to ensure seamless implementation and efficient project management."}
-                  {activeStep === 2 &&
-                    "Final execution, quality checks, and project delivery with strict quality standards to ensure complete client satisfaction."}
                 </p>
               </motion.div>
             </AnimatePresence>
-          </div>
-        </div>
-      </section>
+          </Inner>
+        </section>
 
-      {/* QUALITY & SAFETY - Static */}
-      <section className="pt-16 pb-12 bg-brand-charcoal text-white">
-        <div className="container mx-auto section-px max-w-7xl">
-          <div className="flex flex-col lg:flex-row gap-12 items-start">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="lg:w-1/2"
-            >
-              <h6 className="!text-brand-gold-light">Our Commitment</h6>
-              <h2 className="text-white">
-                Quality & Safety{" "}
-                <span className="text-brand-gold-light">First</span>
-              </h2>
-              <div className="w-12 h-[1px] bg-brand-gold-light mb-6"></div>
-              <p className="text-gray-300 !mb-4">
-                At our construction sites, quality and safety remain the highest
-                priority for every professional involved in interior execution.
-                We strictly follow industry standards to ensure exceptional
-                craftsmanship and a safe working environment.
-              </p>
-              <p className="text-white !mb-0">
-                From providing protective equipment to regular safety
-                inspections and continuous workforce training, every process is
-                designed to protect our team and maintain the highest quality
-                standards.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="lg:w-1/2 grid grid-cols-2 gap-4"
-            >
-              {[
-                {
-                  icon: WrenchIcon,
-                  title: "PPE Equipment",
-                  desc: "Full protective gear for all workers",
-                },
-                {
-                  icon: ShieldCheckIcon,
-                  title: "Safety Inspections",
-                  desc: "Regular monitoring & site audits",
-                },
-                {
-                  icon: WrenchScrewdriverIcon,
-                  title: "Maintenance",
-                  desc: "Routine equipment servicing",
-                },
-                {
-                  icon: UsersIcon,
-                  title: "Team Training",
-                  desc: "Continuous skill development",
-                },
-              ].map((item, index) => {
-                const Icon = item.icon;
-                return (
+        {/* ══════ QUALITY & SAFETY ══════ */}
+        <section>
+          <Inner className="py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-25 items-center">
+              <Reveal>
+                <h6 className="mb-4">Our Commitment</h6>
+                <h2 className="mb-4">
+                  Quality & Safety
+                  <br />
+                  <em className="italic text-brand-gold not-italic">First</em>
+                </h2>
+                <HR className="mb-6" />
+                <p className="mb-3">
+                  At our construction sites, quality and safety remain the
+                  highest priority for every professional involved in interior
+                  execution. We strictly follow industry standards to ensure
+                  exceptional craftsmanship.
+                </p>
+                <p className="m-0">
+                  From providing protective equipment to regular safety
+                  inspections and continuous workforce training, every process
+                  protects our team and maintains the highest quality standards.
+                </p>
+              </Reveal>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-[2px]">
+                {[
+                  {
+                    Icon: WrenchIcon,
+                    title: "PPE Equipment",
+                    desc: "Full protective gear for all workers",
+                  },
+                  {
+                    Icon: ShieldCheckIcon,
+                    title: "Safety Inspections",
+                    desc: "Regular monitoring & site audits",
+                  },
+                  {
+                    Icon: WrenchScrewdriverIcon,
+                    title: "Maintenance",
+                    desc: "Routine equipment servicing",
+                  },
+                  {
+                    Icon: UsersIcon,
+                    title: "Team Training",
+                    desc: "Continuous skill development",
+                  },
+                ].map(({ Icon, title, desc }, i) => (
                   <motion.div
-                    key={index}
+                    key={i}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group border border-white/10 p-6 rounded-lg hover:border-brand-gold-light transition-all duration-300"
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="bg-bg-soft p-6 border-t border-brand-gold/10 transition-all duration-300 hover:bg-bg-soft/70"
                   >
-                    <Icon className="w-6 h-6 text-brand-gold-light mb-3" />
-                    <h4 className="font-semibold mb-1 text-sm">{item.title}</h4>
-                    <p className="text-base text-gray-300 leading-relaxed">
-                      {item.desc}
+                    <div className="w-9 h-9 border border-brand-gold/30 rounded-full flex items-center justify-center mb-3">
+                      <Icon className="w-3.5 h-3.5 text-brand-gold" />
+                    </div>
+                    <h5 className="mb-2">{title}</h5>
+                    <p className="text-sm text-brand-charcoal/60 leading-relaxed m-0">
+                      {desc}
                     </p>
                   </motion.div>
-                );
-              })}
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA BANNER */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={
-              projects?.[1]?.images?.[0]?.image_path
-                ? getImageUrl(projects[1].images[0].image_path)
-                : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
-            }
-            alt="Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-charcoal via-brand-charcoal/95 to-brand-charcoal/90" />
-        </div>
-
-        <div className="container mx-auto section-px relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <h2 className="text-white !mb-4">
-              Ready to Transform{" "}
-              <span className="text-brand-gold-light">Your Space?</span>
-            </h2>
-            <p className="text-gray-300 !mb-6">
-              Let's bring your vision to life with our expertise and dedication
-              to excellence
-            </p>
-            <Link
-              to="/contact"
-              className="btn-primary group bg-brand-gold-light hover:bg-brand-gold text-white !px-8 !py-3 mx-auto"
-            >
-              SCHEDULE A DESIGN CONSULTATION
-              <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* TEAM SECTION */}
-      {displayedTeam.length > 0 && (
-        <section className="pt-16 pb-12 bg-white">
-          <div className="container mx-auto section-px max-w-7xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h6 className="!text-brand-gold-light">Our Leadership</h6>
-              <h2>Meet the Team</h2>
-              <div className="w-12 h-[1px] bg-brand-gold-light mx-auto"></div>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {displayedTeam.map((member, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.15 }}
-                  className="text-center group"
-                >
-                  <div className="relative mb-4 overflow-hidden rounded-lg">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 border border-transparent group-hover:border-brand-gold-light transition-all duration-500"></div>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
-                  <h6 className="!text-brand-gold-light !text-base !mb-2">
-                    {member.role}
-                  </h6>
-                  <p className="text-base">{member.desc}</p>
-                </motion.div>
-              ))}
+                ))}
+              </div>
             </div>
-
-            
-          </div>
+          </Inner>
         </section>
-      )}
 
-      {/* BLOG PREVIEW SECTION */}
-      {displayedBlogs.length > 0 && (
-        <section className="pt-16 pb-12 bg-gradient-to-b from-amber-50/30 to-white">
-          <div className="container mx-auto section-px">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center max-w-3xl mx-auto mb-12"
-            >
-              <h6 className="!text-brand-gold-light">INSIGHTS</h6>
-              <h2>Latest from Our Blog</h2>
-              <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-brand-gold-light to-transparent mx-auto mb-6"></div>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {displayedBlogs.map((blog, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Link to={`/blog/${blog.slug}`} className="block">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={blog.image}
-                        alt={blog.title}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-5">
-                      <p className="text-xs text-brand-gold-light mb-2">
-                        {blog.date}
-                      </p>
-                      <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
-                        {blog.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                        {blog.excerpt}
-                      </p>
-                      <span className="inline-flex items-center gap-1 text-brand-gold-light hover:text-brand-gold transition-colors text-sm font-semibold">
-                        Read More
-                        <ArrowRightIcon className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* View All Blog Link */}
-            <div className="text-center mt-8">
-              <Link
-                to="/blog"
-                className="inline-flex items-center gap-2 text-brand-gold-light hover:text-brand-gold transition-colors font-semibold"
+        {/* ══════ CTA BANNER ══════ */}
+        <section className="relative min-h-[400px]">
+          <div className="absolute inset-0 overflow-hidden">
+            <img
+              src={
+                projects?.[1]?.images?.[0]?.image_path
+                  ? getImageUrl(projects[1].images[0].image_path)
+                  : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
+              }
+              alt=""
+              className="w-full h-full object-cover brightness-90"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-black/80 to-black/80" />
+          </div>
+          <div className="relative z-10 flex items-center min-h-[400px]">
+            <Inner>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="max-w-[600px] text-center mx-auto"
               >
-                View All Articles
-                <ArrowRightIcon className="w-4 h-4" />
-              </Link>
-            </div>
+                <h6 className="mb-4 text-white">Ready to Begin?</h6>
+                <h2 className="text-white mb-5">
+                  Ready to Transform
+                  <br />
+                  <em className="italic text-brand-gold not-italic">
+                    Your Space?
+                  </em>
+                </h2>
+                <p className="text-white/60 leading-relaxed mb-8 max-w-[440px] mx-auto">
+                  Let's bring your vision to life with our expertise and
+                  dedication to excellence. Every project begins with a
+                  conversation.
+                </p>
+                <Link to="/contact" className="btn-primary inline-flex">
+                  Schedule a Consultation
+                  <ArrowRightIcon className="w-4 h-4 ml-2" />
+                </Link>
+              </motion.div>
+            </Inner>
           </div>
         </section>
-      )}
 
-      {/* TESTIMONIAL SECTION */}
-      <Testimonial />
-
-      {/* CONTACT SECTION */}
-      <section className="py-8 bg-brand-charcoal text-white border-t border-white/10">
-        <div className="container mx-auto section-px">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h3 className="text-xl font-bold mb-1">
-                Let's Create Something Amazing Together
-              </h3>
-              <p className="text-gray-300 text-base">
-                Contact us today to discuss your project requirements
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              <div className="flex items-center gap-2 group cursor-pointer">
-                <div className="w-8 h-8 rounded-full bg-brand-gold-light/10 flex items-center justify-center group-hover:bg-brand-gold-light transition-colors duration-300">
-                  <PhoneIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
-                </div>
-                <div>
-                  <p className="text-base text-white">Call Us</p>
-                  <p className="text-white text-sm font-medium">
-                    +91-6393556220
+        {/* ══════ TEAM ══════ */}
+        {displayedTeam.length > 0 && (
+          <section>
+            <Inner className="py-12">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-20 items-end mb-10">
+                <Reveal>
+                  <h6 className="mb-4">Our Leadership</h6>
+                  <h2>
+                    Meet the{" "}
+                    <em className="italic text-brand-gold not-italic">Team</em>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.2} y={10}>
+                  <p className="mb-3">
+                    The minds and hands behind every space we transform — united
+                    by a passion for craft and a relentless pursuit of
+                    perfection.
                   </p>
-                </div>
+                  <HR />
+                </Reveal>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayedTeam.map((m, i) => (
+                  <TeamCard key={i} member={m} index={i} />
+                ))}
+              </div>
+            </Inner>
+          </section>
+        )}
 
-              <div className="flex items-center gap-2 group cursor-pointer">
-                <div className="w-8 h-8 rounded-full bg-brand-gold-light/10 flex items-center justify-center group-hover:bg-brand-gold-light transition-colors duration-300">
-                  <EnvelopeIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
-                </div>
+        {/* ══════ BLOG ══════ */}
+        {displayedBlogs.length > 0 && (
+          <section className="bg-bg-soft">
+            <Inner className="py-12">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10">
                 <div>
-                  <p className="text-base text-white">Email Us</p>
-                  <p className="text-white text-sm font-medium">
-                    info@interioxcel.com
-                  </p>
+                  <Reveal>
+                    <h6 className="mb-3">Insights</h6>
+                  </Reveal>
+                  <Reveal delay={0.1}>
+                    <h2>
+                      Latest from{" "}
+                      <em className="italic text-brand-gold not-italic">
+                        Our Blog
+                      </em>
+                    </h2>
+                  </Reveal>
                 </div>
+                <Reveal delay={0.2}>
+                  <Link
+                    to="/blog"
+                    className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+                  >
+                    All Articles <ArrowRightIcon className="w-2.5 h-2.5" />
+                  </Link>
+                </Reveal>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayedBlogs.map((b, i) => (
+                  <BlogCard key={i} blog={b} index={i} />
+                ))}
+              </div>
+            </Inner>
+          </section>
+        )}
 
-              <div className="flex items-center gap-2 group cursor-pointer">
-                <div className="w-8 h-8 rounded-full bg-brand-gold-light/10 flex items-center justify-center group-hover:bg-brand-gold-light transition-colors duration-300">
-                  <MapPinIcon className="w-4 h-4 text-brand-gold-light group-hover:text-white" />
-                </div>
-                <div>
-                  <p className="text-base text-white">Visit Us</p>
-                  <p className="text-white text-sm font-medium">Varanasi, UP</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+        {/* ══════ TESTIMONIAL ══════ */}
+        <Testimonial />
+
+        {/* ══════ CONTACT BAR ══════ */}
+        <div className="bg-bg-soft border-t border-brand-gold/15">
+          <Inner className="py-6">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="text-center lg:text-left"
+              >
+                <h4 className="mb-1">
+                  Let's Create Something Amazing Together
+                </h4>
+                <p className="text-sm text-brand-charcoal/60 m-0">
+                  Contact us today to discuss your project requirements
+                </p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-col sm:flex-row gap-5 sm:gap-6"
+              >
+                {[
+                  {
+                    Icon: PhoneIcon,
+                    label: "Call Us",
+                    value: "+91-6393556220",
+                  },
+                  {
+                    Icon: EnvelopeIcon,
+                    label: "Email Us",
+                    value: "info@interioxcel.com",
+                  },
+                  {
+                    Icon: MapPinIcon,
+                    label: "Visit Us",
+                    value: "Varanasi, UP",
+                  },
+                ].map(({ Icon, label, value }, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 cursor-pointer group"
+                  >
+                    <div className="w-[34px] h-[34px] rounded-full border border-brand-gold/25 flex items-center justify-center transition-colors duration-300 group-hover:border-brand-gold flex-shrink-0">
+                      <Icon className="w-3 h-3 text-brand-gold" />
+                    </div>
+                    <div>
+                      <h6 className="mb-0">{label}</h6>
+                      <div className="text-sm text-brand-charcoal mt-0.5">
+                        {value}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </Inner>
         </div>
-      </section>
+
+       
+      </div>
     </>
   );
 };

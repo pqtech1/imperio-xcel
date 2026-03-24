@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { UploadCloud, Trash2, ArrowLeft } from "lucide-react";
 
 import TiptapEditor from "@/components/editor/TiptapEditor";
-
 export default function OverviewEdit() {
   const navigate = useNavigate();
   const { id, overviewId } = useParams();
@@ -60,6 +59,20 @@ export default function OverviewEdit() {
     setExistingImages(updated);
   };
 
+  const removeNewImage = (index) => {
+    const updatedImages = [...images];
+    const updatedPreviews = [...imagePreviews];
+
+    // Revoke the object URL to avoid memory leaks
+    URL.revokeObjectURL(updatedPreviews[index]);
+
+    updatedImages.splice(index, 1);
+    updatedPreviews.splice(index, 1);
+
+    setImages(updatedImages);
+    setImagePreviews(updatedPreviews);
+  };
+
   const inputError = (field) =>
     errors[field] ? "border-red-500 focus-visible:ring-red-500" : "";
 
@@ -76,19 +89,21 @@ export default function OverviewEdit() {
     formData.append("intro", intro);
     formData.append("description", description);
 
+    // Send the list of images that should be kept
     existingImages.forEach((img) => {
       formData.append("existing_images[]", img);
     });
 
+    // Add new images
     images.forEach((img) => {
       formData.append("images[]", img);
     });
 
+    // Add _method for Laravel to interpret as PUT
+    formData.append("_method", "PUT");
+
     try {
-      const res = await api.post(
-        `/services-overview/${overviewId}?_method=PUT`,
-        formData,
-      );
+      const res = await api.post(`/services-overview/${overviewId}`, formData);
 
       toast.success(res.data.message || "Overview updated successfully");
       navigate(`/admin/dashboard/services/${id}/overview`);
@@ -103,6 +118,13 @@ export default function OverviewEdit() {
 
     setLoading(false);
   };
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    };
+  }, [imagePreviews]);
 
   return (
     <div className="max-w-4xl mx-auto bg-white border border-gray-200">
@@ -214,7 +236,7 @@ export default function OverviewEdit() {
                   {existingImages.map((img, index) => (
                     <div
                       key={index}
-                      className="relative border border-gray-200 bg-gray-50"
+                      className="relative border border-gray-200 bg-gray-50 group"
                     >
                       <img
                         src={`${IMG_PATH}/${img}`}
@@ -224,12 +246,46 @@ export default function OverviewEdit() {
                       <button
                         type="button"
                         onClick={() => removeExistingImage(index)}
-                        className="absolute top-2 right-2 bg-white border border-gray-300 p-1.5 hover:bg-red-50 transition-colors group"
+                        className="absolute top-2 right-2 bg-white border border-gray-300 p-1.5 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
                         title="Remove image"
                       >
                         <Trash2
                           size={14}
-                          className="text-gray-600 group-hover:text-red-600"
+                          className="text-gray-600 hover:text-red-600"
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* New Images Preview */}
+            {imagePreviews.length > 0 && (
+              <div className="mb-8">
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  New Images
+                </Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div
+                      key={index}
+                      className="relative border border-gray-200 bg-gray-50 group"
+                    >
+                      <img
+                        src={preview}
+                        alt={`New ${index + 1}`}
+                        className="h-32 w-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeNewImage(index)}
+                        className="absolute top-2 right-2 bg-white border border-gray-300 p-1.5 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Remove image"
+                      >
+                        <Trash2
+                          size={14}
+                          className="text-gray-600 hover:text-red-600"
                         />
                       </button>
                     </div>
@@ -241,7 +297,7 @@ export default function OverviewEdit() {
             {/* Upload New Images */}
             <div className="space-y-3">
               <Label className="text-sm font-medium text-gray-700">
-                {existingImages.length > 0
+                {existingImages.length > 0 || imagePreviews.length > 0
                   ? "Add More Images"
                   : "Upload Images"}
               </Label>
@@ -253,36 +309,12 @@ export default function OverviewEdit() {
               >
                 <UploadCloud className="w-10 h-10 mb-3 text-gray-400" />
 
-                {imagePreviews.length > 0 ? (
-                  <div className="text-center w-full">
-                    <div className="flex flex-wrap gap-3 justify-center mb-3">
-                      {imagePreviews.map((preview, index) => (
-                        <img
-                          key={index}
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
-                          className="h-16 w-16 object-cover border border-gray-200"
-                        />
-                      ))}
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      {images.length} new{" "}
-                      {images.length === 1 ? "image" : "images"} selected
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Click to change or add more
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-base font-medium text-gray-700">
-                      Click to upload images
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      PNG, JPG up to 2MB each
-                    </p>
-                  </>
-                )}
+                <p className="text-base font-medium text-gray-700">
+                  Click to upload images
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  PNG, JPG up to 2MB each
+                </p>
 
                 <input
                   type="file"

@@ -1,45 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, CircleCheckBig } from "lucide-react";
 import {
-  BuildingOfficeIcon,
-  BuildingStorefrontIcon,
-  BuildingLibraryIcon,
-  HomeModernIcon,
-  CheckCircleIcon,
-  WrenchScrewdriverIcon,
-  SwatchIcon,
-  CubeIcon,
-  Squares2X2Icon,
-  ShieldCheckIcon,
-  UserGroupIcon,
-  SparklesIcon,
-  ClockIcon,
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 
-import api from "@/lib/api";
-import { getImageUrl, stripHtml } from "@/lib/imageUtils";
+import { getImageUrl } from "@/lib/imageUtils";
 import { useServices, useFAQs } from "@/hooks/useApiData";
 import { PageLoader } from "../Layouts/Header";
+import PremiumProcessSection from "./PremiumProcessSection";
 
-// Import shadcn carousel components
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+const GOLD = "#C9A96E";
+const GOLD_LIGHT = "#E2C98A";
+const DARK = "#FFFFFF"; // Changed to white background
+const DARK_2 = "#FAFAFA"; // Light grey for subtle contrast
+const DARK_3 = "#F5F5F5"; // Even lighter grey
+const LIGHT = "#0C0C0C"; // Changed to dark text
+const MUTED = "rgba(12,12,12,0.65)"; // Dark muted text
 
-// Reusable hooks
+const serif = "'Georgia', 'Times New Roman', serif";
+
+/* ─────────────────────────────────────────
+   useInView HOOK
+───────────────────────────────────────── */
 const useInView = (threshold = 0.15) => {
-  const ref = React.useRef(null);
-  const [visible, setVisible] = React.useState(false);
-  React.useEffect(() => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) setVisible(true);
@@ -52,320 +45,524 @@ const useInView = (threshold = 0.15) => {
   return [ref, visible];
 };
 
-const BlueprintBg = () => (
-  <svg
-    className="absolute inset-0 w-full h-full pointer-events-none opacity-10"
-    xmlns="http://www.w3.org/2000/svg"
+/* ─────────────────────────────────────────
+   SECTION LABEL
+───────────────────────────────────────── */
+const SectionLabel = ({ children }) => (
+  <p
+    style={{
+      fontSize: "11px",
+      letterSpacing: "0.28em",
+      textTransform: "uppercase",
+      color: GOLD,
+      fontWeight: 500,
+      marginBottom: "14px",
+    }}
   >
-    <defs>
-      <pattern
-        id="bp-grid"
-        width="28"
-        height="28"
-        patternUnits="userSpaceOnUse"
-      >
-        <path
-          d="M28 0L0 0 0 28"
-          fill="none"
-          stroke="#b88a44"
-          strokeWidth="0.5"
-        />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#bp-grid)" />
-  </svg>
+    {children}
+  </p>
 );
 
-// Why Choose Us Card
-const WhyCard = ({ item, delay }) => {
+/* ─────────────────────────────────────────
+   GOLD DIVIDER
+───────────────────────────────────────── */
+const GoldLine = ({ width = 40, style = {} }) => (
+  <div
+    style={{ width, height: "1px", background: GOLD, opacity: 0.7, ...style }}
+  />
+);
+
+/* ─────────────────────────────────────────
+   IMAGE CAROUSEL
+───────────────────────────────────────── */
+const TwoImageCarousel = ({ images }) => {
+  const [idx, setIdx] = useState(0);
+  if (!images?.length) return null;
+  const valid = images.filter((i) => i?.src);
+  const prev = () => setIdx((p) => (p === 0 ? valid.length - 2 : p - 2));
+  const next = () => setIdx((p) => (p + 2 >= valid.length ? 0 : p + 2));
+  const display = valid.slice(idx, idx + 2);
+  if (display.length === 1) display.push(display[0]);
+  const pages = Math.ceil(valid.length / 2);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}
+      >
+        <AnimatePresence mode="wait">
+          {display.map((img, i) => (
+            <motion.div
+              key={`${idx}-${i}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.55, delay: i * 0.08 }}
+              style={{
+                position: "relative",
+                borderRadius: "2px",
+                overflow: "hidden",
+                aspectRatio: "4/3",
+              }}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  e.target.src = "/img/services/1.webp";
+                }}
+              />
+              {/* Subtle vignette */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(135deg, rgba(0,0,0,0.05) 0%, transparent 60%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {valid.length > 2 && (
+        <>
+          {[
+            { fn: prev, side: "left", Icon: ChevronLeft },
+            { fn: next, side: "right", Icon: ChevronRight },
+          ].map(({ fn, side, Icon }) => (
+            <button
+              key={side}
+              onClick={fn}
+              style={{
+                position: "absolute",
+                [side]: "-20px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "40px",
+                height: "40px",
+                background: "#FFFFFF",
+                border: `0.5px solid rgba(201,169,110,0.4)`,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#F5F5F5")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "#FFFFFF")
+              }
+            >
+              <Icon size={16} color={GOLD} />
+            </button>
+          ))}
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "8px",
+              marginTop: "24px",
+            }}
+          >
+            {Array.from({ length: pages }).map((_, i) => (
+              <div
+                key={i}
+                onClick={() => setIdx(i * 2)}
+                style={{
+                  width: Math.floor(idx / 2) === i ? "28px" : "6px",
+                  height: "2px",
+                  borderRadius: "1px",
+                  background:
+                    Math.floor(idx / 2) === i ? GOLD : "rgba(0,0,0,0.2)",
+                  cursor: "pointer",
+                  transition: "all 0.4s ease",
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   SERVICE CARD (What We Do)
+───────────────────────────────────────── */
+const ServiceCard = ({ item, index }) => {
   const [ref, visible] = useInView(0.15);
   const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="flex-1 relative overflow-hidden px-5 md:px-6 py-8 border border-gray-200 cursor-default text-center transition-colors duration-400 rounded-lg"
-      style={{
-        background: hovered ? "#1a1f26" : "#ffffff",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(24px)",
-        transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s, background 0.3s ease`,
-      }}
-    >
-      <BlueprintBg />
-      <div className="relative z-10">
-        <div className="w-14 h-14 mx-auto mb-3 bg-brand-gold-light/10 rounded-lg flex items-center justify-center">
-          <BuildingOfficeIcon className="w-7 h-7 text-brand-gold-light" />
-        </div>
-        <h3
-          className="text-base md:text-base font-bold font-sans mb-2 tracking-tight transition-colors duration-300"
-          style={{ color: hovered ? "#fff" : "#1a1f26" }}
-        >
-          {item.title}
-        </h3>
-        <p
-          className="md:text-base leading-relaxed font-sans transition-colors duration-300"
-          style={{ color: hovered ? "#bbb" : "#666" }}
-        >
-          {item.desc}
-        </p>
-      </div>
-    </div>
-  );
-};
-
-// FAQ Item
-const FAQItem = ({ item, index }) => {
-  const [open, setOpen] = useState(index === 0);
-  const [ref, visible] = useInView(0.1);
-  return (
-    <div
-      ref={ref}
-      className="border-b border-stone-200"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(12px)",
-        transition: `opacity 0.4s ease ${index * 0.03}s, transform 0.4s ease ${index * 0.03}s`,
-      }}
-    >
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="w-full flex justify-between items-center py-3 md:py-4 bg-transparent border-none cursor-pointer text-left gap-3"
-      >
-        <span className="text-base md:text-base font-semibold font-serif leading-snug">
-          {item.question || item.q}
-        </span>
-        <span
-          className="shrink-0 w-6 h-6 rounded-full border-2 border-brand-gold-light flex items-center justify-center transition-all duration-300"
-          style={{
-            color: open ? "#fff" : "#b88a44",
-            background: open ? "#b88a44" : "transparent",
-            transform: open ? "rotate(45deg)" : "rotate(0deg)",
-          }}
-        >
-          <span className="leading-none text-base -mt-px">+</span>
-        </span>
-      </button>
-      <div
-        className="overflow-hidden transition-all duration-400"
-        style={{ maxHeight: open ? "200px" : "0" }}
-      >
-        <p className="leading-6 pb-4 pr-8">{item.answer || item.a}</p>
-      </div>
-    </div>
-  );
-};
-
-// Service Card Component for What We Do
-const ServiceCard = ({ item, index }) => {
-  const [ref, visible] = useInView(0.2);
-  const [hovered, setHovered] = useState(false);
   const isEven = index % 2 === 1;
-
-  // Get image from the item if available
-  const imageUrl = item.image
-    ? getImageUrl(item.image)
-    : "https://images.pexels.com/photos/1631049/pexels-photo-1631049.jpeg";
+  const imgNum = (index % 10) + 1;
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={`flex flex-col md:flex-row mb-8 overflow-hidden min-h-72 rounded-lg shadow-md ${isEven ? "md:flex-row-reverse" : ""}`}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 40 }}
+      transition={{ duration: 0.7 }}
+      style={{
+        display: "flex",
+        flexDirection: isEven ? "row-reverse" : "row",
+        marginBottom: "2px",
+        overflow: "hidden",
+        background: DARK_2,
+        position: "relative",
+      }}
     >
+      {/* Number indicator */}
+      <div
+        style={{
+          position: "absolute",
+          top: "24px",
+          left: isEven ? "auto" : "calc(50% + 24px)",
+          right: isEven ? "calc(50% + 24px)" : "auto",
+          fontSize: "11px",
+          letterSpacing: "0.2em",
+          color: GOLD,
+          fontWeight: 500,
+          zIndex: 2,
+        }}
+      >
+        {String(index + 1).padStart(2, "0")}
+      </div>
+
       {/* Image */}
       <div
-        className="w-full md:w-1/2 relative overflow-hidden cursor-pointer min-h-56 md:min-h-0"
         style={{
-          transform: visible ? "translateX(0)" : "translateX(-40px)",
-          opacity: visible ? 1 : 0,
-          transition:
-            "transform 0.7s cubic-bezier(0.23,1,0.32,1), opacity 0.7s ease",
+          width: "50%",
+          position: "relative",
+          overflow: "hidden",
+          minHeight: "340px",
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         <img
-          src={imageUrl}
+          src={`img/services/${imgNum}.webp`}
           alt={item.title}
-          className="w-full h-full object-cover block"
           style={{
-            filter: hovered
-              ? "grayscale(0%) brightness(1.05)"
-              : "grayscale(50%)",
-            transform: hovered ? "scale(1.05)" : "scale(1)",
-            transition: "filter 0.5s ease, transform 0.5s ease",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: hovered ? "scale(1.07)" : "scale(1)",
+            transition: "transform 1.1s cubic-bezier(0.76, 0, 0.24, 1)",
+            display: "block",
           }}
           onError={(e) => {
-            e.target.src =
-              "https://images.pexels.com/photos/1631049/pexels-photo-1631049.jpeg";
+            e.target.src = "/img/services/1.webp";
           }}
         />
         <div
-          className="absolute inset-0 pointer-events-none transition-opacity duration-500"
-          style={{ background: "#b88a44", opacity: hovered ? 0.15 : 0 }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: hovered
+              ? "linear-gradient(to right, rgba(0,0,0,0.2), transparent)"
+              : "linear-gradient(to right, rgba(0,0,0,0.05), transparent)",
+            transition: "background 0.6s ease",
+          }}
         />
       </div>
 
-      {/* Text */}
+      {/* Content */}
       <div
-        className="w-full md:w-1/2 bg-brand-charcoal px-5 md:px-8 py-6 md:py-8 flex flex-col justify-center"
         style={{
-          transform: visible ? "translateX(0)" : "translateX(40px)",
-          opacity: visible ? 1 : 0,
-          transition:
-            "transform 0.7s cubic-bezier(0.23,1,0.32,1) 0.1s, opacity 0.7s ease 0.1s",
+          width: "50%",
+          padding: "52px 48px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          background: DARK_2,
+          position: "relative",
         }}
       >
+        {/* Vertical gold accent */}
         <div
-          className="h-0.5 mb-4 transition-all duration-500 delay-300"
           style={{
-            width: visible ? "40px" : "0px",
-            background: "#b88a44",
+            position: "absolute",
+            [isEven ? "right" : "left"]: 0,
+            top: "10%",
+            bottom: "10%",
+            width: "1px",
+            background: `linear-gradient(to bottom, transparent, ${GOLD}, transparent)`,
+            opacity: 0.3,
           }}
         />
-        <h3 className="text-white text-lg md:text-xl font-bold font-serif tracking-wide mb-3">
+
+        <GoldLine style={{ marginBottom: "20px" }} />
+        <h3
+          style={{
+            fontSize: "clamp(20px, 2.5vw, 28px)",
+            fontWeight: 300,
+            color: LIGHT,
+            margin: "0 0 16px",
+            fontFamily: serif,
+            lineHeight: 1.2,
+            letterSpacing: "-0.01em",
+          }}
+        >
           {item.title}
         </h3>
         {item.description && (
           <div
-            className="text-gray-300 text-base leading-6 font-sans mb-4"
+            style={{
+              color: MUTED,
+              fontSize: "14px",
+              lineHeight: 1.8,
+              marginBottom: "24px",
+            }}
             dangerouslySetInnerHTML={{ __html: item.description }}
           />
         )}
-
-        {/* Services list */}
-        {item.services && item.services.length > 0 && (
-          <ul className="list-none p-0 m-0 space-y-2">
-            {item.services.map((service, i) => (
+        {item.services?.length > 0 && (
+          <ul
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+            }}
+          >
+            {item.services.slice(0, 4).map((s, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-gray-300 font-sans"
-                style={{
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? "translateX(0)" : "translateX(12px)",
-                  transition: `opacity 0.4s ease ${0.3 + i * 0.05}s, transform 0.4s ease ${0.3 + i * 0.05}s`,
-                }}
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
+                <CircleCheckBig
+                  size={14}
+                  color={GOLD}
+                  style={{ flexShrink: 0 }}
+                />
                 <span
-                  className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 text-white font-bold mt-1"
-                  style={{ background: "#b88a44" }}
+                  style={{
+                    color: "rgba(12,12,12,0.65)",
+                    fontSize: "13px",
+                    letterSpacing: "0.02em",
+                  }}
                 >
-                  ✓
+                  {s}
                 </span>
-                <span>{service}</span>
               </li>
             ))}
           </ul>
         )}
       </div>
+    </motion.div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   FAQ ITEM
+───────────────────────────────────────── */
+const FAQItem = ({ item, index }) => {
+  const [open, setOpen] = useState(index === 0);
+  const [ref, visible] = useInView(0.1);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 16 }}
+      transition={{ duration: 0.45, delay: index * 0.05 }}
+      style={{ borderBottom: "0.5px solid rgba(201,169,110,0.2)" }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "22px 0",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "15px",
+            fontWeight: 400,
+            color: open ? GOLD : LIGHT,
+            lineHeight: 1.4,
+            transition: "color 0.3s",
+            paddingRight: "24px",
+            fontFamily: serif,
+          }}
+        >
+          {item.question || item.q}
+        </span>
+        <div
+          style={{
+            width: "26px",
+            height: "26px",
+            borderRadius: "50%",
+            border: `0.5px solid ${open ? GOLD : "rgba(201,169,110,0.4)"}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            background: open ? GOLD : "transparent",
+            transition: "all 0.35s ease",
+            transform: open ? "rotate(45deg)" : "rotate(0deg)",
+          }}
+        >
+          <span
+            style={{
+              color: open ? "#FFFFFF" : GOLD,
+              fontSize: "18px",
+              lineHeight: 1,
+              marginTop: "-1px",
+            }}
+          >
+            +
+          </span>
+        </div>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            style={{ overflow: "hidden" }}
+          >
+            <p
+              style={{
+                color: MUTED,
+                fontSize: "14px",
+                lineHeight: 1.8,
+                paddingBottom: "22px",
+              }}
+            >
+              {item.answer || item.a}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   STAT TICKER
+───────────────────────────────────────── */
+const StatBar = () => {
+  const stats = [
+    { value: "500+", label: "Projects Completed" },
+    { value: "12+", label: "Years of Excellence" },
+    { value: "98%", label: "Client Satisfaction" },
+    { value: "50+", label: "Design Awards" },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        borderTop: `0.5px solid rgba(201,169,110,0.2)`,
+        borderBottom: `0.5px solid rgba(201,169,110,0.2)`,
+      }}
+    >
+      {stats.map((s, i) => (
+        <div
+          key={i}
+          style={{
+            padding: "32px 0",
+            textAlign: "center",
+            borderRight: i < 3 ? `0.5px solid rgba(201,169,110,0.15)` : "none",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "clamp(28px, 3vw, 40px)",
+              fontWeight: 300,
+              color: GOLD,
+              fontFamily: serif,
+              lineHeight: 1,
+              marginBottom: "6px",
+            }}
+          >
+            {s.value}
+          </div>
+          <div
+            style={{
+              fontSize: "11px",
+              letterSpacing: "0.18em",
+              color: "rgba(12,12,12,0.5)",
+              textTransform: "uppercase",
+            }}
+          >
+            {s.label}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
 
-// Image Carousel Component
-const ImageCarousel = ({ images }) => {
-  if (!images || images.length === 0) return null;
-
-  const validImages = images.filter((img) => img && img.src);
-
-  if (validImages.length === 1) {
-    return (
-      <div className="w-full rounded-lg overflow-hidden">
-        <img
-          src={validImages[0].src}
-          alt={validImages[0].alt}
-          className="w-full h-full object-cover"
-          style={{ maxHeight: "400px" }}
-          onError={(e) => {
-            e.target.src =
-              "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
-          }}
-        />
-      </div>
-    );
-  }
-
-  if (validImages.length === 2) {
-    return (
-      <div className="grid grid-cols-2 gap-4">
-        {validImages.map((img, idx) => (
-          <div key={idx} className="rounded-lg overflow-hidden">
-            <img
-              src={img.src}
-              alt={img.alt}
-              className="w-full h-full object-cover"
-              style={{ maxHeight: "400px" }}
-              onError={(e) => {
-                e.target.src =
-                  "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <Carousel className="w-full">
-      <CarouselContent>
-        {validImages.map((img, idx) => (
-          <CarouselItem key={idx}>
-            <div className="rounded-lg overflow-hidden">
-              <img
-                src={img.src}
-                alt={img.alt}
-                className="w-full h-full object-cover"
-                style={{ maxHeight: "500px", minHeight: "300px" }}
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
-                }}
-              />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="left-4" />
-      <CarouselNext className="right-4" />
-    </Carousel>
-  );
-};
-
+/* ─────────────────────────────────────────
+   MAIN PAGE
+───────────────────────────────────────── */
 const ServiceDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [focusedField, setFocusedField] = useState(null);
 
-  // Fetch FAQs
   const { data: faqs } = useFAQs();
-
-  // Fetch all services to find the current one
   const { data: services, isLoading: servicesLoading } = useServices();
 
   useEffect(() => {
-    if (services && services.length > 0) {
-      // Find service by slug or id
+    if (services?.length) {
       const found = services.find(
         (s) => s.slug === slug || s.id.toString() === slug,
       );
-
       if (found) {
         setService(found);
         setError(null);
-      } else {
-        setError("Service not found");
-      }
+      } else setError("Service not found");
       setLoading(false);
     }
   }, [services, slug]);
 
   if (loading || servicesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: DARK,
+        }}
+      >
         <PageLoader />
       </div>
     );
@@ -373,79 +570,50 @@ const ServiceDetail = () => {
 
   if (error || !service) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-brand-charcoal mb-4">
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: DARK,
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <h2
+            style={{
+              fontSize: "28px",
+              fontWeight: 300,
+              color: LIGHT,
+              marginBottom: "12px",
+              fontFamily: serif,
+            }}
+          >
             Service Not Found
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p style={{ color: MUTED, marginBottom: "28px" }}>
             The service you're looking for doesn't exist.
           </p>
           <button
             onClick={() => navigate("/")}
-            className="px-6 py-2 bg-brand-gold text-white rounded-lg hover:bg-brand-gold-light transition-colors"
+            style={{
+              padding: "12px 32px",
+              background: "transparent",
+              border: `0.5px solid ${GOLD}`,
+              color: GOLD,
+              borderRadius: "2px",
+              cursor: "pointer",
+              fontSize: "13px",
+              letterSpacing: "0.08em",
+            }}
           >
-            Go Back Home
+            Return Home
           </button>
         </div>
       </div>
     );
   }
 
-  // Prepare why work with us data from API
-  const whyWorkData =
-    service.why_work_with_us?.length > 0
-      ? service.why_work_with_us.map((item) => ({
-          id: item.id,
-          title: item.title,
-          desc:
-            item.tagline || stripHtml(item.description || "").substring(0, 120),
-        }))
-      : [
-          {
-            id: 1,
-            title: "Experience and Expertise",
-            desc: "With 7+ years of experience, we have collaborated with esteemed architects and PMC companies to successfully deliver numerous interior projects.",
-          },
-          {
-            id: 2,
-            title: "Personalized Approach",
-            desc: "We understand that each client has unique requirements. Our team works closely with you to understand your vision.",
-          },
-          {
-            id: 3,
-            title: "Skilled & Expert Team",
-            desc: "Our founders bring extensive wealth of experience, spanning decades, in the interior solutions sector.",
-          },
-        ];
-
-  // Prepare process data from what_we_do
-  const processData =
-    service.what_we_do?.length > 0
-      ? service.what_we_do.slice(0, 3).map((item, index) => ({
-          id: index + 1,
-          title: item.title,
-          desc: stripHtml(item.description || "").substring(0, 100),
-        }))
-      : [
-          {
-            id: 1,
-            title: "Planning and Design",
-            desc: "Understanding designs and drawings, allocating resources for optimal project execution.",
-          },
-          {
-            id: 2,
-            title: "Documentation & Estimates",
-            desc: "Detailed documentation, estimates, and resource planning for seamless implementation.",
-          },
-          {
-            id: 3,
-            title: "Completion & Evaluation",
-            desc: "Final execution, quality checks, and project delivery with client satisfaction.",
-          },
-        ];
-
-  // Get slider images from services_over_view
   const sliderImages =
     service.services_over_view?.flatMap((ov) =>
       ov.images?.map((img) => ({
@@ -455,186 +623,396 @@ const ServiceDetail = () => {
       })),
     ) || [];
 
-  // Get hero image
   const heroImage = service.service_banner_img
     ? getImageUrl(service.service_banner_img)
     : "https://images.pexels.com/photos/3741314/pexels-photo-3741314.jpeg";
 
+  const inputStyle = (field) => ({
+    width: "100%",
+    padding: "14px 0",
+    background: "transparent",
+    border: "none",
+    borderBottom: `0.5px solid ${focusedField === field ? GOLD : "rgba(201,169,110,0.25)"}`,
+    color: LIGHT,
+    fontSize: "14px",
+    outline: "none",
+    transition: "border-color 0.3s",
+    boxSizing: "border-box",
+    caretColor: GOLD,
+  });
+
   return (
-    <div className="bg-stone-50">
-      {/* Hero Section */}
-      <div className="w-full relative">
+    <div
+      style={{
+        background: DARK,
+        minHeight: "100vh",
+        fontFamily: "'Cormorant Garamond', 'Georgia', serif",
+      }}
+    >
+      {/* ── CINEMATIC HERO ── */}
+      <div
+        style={{
+          position: "relative",
+          height: "100vh",
+          minHeight: "600px",
+          overflow: "hidden",
+        }}
+      >
         <img
           src={heroImage}
           alt={service.service_title}
-          className="w-full object-cover block max-h-80 md:max-h-96 lg:max-h-[500px]"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
           onError={(e) => {
             e.target.src =
               "https://images.pexels.com/photos/3741314/pexels-photo-3741314.jpeg";
           }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent flex items-center">
-          <div className="container mx-auto px-4 md:px-8 lg:px-16">
+        {/* Multi-layer overlay - lighter for white background */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 60%, transparent 100%)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)",
+          }}
+        />
+
+        {/* Decorative vertical line */}
+        <div
+          style={{
+            position: "absolute",
+            left: "calc(48px + 2px)",
+            top: 0,
+            bottom: 0,
+            width: "0.5px",
+            background: `linear-gradient(to bottom, transparent 0%, ${GOLD} 30%, ${GOLD} 70%, transparent 100%)`,
+            opacity: 0.3,
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "flex-end",
+            padding: "0 80px 80px",
+            maxWidth: "1280px",
+            margin: "0 auto",
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+            style={{ maxWidth: "680px" }}
+          >
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-2xl"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+                marginBottom: "20px",
+              }}
             >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="w-10 h-[2px] bg-brand-gold-light" />
-                <h6 className="text-brand-gold-light mb-0 text-sm md:text-base uppercase tracking-wider">
-                  {service.service_tagline || "Our Services"}
-                </h6>
-              </div>
-
-              <h1 className="text-white mb-3 text-3xl md:text-4xl lg:text-5xl font-bold">
-                {service.service_title}
-              </h1>
-
-              <p className="text-gray-200 mb-0 text-base md:text-lg">
-                {service.service_short_description}
-              </p>
+              <GoldLine width={48} />
+              <SectionLabel>
+                {service.service_tagline || "Premium Interior Design"}
+              </SectionLabel>
             </motion.div>
-          </div>
+
+            <h1
+              style={{
+                fontSize: "clamp(40px, 6vw, 80px)",
+                fontWeight: 300,
+                color: LIGHT,
+                lineHeight: 1.0,
+                margin: "0 0 24px",
+                fontFamily: serif,
+                letterSpacing: "-0.025em",
+              }}
+            >
+              {service.service_intro_title || service.service_title}
+            </h1>
+
+            <p
+              style={{
+                fontSize: "16px",
+                color: "rgba(12,12,12,0.7)",
+                lineHeight: 1.7,
+                maxWidth: "520px",
+                margin: 0,
+              }}
+            >
+              {service.service_short_description}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+          style={{
+            position: "absolute",
+            bottom: "40px",
+            right: "80px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "10px",
+              letterSpacing: "0.2em",
+              color: "rgba(12,12,12,0.5)",
+              textTransform: "uppercase",
+              writingMode: "vertical-rl",
+            }}
+          >
+            Scroll
+          </span>
+          <div
+            style={{
+              width: "0.5px",
+              height: "60px",
+              background: `linear-gradient(to bottom, ${GOLD}, transparent)`,
+              opacity: 0.5,
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* ── STATS BAR ── */}
+      <div style={{ background: DARK_2 }}>
+        <div
+          style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 80px" }}
+        >
+          <StatBar />
         </div>
       </div>
 
-      {/* Intro Text */}
-      <div className="mt-10 md:mt-16 px-4 md:px-8 lg:px-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-            {service.service_intro_title || "Service Excellence"}
-          </h2>
-          <p className="text-gray-600 mb-0 text-base md:text-lg leading-relaxed">
-            <strong className="text-brand-charcoal">
-              {service.service_tagline}
-            </strong>
-          </p>
-          {service.description && (
+      {/* ── OVERVIEW ── */}
+      {service.services_over_view?.[0] && (
+        <div style={{ background: DARK, padding: "100px 80px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
             <div
-              className="text-gray-600 mt-4 text-base md:text-lg leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: service.description }}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Image Slider/Carousel */}
-      {sliderImages.length > 0 && (
-        <div className="px-4 md:px-8 lg:px-16 mt-12 md:mt-16">
-          <div className="max-w-6xl mx-auto">
-            <ImageCarousel images={sliderImages} />
-          </div>
-        </div>
-      )}
-
-      {/* Why Work With Us */}
-      <div className="px-4 md:px-8 lg:px-16 mt-12 md:mt-16">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-light mb-2">
-            Why Work With Us
-          </h2>
-          <p className="text-base md:text-lg leading-relaxed text-brand-charcoal font-semibold mb-4 italic">
-            "We shape our spaces, and then, our spaces shape us."
-          </p>
-          <p className="text-gray-600 mb-0 text-base md:text-lg leading-relaxed">
-            {service.why_work_with_us?.[0]?.description
-              ? stripHtml(service.why_work_with_us[0].description)
-              : "At InterioXcel, we offer customized interior solutions and devoted customer care with personal assistance. Our team of skilled architects and interior designers plan, research, manage and coordinate every aspect of the design, adding your vision combined with our creativity to accomplish the task magnificently within time."}
-          </p>
-        </div>
-      </div>
-
-      {/* Service Cards from what_we_do */}
-      {service.what_we_do && service.what_we_do.length > 0 && (
-        <div className="bg-gray-50 pt-12 md:pt-16 pb-8 mt-12 md:mt-16">
-          <div className="text-center mb-8 md:mb-12 px-4">
-            <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
-              What We Do
-            </h6>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
-              Our Services
-            </h2>
-            <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
-          </div>
-          <div className="px-4 md:px-8 lg:px-16">
-            <div className="max-w-5xl mx-auto">
-              {service.what_we_do.map((item, i) => (
-                <ServiceCard key={item.id || i} item={item} index={i} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Why Choose Us */}
-      <div className="bg-white pt-12 md:pt-16 pb-12 px-4 md:px-8 lg:px-16">
-        <div className="text-center mb-8 md:mb-12">
-          <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
-            Why Us
-          </h6>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
-            Why Choose Us
-          </h2>
-          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
-        </div>
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-6">
-            {whyWorkData.map((item, i) => (
-              <WhyCard key={item.id} item={item} delay={i * 0.1} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Process */}
-      <div className="bg-gray-50 pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
-        <div className="text-center mb-8 md:mb-12">
-          <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
-            How We Work
-          </h6>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
-            Our Process
-          </h2>
-          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
-        </div>
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {processData.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              >
-                <div className="w-12 h-12 mb-4 bg-brand-gold-light/10 rounded-lg flex items-center justify-center">
-                  <span className="text-xl font-bold text-brand-gold-light">
-                    {item.id}
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold mb-3">{item.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {item.desc}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 2fr",
+                gap: "80px",
+                alignItems: "start",
+              }}
+            >
+              <div>
+                <SectionLabel>Overview</SectionLabel>
+                <h2
+                  style={{
+                    fontSize: "clamp(28px, 3.5vw, 44px)",
+                    fontWeight: 300,
+                    color: LIGHT,
+                    fontFamily: serif,
+                    lineHeight: 1.15,
+                    letterSpacing: "-0.02em",
+                    margin: "0 0 28px",
+                  }}
+                >
+                  {service.services_over_view[0].title || "Service Excellence"}
+                </h2>
+                <GoldLine style={{ marginBottom: "28px" }} />
+                <p
+                  style={{
+                    color: MUTED,
+                    fontSize: "13px",
+                    lineHeight: 1.8,
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {service.services_over_view[0].intro}
                 </p>
               </div>
+              <div>
+                <div
+                  style={{
+                    color: MUTED,
+                    fontSize: "16px",
+                    lineHeight: 1.9,
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: service.services_over_view[0].description,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── IMAGE CAROUSEL ── */}
+      {sliderImages.length > 0 && (
+        <div style={{ background: DARK_2, padding: "0 80px 80px" }}>
+          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+            <TwoImageCarousel images={sliderImages} />
+          </div>
+        </div>
+      )}
+
+      {/* ── WHY WORK WITH US ── */}
+      {service.why_work_with_us?.[0] && (
+        <div
+          style={{
+            background: DARK_3,
+            padding: "100px 80px",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Large faded background text */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              fontSize: "clamp(80px, 15vw, 200px)",
+              fontFamily: serif,
+              fontWeight: 300,
+              color: "rgba(201,169,110,0.05)",
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          >
+            Excellence
+          </div>
+
+          <div
+            style={{
+              maxWidth: "1280px",
+              margin: "0 auto",
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            <div
+              style={{
+                textAlign: "center",
+                maxWidth: "700px",
+                margin: "0 auto",
+              }}
+            >
+              <SectionLabel>Why Choose Us</SectionLabel>
+              <h2
+                style={{
+                  fontSize: "clamp(30px, 4vw, 52px)",
+                  fontWeight: 300,
+                  color: LIGHT,
+                  fontFamily: serif,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.1,
+                  margin: "0 0 12px",
+                }}
+              >
+                {service.why_work_with_us[0].title}
+              </h2>
+              <GoldLine width={40} style={{ margin: "20px auto 24px" }} />
+              <p
+                style={{
+                  fontSize: "18px",
+                  color: GOLD,
+                  fontStyle: "italic",
+                  margin: "0 0 28px",
+                  fontFamily: serif,
+                }}
+              >
+                {service.why_work_with_us[0].tagline}
+              </p>
+              <div
+                style={{ color: MUTED, fontSize: "15px", lineHeight: 1.9 }}
+                dangerouslySetInnerHTML={{
+                  __html: service.why_work_with_us[0].description,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── WHAT WE DO ── */}
+      {service.what_we_do?.length > 0 && (
+        <div style={{ background: DARK }}>
+          {/* Section header */}
+          <div style={{ padding: "80px 80px 48px", textAlign: "center" }}>
+            <SectionLabel>What We Do</SectionLabel>
+            <h2
+              style={{
+                fontSize: "clamp(30px, 4vw, 52px)",
+                fontWeight: 300,
+                color: LIGHT,
+                fontFamily: serif,
+                letterSpacing: "-0.02em",
+                margin: "0 0 16px",
+              }}
+            >
+              Our Services
+            </h2>
+            <GoldLine width={40} style={{ margin: "0 auto" }} />
+          </div>
+
+          <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+            {service.what_we_do.map((item, i) => (
+              <ServiceCard key={item.id || i} item={item} index={i} />
             ))}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* FAQ */}
-      {faqs && faqs.length > 0 && (
-        <div className="bg-white pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8 md:mb-12">
-              <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-2">
-                FAQ
-              </h6>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mt-2">
-                Frequently Asked Questions
+      {/* ── PROCESS ── */}
+      <PremiumProcessSection />
+
+      {/* ── FAQ ── */}
+      {faqs?.length > 0 && (
+        <div style={{ background: DARK_2, padding: "100px 80px" }}>
+          <div style={{ maxWidth: "840px", margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: "60px" }}>
+              <SectionLabel>FAQ</SectionLabel>
+              <h2
+                style={{
+                  fontSize: "clamp(28px, 3.5vw, 48px)",
+                  fontWeight: 300,
+                  color: LIGHT,
+                  fontFamily: serif,
+                  letterSpacing: "-0.02em",
+                  margin: "0 0 16px",
+                }}
+              >
+                Frequently Asked
+                <br />
+                <em style={{ color: GOLD, fontStyle: "italic" }}>Questions</em>
               </h2>
-              <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mt-4 rounded" />
+              <GoldLine width={40} style={{ margin: "0 auto" }} />
             </div>
+
             <div>
               {faqs.slice(0, 6).map((item, i) => (
                 <FAQItem key={i} item={item} index={i} />
@@ -644,167 +1022,292 @@ const ServiceDetail = () => {
         </div>
       )}
 
-      {/* Quality & Safety */}
-      <div className="bg-gray-50 pt-12 md:pt-16 pb-12 md:pb-16 px-4 md:px-8 lg:px-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-            <div className="lg:w-1/2">
-              <h6 className="text-brand-gold-light text-sm md:text-base uppercase tracking-wider mb-3">
-                OUR COMMITMENT
-              </h6>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-                Quality & Safety{" "}
-                <span className="text-brand-gold-light">First</span>
-              </h2>
-              <div className="w-16 h-[2px] bg-brand-gold-light mb-6" />
-              <p className="text-gray-600 mb-4 text-base md:text-lg leading-relaxed">
-                At our construction site, quality and safety are our top
-                priorities for all laborers involved in interior work. We
-                maintain strict adherence to industry standards and regulations
-                to ensure the highest quality of craftsmanship and safety for
-                our team.
-              </p>
-              <p className="text-gray-500 mb-0 text-base leading-relaxed">
-                We provide comprehensive training, personal protective equipment
-                (PPE), and regularly inspect and maintain equipment to mitigate
-                risks.
-              </p>
-            </div>
+      {/* ── GET A QUOTE ── */}
+      <div
+        style={{
+          background: DARK,
+          padding: "100px 80px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Decorative corner element */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "40%",
+            height: "100%",
+            background: `linear-gradient(135deg, transparent 0%, rgba(201,169,110,0.03) 100%)`,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "60px",
+            right: "80px",
+            fontSize: "180px",
+            fontFamily: serif,
+            color: "rgba(201,169,110,0.05)",
+            lineHeight: 1,
+            fontWeight: 300,
+            userSelect: "none",
+          }}
+        >
+          ✦
+        </div>
 
-            <div className="lg:w-1/2 grid grid-cols-2 gap-4">
+        <div
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          <div style={{ marginBottom: "64px" }}>
+            <SectionLabel>Let's Talk</SectionLabel>
+            <h2
+              style={{
+                fontSize: "clamp(36px, 5vw, 68px)",
+                fontWeight: 300,
+                color: LIGHT,
+                fontFamily: serif,
+                letterSpacing: "-0.025em",
+                lineHeight: 1.0,
+                margin: 0,
+              }}
+            >
+              Begin Your
+              <br />
+              <em style={{ color: GOLD, fontStyle: "italic" }}>
+                Transformation
+              </em>
+            </h2>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1.4fr",
+              gap: "100px",
+              alignItems: "start",
+            }}
+          >
+            {/* Contact details */}
+            <div>
+              <p
+                style={{
+                  color: MUTED,
+                  fontSize: "14px",
+                  lineHeight: 1.8,
+                  marginBottom: "48px",
+                }}
+              >
+                Share your vision with us. Our design consultants will craft a
+                bespoke proposal tailored to your space, taste, and ambitions.
+              </p>
+
               {[
                 {
-                  icon: ShieldCheckIcon,
-                  title: "PPE Equipment",
-                  desc: "Full protective gear",
+                  Icon: MapPinIcon,
+                  label: "Studio",
+                  lines: ["Coraut Bazar Kotwa Lohata", "Varanasi — 221107"],
                 },
                 {
-                  icon: CheckCircleIcon,
-                  title: "Regular Inspections",
-                  desc: "Daily safety checks",
+                  Icon: PhoneIcon,
+                  label: "Call",
+                  lines: ["+91-6393556220", "+91-9935550330"],
                 },
                 {
-                  icon: WrenchScrewdriverIcon,
-                  title: "Maintenance",
-                  desc: "Regular servicing",
+                  Icon: EnvelopeIcon,
+                  label: "Email",
+                  lines: ["info@interioxcel.com"],
                 },
-                {
-                  icon: UserGroupIcon,
-                  title: "Team Training",
-                  desc: "Safety training",
-                },
-              ].map((item, index) => {
-                const Icon = item.icon;
-                return (
+              ].map(({ Icon, label, lines }, i) => (
+                <div
+                  key={i}
+                  style={{ display: "flex", gap: "20px", marginBottom: "36px" }}
+                >
                   <div
-                    key={index}
-                    className="bg-amber-50/50 p-4 md:p-6 rounded-lg text-center hover:shadow-md transition-shadow"
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      border: `0.5px solid rgba(201,169,110,0.3)`,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
                   >
-                    <Icon className="w-8 h-8 md:w-10 md:h-10 mx-auto text-brand-gold-light mb-3" />
-                    <h4 className="font-bold mb-2 text-sm md:text-base">
-                      {item.title}
-                    </h4>
-                    <p className="text-gray-500 text-xs md:text-sm">
-                      {item.desc}
-                    </p>
+                    <Icon
+                      style={{ width: "15px", height: "15px", color: GOLD }}
+                    />
                   </div>
-                );
-              })}
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        letterSpacing: "0.15em",
+                        color: GOLD,
+                        textTransform: "uppercase",
+                        margin: "0 0 6px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {label}
+                    </p>
+                    {lines.map((l, j) => (
+                      <p
+                        key={j}
+                        style={{
+                          color: MUTED,
+                          fontSize: "14px",
+                          margin: "0 0 2px",
+                        }}
+                      >
+                        {l}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Form */}
+            <div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "0 40px",
+                }}
+              >
+                {[
+                  {
+                    key: "name",
+                    placeholder: "Full Name",
+                    type: "text",
+                    span: 1,
+                  },
+                  {
+                    key: "email",
+                    placeholder: "Email Address",
+                    type: "email",
+                    span: 1,
+                  },
+                  {
+                    key: "phone",
+                    placeholder: "Phone Number",
+                    type: "tel",
+                    span: 2,
+                  },
+                ].map(({ key, placeholder, type, span }) => (
+                  <div
+                    key={key}
+                    style={{
+                      gridColumn: span === 2 ? "1 / -1" : "auto",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    <input
+                      type={type}
+                      placeholder={placeholder}
+                      value={formData[key]}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, [key]: e.target.value }))
+                      }
+                      onFocus={() => setFocusedField(key)}
+                      onBlur={() => setFocusedField(null)}
+                      style={{
+                        ...inputStyle(key),
+                        "::placeholder": { color: "rgba(12,12,12,0.35)" },
+                      }}
+                    />
+                    <style>{`input[data-field="${key}"]::placeholder { color: rgba(12,12,12,0.35); }`}</style>
+                  </div>
+                ))}
+              </div>
+              <textarea
+                rows={4}
+                placeholder="Project Details..."
+                value={formData.message}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, message: e.target.value }))
+                }
+                onFocus={() => setFocusedField("message")}
+                onBlur={() => setFocusedField(null)}
+                style={{
+                  ...inputStyle("message"),
+                  resize: "none",
+                  display: "block",
+                  marginBottom: "40px",
+                  fontFamily: "inherit",
+                }}
+              />
+
+              <button
+                type="button"
+                style={{
+                  padding: "16px 48px",
+                  background: "transparent",
+                  border: `0.5px solid ${GOLD}`,
+                  color: GOLD,
+                  fontSize: "12px",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  transition: "all 0.35s ease",
+                  borderRadius: "1px",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = GOLD;
+                  e.currentTarget.style.color = "#FFFFFF";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = GOLD;
+                }}
+              >
+                Send Enquiry
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Get A Quote */}
-      <div className="bg-white px-4 md:px-8 lg:px-16 py-12 md:py-16">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-center text-2xl md:text-3xl font-bold font-sans mb-3">
-            GET A QUOTE
-          </h2>
-          <div className="w-12 h-0.5 bg-brand-gold-light mx-auto mb-8 md:mb-12" />
-
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12 lg:gap-16 items-start">
-            {/* Contact Info */}
-            <div className="w-full md:w-72 md:shrink-0 space-y-6 md:space-y-8">
-              {[
-                {
-                  icon: MapPinIcon,
-                  label: "Office",
-                  lines: ["Coraut Bazar Kotwa Lohata", "Varanasi - 221107"],
-                },
-                {
-                  icon: PhoneIcon,
-                  label: "Call",
-                  lines: ["+91-6393556220", "+91-9935550330"],
-                },
-                {
-                  icon: EnvelopeIcon,
-                  label: "Email",
-                  lines: ["info@interioxcel.com"],
-                },
-              ].map((c, i) => {
-                const Icon = c.icon;
-                return (
-                  <div key={i} className="flex items-start gap-3 md:gap-4">
-                    <div className="shrink-0 mt-0.5 text-brand-gold-light">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold font-sans mb-2 text-sm md:text-base">
-                        {c.label}
-                      </p>
-                      {c.lines.map((l, j) => (
-                        <p
-                          key={j}
-                          className="text-text-main/70 font-sans leading-6 m-0 text-sm"
-                        >
-                          {l}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Form */}
-            <div className="flex-1 w-full">
-              <form className="space-y-5">
-                {[
-                  { name: "name", label: "YOUR NAME *", type: "text" },
-                  { name: "email", label: "YOUR EMAIL *", type: "email" },
-                  { name: "phone", label: "YOUR PHONE", type: "tel" },
-                ].map((f) => (
-                  <div key={f.name}>
-                    <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-2 text-xs md:text-sm">
-                      {f.label}
-                    </label>
-                    <input
-                      type={f.type}
-                      name={f.name}
-                      className="w-full border-0 border-b border-gray-300 pb-2 pt-2 text-base font-sans bg-transparent outline-none focus:border-brand-gold-light transition-colors duration-200"
-                    />
-                  </div>
-                ))}
-                <div>
-                  <label className="block tracking-widest text-text-main/60 font-sans uppercase mb-2 text-xs md:text-sm">
-                    PROJECT DETAILS...
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={4}
-                    className="w-full border-0 border-b border-gray-300 pb-2 pt-2 text-base font-sans bg-transparent outline-none focus:border-brand-gold-light transition-colors duration-200 resize-none"
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="bg-brand-gold-light hover:bg-brand-gold text-white px-6 py-3 rounded-md transition-colors font-medium"
-                >
-                  SEND MESSAGE
-                </button>
-              </form>
-            </div>
-          </div>
+      {/* Footer line */}
+      <div
+        style={{
+          background: DARK,
+          padding: "24px 80px",
+          borderTop: `0.5px solid rgba(201,169,110,0.15)`,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "11px",
+              color: "rgba(12,12,12,0.4)",
+              letterSpacing: "0.1em",
+            }}
+          >
+            © {new Date().getFullYear()} Interioxcel
+          </span>
+          <GoldLine width={60} style={{ opacity: 0.2 }} />
         </div>
       </div>
     </div>

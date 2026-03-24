@@ -20,12 +20,10 @@
 }
 
 @layer components {
-
-  *{
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-
   }
 
   /* Container Padding */
@@ -35,7 +33,7 @@
 
   /* Section Spacing */
   section {
-    @apply py-16 md:py-20 lg:py-24;
+    @apply py-16 md:py-20 lg:py-0;
   }
 
   /* Typography Defaults */
@@ -112,13 +110,18 @@
   /* Buttons */
   .btn-primary {
     @apply bg-brand-charcoal text-white px-6 py-3 transition-all duration-300 
-           hover:bg-brand-gold hover:shadow-lg active:scale-95 flex items-center 
+           hover:bg-brand-gold hover:text-white hover:shadow-lg active:scale-95 flex items-center 
            justify-center font-medium uppercase tracking-wide text-sm;
   }
 
   .btn-outline {
     @apply border-2 border-brand-gold text-brand-gold px-6 py-3 transition-all duration-300 
            hover:bg-brand-gold hover:text-white font-medium uppercase text-sm;
+  }
+
+  .writing-mode-vertical-lr {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
   }
 
   /* Scrollbar Styling */
@@ -133,12 +136,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-      180deg,
-      #d4af37,
-      #b88a44,
-      #9c7438
-    );
+    background: linear-gradient(180deg, #d4af37, #b88a44, #9c7438);
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -185,11 +183,11 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-line-shadow: line-shadow 15s linear infinite;
   @keyframes line-shadow {
-  0% {
-    background-position: 0 0;
+    0% {
+      background-position: 0 0;
     }
-  100% {
-    background-position: 100% -100%;
+    100% {
+      background-position: 100% -100%;
     }
   }
 }
