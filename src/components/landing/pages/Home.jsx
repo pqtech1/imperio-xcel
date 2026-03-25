@@ -20,6 +20,7 @@ import {
   WrenchScrewdriverIcon,
   CubeIcon,
   SwatchIcon,
+  BuildingOfficeIcon,
 } from "@heroicons/react/24/outline";
 import {
   BuildingLibraryIcon,
@@ -33,6 +34,7 @@ import {
   useTeams,
   useAchievements,
   useBlogs,
+  useClients,
 } from "@/hooks/useApiData";
 import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import Testimonial from "./Testimonial";
@@ -222,9 +224,8 @@ const ProjectCard = ({ project, index }) => {
       transition={{ duration: 0.7, delay: index * 0.08 }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      className="relative overflow-hidden cursor-pointer bg-black group" // Added group for easier child styling
+      className="relative overflow-hidden cursor-pointer bg-black group"
     >
-      {/* Image Container */}
       <div className="h-72 overflow-hidden">
         <img
           src={project.image}
@@ -238,25 +239,22 @@ const ProjectCard = ({ project, index }) => {
         />
       </div>
 
-      {/* Dark Overlay - Gradient from transparent to black at the bottom */}
       <div
         className={`absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-black/80 via-black/20 to-transparent ${
           hov ? "opacity-100" : "opacity-70"
         }`}
       />
 
-      {/* Status Badge */}
       <div
         className={`absolute top-4 right-4 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm shadow-sm border ${
           project.ongoing
-            ? "bg-amber-500/10 border-amber-500 text-amber-500" // Ongoing: Subtle Gold
-            : "bg-emerald-600 border-emerald-600 text-white" // Completed: Solid Green
+            ? "bg-amber-500/10 border-amber-500 text-amber-500"
+            : "bg-emerald-600 border-emerald-600 text-white"
         }`}
       >
         {project.ongoing ? "Ongoing" : "Completed"}
       </div>
 
-      {/* Text Content */}
       <div
         className={`absolute bottom-0 left-0 right-0 p-6 transition-all duration-500 transform ${
           hov ? "translate-y-0" : "translate-y-1"
@@ -360,6 +358,70 @@ const TeamCard = ({ member, index }) => {
   );
 };
 
+/* ─────── CLIENT CARD ─────── */
+const ClientCard = ({ client, index }) => {
+  const [hov, setHov] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="group relative bg-white rounded-lg p-5 border border-brand-gold/10 hover:shadow-md transition-all duration-300"
+    >
+      <div className="flex items-center gap-4 mb-3">
+        <div className="w-14 h-14 rounded-full bg-brand-gold/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+          {client.logo ? (
+            <img
+              src={getImageUrl(client.logo)}
+              alt={client.company || client.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <BuildingOfficeIcon className="w-7 h-7 text-brand-gold" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h5 className="font-heading font-semibold text-brand-charcoal truncate mb-1">
+            {client.company || client.name}
+          </h5>
+          {client.name && client.company !== client.name && (
+            <p className="text-xs text-brand-charcoal/50 truncate">
+              {client.name}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {(client.email || client.phone) && (
+        <div className="space-y-2">
+          {client.email && (
+            <div className="flex items-center gap-2 text-xs text-brand-charcoal/60">
+              <EnvelopeIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
+              <span className="truncate">{client.email}</span>
+            </div>
+          )}
+          {client.phone && (
+            <div className="flex items-center gap-2 text-xs text-brand-charcoal/60">
+              <PhoneIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
+              <span>{client.phone}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div
+        className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-gold transition-transform duration-500 ${
+          hov ? "scale-x-100" : "scale-x-0"
+        }`}
+      />
+    </motion.div>
+  );
+};
+
 /* ═══════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════ */
@@ -373,8 +435,9 @@ const Home = () => {
   const { data: teams, loading: tl } = useTeams();
   const { data: achievements, loading: ahl } = useAchievements();
   const { data: blogs, loading: bl } = useBlogs();
+  const { data: clients, loading: cl } = useClients();
 
-  const loading = sl || al || pl || tl || ahl || bl;
+  const loading = sl || al || pl || tl || ahl || bl || cl;
 
   useEffect(() => {
     const t = setInterval(
@@ -501,7 +564,7 @@ const Home = () => {
         url="https://interioxcel.com"
       />
       <div className="bg-white">
-        {/* ══════ HERO ══════ */}
+        {/* Hero Section */}
         <section className="relative h-screen min-h-[640px] overflow-hidden">
           <AnimatePresence>
             <motion.img
@@ -545,7 +608,9 @@ const Home = () => {
                 <h6 className="mb-0">{heroSlides[slide].sub}</h6>
               </motion.div>
               <h1>
-                <span className="block text-white">{heroSlides[slide].line1}</span>
+                <span className="block text-white">
+                  {heroSlides[slide].line1}
+                </span>
                 <em className="italic text-brand-gold not-italic">
                   {heroSlides[slide].line2}
                 </em>
@@ -598,7 +663,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ══════ PHILOSOPHY ══════ */}
+        {/* Philosophy Section */}
         <section>
           <div className="bg-bg-soft border-t border-brand-gold/15 border-b border-brand-gold/15 overflow-hidden py-3">
             <motion.div
@@ -674,7 +739,7 @@ const Home = () => {
           </Inner>
         </section>
 
-        {/* ══════ INTRODUCTION ══════ */}
+        {/* Introduction Section */}
         <section className="bg-bg-soft">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="py-12 lg:py-16 section-px flex flex-col justify-center">
@@ -747,7 +812,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ══════ ACHIEVEMENTS / STATS ══════ */}
+        {/* Achievements Section */}
         <section className="bg-bg-soft">
           <Inner className="pt-12 pb-8">
             <div className="text-center mb-8">
@@ -789,7 +854,7 @@ const Home = () => {
           </Inner>
         </section>
 
-        {/* ══════ SERVICES ══════ */}
+        {/* Services Section */}
         {displayedServices.length > 0 && (
           <section>
             <Inner className="pt-12 pb-8">
@@ -828,7 +893,7 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ AREAS ══════ */}
+        {/* Areas Section */}
         {displayedAreas.length > 0 && (
           <section className="bg-bg-soft">
             <Inner className="py-12">
@@ -886,7 +951,7 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ PROJECTS ══════ */}
+        {/* Projects Section */}
         {displayedProjects.length > 0 && (
           <section>
             <Inner className="pt-12 pb-6">
@@ -924,7 +989,7 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ WORK IN PROGRESS ══════ */}
+        {/* Work In Progress Section */}
         {workInProgress.length > 0 && (
           <section className="bg-bg-soft">
             <Inner className="py-12">
@@ -983,7 +1048,48 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ PROCESS ══════ */}
+        {/* Clients Section */}
+        {clients && clients.length > 0 && (
+          <section className="bg-white">
+            <Inner className="py-12">
+              <div className="text-center mb-10">
+                <Reveal>
+                  <h6 className="mb-3">Our Valued Clients</h6>
+                </Reveal>
+                <Reveal delay={0.1}>
+                  <h2>
+                    Trusted By{" "}
+                    <em className="italic text-brand-gold not-italic">
+                      Industry Leaders
+                    </em>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.2}>
+                  <HR className="mx-auto mt-4" />
+                </Reveal>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                {clients.slice(0, 8).map((client, index) => (
+                  <ClientCard key={client.id} client={client} index={index} />
+                ))}
+              </div>
+
+              {clients.length > 8 && (
+                <div className="text-center mt-8">
+                  <Link
+                    to="/clients"
+                    className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
+                  >
+                    View All Clients <ArrowRightIcon className="w-2.5 h-2.5" />
+                  </Link>
+                </div>
+              )}
+            </Inner>
+          </section>
+        )}
+
+        {/* Process Section */}
         <section className="bg-bg-soft">
           <Inner className="py-12">
             <div className="text-center mb-10">
@@ -1064,7 +1170,7 @@ const Home = () => {
           </Inner>
         </section>
 
-        {/* ══════ QUALITY & SAFETY ══════ */}
+        {/* Quality & Safety Section */}
         <section>
           <Inner className="py-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-25 items-center">
@@ -1133,7 +1239,7 @@ const Home = () => {
           </Inner>
         </section>
 
-        {/* ══════ CTA BANNER ══════ */}
+        {/* CTA Banner */}
         <section className="relative min-h-[400px]">
           <div className="absolute inset-0 overflow-hidden">
             <img
@@ -1178,7 +1284,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ══════ TEAM ══════ */}
+        {/* Team Section */}
         {displayedTeam.length > 0 && (
           <section>
             <Inner className="py-12">
@@ -1208,7 +1314,7 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ BLOG ══════ */}
+        {/* Blog Section */}
         {displayedBlogs.length > 0 && (
           <section className="bg-bg-soft">
             <Inner className="py-12">
@@ -1244,10 +1350,10 @@ const Home = () => {
           </section>
         )}
 
-        {/* ══════ TESTIMONIAL ══════ */}
+        {/* Testimonial Section */}
         <Testimonial />
 
-        {/* ══════ CONTACT BAR ══════ */}
+        {/* Contact Bar */}
         <div className="bg-bg-soft border-t border-brand-gold/15">
           <Inner className="py-6">
             <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
@@ -1306,8 +1412,6 @@ const Home = () => {
             </div>
           </Inner>
         </div>
-
-       
       </div>
     </>
   );

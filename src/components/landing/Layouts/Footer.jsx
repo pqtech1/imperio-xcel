@@ -10,26 +10,29 @@ import {
   FaPhone,
   FaMapMarkerAlt,
   FaArrowRight,
+  FaPalette,
+  FaHome,
+  FaBuilding,
+  FaStore,
+  FaHotel,
+
 } from "react-icons/fa";
 import { LineShadowText } from "@/components/ui/line-shadow-text";
+import { useServices } from "@/hooks/useApiData";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { data: services, loading: servicesLoading } = useServices();
 
-  const quickLinks = [
-    { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Portfolio", path: "/portfolio" },
-    { name: "Achievements", path: "/achievement" },
-    { name: "Blog", path: "/blog" },
-    { name: "Contact", path: "/contact" },
-  ];
-
-  const services = [
-    { name: "Interior Design", path: "/interior-design" },
-    { name: "Architecture", path: "/architecture" },
-    { name: "Turnkey Solutions", path: "/turnkey-solutions" },
-    { name: "Competence", path: "/competence" },
+  // Navigation links exactly matching Header
+  const mainNavigation = [
+    { name: "HOME", path: "/" },
+    { name: "PORTFOLIO", path: "/portfolio" },
+    { name: "ABOUT", path: "/about" },
+    { name: "ACHIEVEMENT", path: "/achievement" },
+    { name: "AREAS WE SERVE", path: "/areas-we-serve" },
+    { name: "BLOG", path: "/blog" },
+    { name: "CONTACT", path: "/contact" },
   ];
 
   const socialIcons = [
@@ -37,33 +40,43 @@ const Footer = () => {
       icon: FaFacebookF,
       label: "Facebook",
       href: SOCIAL.facebook,
-      color: "hover:text-[#1877F2]",
     },
     {
       icon: FaInstagram,
       label: "Instagram",
       href: SOCIAL.instagram,
-      color: "hover:text-[#E4405F]",
     },
     {
       icon: FaLinkedinIn,
       label: "LinkedIn",
       href: SOCIAL.linkedin,
-      color: "hover:text-[#0A66C2]",
     },
     {
       icon: FaYoutube,
       label: "YouTube",
       href: SOCIAL.youtube,
-      color: "hover:text-[#FF0000]",
     },
     {
       icon: FaWhatsapp,
       label: "WhatsApp",
       href: SOCIAL.whatsapp,
-      color: "hover:text-[#25D366]",
     },
   ];
+
+  // Get icon based on service title
+  const getServiceIcon = (title) => {
+    const lowerTitle = title?.toLowerCase() || "";
+    if (lowerTitle.includes("home") || lowerTitle.includes("residential"))
+      return FaHome;
+    if (lowerTitle.includes("commercial") || lowerTitle.includes("office"))
+      return FaBuilding;
+    if (lowerTitle.includes("retail") || lowerTitle.includes("store"))
+      return FaStore;
+    if (lowerTitle.includes("hotel") || lowerTitle.includes("hospitality"))
+      return FaHotel;
+    if (lowerTitle.includes("corporate")) return FaHome;
+    return FaPalette;
+  };
 
   return (
     <footer className="bg-brand-charcoal text-gray-300 relative overflow-hidden">
@@ -103,13 +116,13 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links - 2 cols */}
-          <div className="lg:col-span-2">
+          {/* Quick Links - 3 cols */}
+          <div className="lg:col-span-3">
             <h4 className="text-white text-sm font-semibold uppercase tracking-wider mb-6">
               Quick Links
             </h4>
             <ul className="space-y-3">
-              {quickLinks.map((link) => (
+              {mainNavigation.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.path}
@@ -118,28 +131,6 @@ const Footer = () => {
                     <FaArrowRight className="w-3 h-3 text-brand-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                     <span className="group-hover:translate-x-1 transition-transform duration-200">
                       {link.name}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Services - 2 cols */}
-          <div className="lg:col-span-2">
-            <h4 className="text-white text-sm font-semibold uppercase tracking-wider mb-6">
-              Our Services
-            </h4>
-            <ul className="space-y-3">
-              {services.map((service) => (
-                <li key={service.name}>
-                  <Link
-                    to={service.path}
-                    className="text-sm text-gray-400 hover:text-brand-gold-light transition-colors duration-200 flex items-center gap-2 group"
-                  >
-                    <FaArrowRight className="w-3 h-3 text-brand-gold-light opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    <span className="group-hover:translate-x-1 transition-transform duration-200">
-                      {service.name}
                     </span>
                   </Link>
                 </li>
@@ -194,11 +185,11 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Social Icons - Now only one set */}
+            {/* Social Icons */}
             <div className="mt-6">
               <p className="text-xs text-gray-500 mb-3">FOLLOW US</p>
               <div className="flex gap-3">
-                {socialIcons.map(({ icon: Icon, label, href, color }) => (
+                {socialIcons.map(({ icon: Icon, label, href }) => (
                   <a
                     key={label}
                     href={href}
@@ -213,6 +204,61 @@ const Footer = () => {
               </div>
             </div>
           </div>
+
+          {/* Newsletter Signup - 3 cols */}
+          <div className="lg:col-span-3">
+            <h4 className="text-white text-sm font-semibold uppercase tracking-wider mb-6">
+              Stay Updated
+            </h4>
+            <p className="text-sm text-gray-400 mb-4">
+              Subscribe to our newsletter for design inspiration and updates.
+            </p>
+            <form className="flex flex-col gap-3">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-gold-light"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-brand-gold-light text-white rounded-lg text-sm font-medium hover:bg-brand-gold transition-colors"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Services Section - Full Width with Flex Wrap */}
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <h4 className="text-white text-sm font-semibold uppercase tracking-wider mb-6 text-center">
+            Our Services
+          </h4>
+          {servicesLoading ? (
+            <div className="text-center text-sm text-gray-500 py-4">
+              Loading services...
+            </div>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-3">
+              {services?.map((service) => {
+                const Icon = getServiceIcon(
+                  service.service_title || service.title,
+                );
+                return (
+                  <Link
+                    key={service.id}
+                    to={`/${service.slug || service.id}`}
+                    className="group inline-flex items-center gap-2 px-4 py-2 bg-gray-800/30 hover:bg-brand-gold/10 border border-gray-700 hover:border-brand-gold-light rounded-full transition-all duration-300"
+                  >
+                    <Icon className="w-3.5 h-3.5 text-brand-gold-light group-hover:text-brand-gold-light transition-colors" />
+                    <span className="text-sm text-gray-400 group-hover:text-brand-gold-light transition-colors">
+                      {service.service_title || service.title}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Stats Bar - Minimal achievement stats */}
@@ -246,13 +292,11 @@ const Footer = () => {
         </div>
       </div>
 
-      
-
       {/* Glitch Effect Footer - Full Width with Larger Text */}
       <div className="w-full bg-black/40 border-t border-gray-800/50">
         <div className="w-full px-4">
-          <div className="flex flex-col items-center justify-center space-y-8">
-            {/* InterioXcel with Glitch Effect - Full Width Size */}
+          <div className="flex flex-col items-center justify-center space-y-8 py-8">
+            {/* InterioXcel with Glitch Effect */}
             <div className="relative w-full overflow-hidden">
               <h1 className="text-[15vw] md:text-[12vw] lg:text-[10vw] font-black tracking-tighter text-center whitespace-nowrap leading-none">
                 <span className="relative inline-block">
@@ -288,9 +332,10 @@ const Footer = () => {
             </div>
 
             {/* Developer Credit */}
-            <div className="text-center ">
+            <div className="text-center">
               <p className="text-xs text-gray-500">
-                © {currentYear} InterioXcel. <br className="hidden sm:inline" />
+                © {currentYear} InterioXcel. All rights reserved.
+                <br className="hidden sm:inline" />
                 Design & Developed by{" "}
                 <a
                   href="https://positivequadrant.in/"
