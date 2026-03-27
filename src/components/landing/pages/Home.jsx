@@ -27,6 +27,15 @@ import {
   BuildingOffice2Icon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import {
+  Thumbnails,
+  Fullscreen,
+  Zoom,
+  Counter,
+} from "yet-another-react-lightbox/plugins";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
 import {
   useServices,
   useAreas,
@@ -35,6 +44,7 @@ import {
   useAchievements,
   useBlogs,
   useClients,
+  useFAQs,
 } from "@/hooks/useApiData";
 import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import Testimonial from "./Testimonial";
@@ -87,10 +97,6 @@ const principles = [
 ];
 
 /* ─────── TINY HELPERS ─────── */
-const Cap = ({ children, className = "" }) => (
-  <h6 className={className}>{children}</h6>
-);
-
 const HR = ({ w = 40, className = "" }) => (
   <div className={`w-[${w}px] h-px bg-brand-gold opacity-65 ${className}`} />
 );
@@ -213,7 +219,7 @@ const ServiceCard = ({ service, index }) => {
 };
 
 /* ─────── PROJECT CARD ─────── */
-const ProjectCard = ({ project, index }) => {
+const ProjectCard = ({ project, index, onClick }) => {
   const [hov, setHov] = useState(false);
 
   return (
@@ -224,6 +230,7 @@ const ProjectCard = ({ project, index }) => {
       transition={{ duration: 0.7, delay: index * 0.08 }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      onClick={() => onClick(project)}
       className="relative overflow-hidden cursor-pointer bg-black group"
     >
       <div className="h-72 overflow-hidden">
@@ -422,12 +429,81 @@ const ClientCard = ({ client, index }) => {
   );
 };
 
+/* ─────── FAQ ITEM ─────── */
+const FAQItem = ({ item, index }) => {
+  const [open, setOpen] = useState(index === 0);
+  const [ref, visible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const o = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) visible(true);
+      },
+      { threshold: 0.1 },
+    );
+    if (containerRef.current) o.observe(containerRef.current);
+    return () => o.disconnect();
+  }, []);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 16 }}
+      transition={{ duration: 0.45, delay: index * 0.05 }}
+      className="border-b border-brand-gold/20"
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex justify-between items-center py-5 bg-transparent border-none cursor-pointer text-left"
+      >
+        <span
+          className={`text-base md:text-lg font-medium pr-6 transition-colors duration-300 ${open ? "text-brand-gold" : "text-brand-charcoal"}`}
+        >
+          {item.question || item.q}
+        </span>
+        <div
+          className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-300 ${open ? "border-brand-gold bg-brand-gold rotate-45" : "border-brand-gold/40 bg-transparent"}`}
+        >
+          <span
+            className={`text-lg leading-none ${open ? "text-white" : "text-brand-gold"}`}
+          >
+            +
+          </span>
+        </div>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            className="overflow-hidden"
+          >
+            <p className="text-brand-charcoal/65 text-base leading-relaxed pb-5">
+              {item.answer || item.a}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
 /* ═══════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════ */
 const Home = () => {
   const [slide, setSlide] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
+
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [selectedProjectImages, setSelectedProjectImages] = useState([]);
+  const [selectedProjectName, setSelectedProjectName] = useState("");
 
   const { data: services, loading: sl } = useServices();
   const { data: areas, loading: al } = useAreas();
@@ -436,8 +512,9 @@ const Home = () => {
   const { data: achievements, loading: ahl } = useAchievements();
   const { data: blogs, loading: bl } = useBlogs();
   const { data: clients, loading: cl } = useClients();
+  const { data: faqs, loading: fl } = useFAQs();
 
-  const loading = sl || al || pl || tl || ahl || bl || cl;
+  const loading = sl || al || pl || tl || ahl || bl || cl || fl;
 
   useEffect(() => {
     const t = setInterval(
@@ -450,6 +527,29 @@ const Home = () => {
     const t = setInterval(() => setActiveStep((p) => (p + 1) % 3), 3000);
     return () => clearInterval(t);
   }, []);
+
+  // Handle project click to open lightbox
+  const handleProjectClick = (project) => {
+    // Get all images for the clicked project
+    const originalProject = projects?.find(
+      (p) => p.name === project.name || p.id === project.id,
+    );
+
+    if (
+      originalProject &&
+      originalProject.images &&
+      originalProject.images.length > 0
+    ) {
+      const images = originalProject.images.map((img) => ({
+        src: getImageUrl(img.image_path) || "",
+        alt: `${originalProject.name} - Interior Design`,
+      }));
+      setSelectedProjectImages(images);
+      setSelectedProjectName(originalProject.name);
+      setLightboxIndex(0);
+      setLightboxOpen(true);
+    }
+  };
 
   if (loading)
     return (
@@ -498,6 +598,7 @@ const Home = () => {
 
   const displayedProjects =
     projects?.slice(0, 6).map((p) => ({
+      id: p.id,
       name: p.name || "Project",
       locations:
         [p.district, p.state, p.country].filter(Boolean).join(", ") || "India",
@@ -505,6 +606,7 @@ const Home = () => {
         ? getImageUrl(p.images[0].image_path)
         : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg",
       ongoing: p.ongoing,
+      images: p.images || [],
     })) || [];
 
   const workInProgress =
@@ -553,6 +655,9 @@ const Home = () => {
   const totalBankModels =
     projects?.filter((p) => p.name?.toLowerCase().includes("bank")).length ||
     40;
+
+  // Get FAQs to display (limit to 6)
+  const displayedFaqs = faqs?.slice(0, 6) || [];
 
   return (
     <>
@@ -982,7 +1087,12 @@ const Home = () => {
             <Inner className="pb-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2px]">
                 {displayedProjects.map((p, i) => (
-                  <ProjectCard key={i} project={p} index={i} />
+                  <ProjectCard
+                    key={i}
+                    project={p}
+                    index={i}
+                    onClick={handleProjectClick}
+                  />
                 ))}
               </div>
             </Inner>
@@ -1239,6 +1349,37 @@ const Home = () => {
           </Inner>
         </section>
 
+        {/* FAQ Section */}
+        {displayedFaqs.length > 0 && (
+          <section className="bg-bg-soft py-16 lg:py-24">
+            <div className="container mx-auto section-px max-w-3xl">
+              <div className="text-center mb-12">
+                <Reveal>
+                  <h6 className="mb-3 text-brand-gold">FAQ</h6>
+                </Reveal>
+                <Reveal delay={0.1}>
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-brand-charcoal mb-3">
+                    Frequently Asked
+                    <br />
+                    <span className="text-brand-gold italic">Questions</span>
+                  </h2>
+                </Reveal>
+                <Reveal delay={0.2}>
+                  <div className="w-10 h-px bg-brand-gold opacity-70 mx-auto" />
+                </Reveal>
+              </div>
+
+              <div>
+                {displayedFaqs.map((item, i) => (
+                  <FAQItem key={item.id || i} item={item} index={i} />
+                ))}
+              </div>
+
+              
+            </div>
+          </section>
+        )}
+
         {/* CTA Banner */}
         <section className="relative min-h-[400px]">
           <div className="absolute inset-0 overflow-hidden">
@@ -1412,6 +1553,46 @@ const Home = () => {
             </div>
           </Inner>
         </div>
+
+        {/* Lightbox Gallery */}
+        <Lightbox
+          open={lightboxOpen}
+          close={() => setLightboxOpen(false)}
+          index={lightboxIndex}
+          slides={selectedProjectImages}
+          plugins={[Thumbnails, Fullscreen, Zoom, Counter]}
+          thumbnails={{
+            position: "bottom",
+            width: 60,
+            height: 40,
+            border: 1,
+            borderRadius: 4,
+            padding: 2,
+            gap: 4,
+          }}
+          zoom={{
+            maxZoomPixelRatio: 3,
+            zoomInMultiplier: 2,
+            doubleTapDelay: 300,
+          }}
+          counter={{
+            container: {
+              style: {
+                top: 12,
+                right: 12,
+                background: "rgba(184, 138, 68, 0.9)",
+                color: "white",
+                padding: "2px 8px",
+                borderRadius: 16,
+                fontSize: 12,
+              },
+            },
+          }}
+          styles={{
+            container: { backgroundColor: "rgba(0,0,0,0.95)" },
+            thumbnail: { borderColor: "#b88a44" },
+          }}
+        />
       </div>
     </>
   );

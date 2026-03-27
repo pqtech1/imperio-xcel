@@ -167,11 +167,11 @@ const BlogDetail = () => {
                 <div className="flex items-center gap-4 text-white/70">
                   <div className="flex items-center gap-2">
                     <UserIcon className="w-4 h-4" />
-                    <p className="text-sm mb-0">InterioXcel Team</p>
+                    <p className="text-sm mb-0 text-white">InterioXcel Team</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <ClockIcon className="w-4 h-4" />
-                    <p className="text-sm mb-0">
+                    <p className="text-sm mb-0 text-white">
                       {getReadTime(blog.content)} min read
                     </p>
                   </div>

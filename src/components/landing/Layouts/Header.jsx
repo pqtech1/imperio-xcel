@@ -107,17 +107,20 @@ const Header = () => {
             {/* LOGO */}
             <Link
               to="/"
-              className="relative z-10 flex items-center gap-3 group"
+              className="relative z-10 flex flex-col items-start gap-1 group"
             >
+              {/* Logo */}
               <img
                 src={BRAND.logo}
                 alt={BRAND.name}
                 className={`h-12 md:h-14 object-contain transition-all duration-300 ${isScrolled ? "brightness-100" : "brightness-0 invert"}`}
               />
+
+              {/* Company Name */}
               <span
-                className={`italic font-heading text-lg md:text-2xl tracking-wide transition-colors duration-300 ${isScrolled ? "text-brand-charcoal" : "text-white"}`}
+                className={`font-heading text-base tracking-wide transition-colors duration-300 ml-1 ${isScrolled ? "text-brand-charcoal" : "text-white"}`}
               >
-                - KK <span className="text-brand-gold">Enterprises</span>
+                KK <span className="text-brand-gold">Enterprises</span>
               </span>
             </Link>
 
