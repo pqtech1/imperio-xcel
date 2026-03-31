@@ -12,6 +12,7 @@ import Contacts from "./components/landing/pages/Contacts";
 import Architecture from "./components/landing/pages/Architecture";
 import Turnkey from "./components/landing/pages/Turnkey";
 import Competence from "./components/landing/pages/Competence";
+import Services from "./components/landing/pages/Services";
 
 /* Admin */
 import AdminLayout from "./components/admin/layout/Layout";
@@ -85,6 +86,7 @@ import ServiceDetail from "./components/landing/pages/ServiceDetail";
 import BlogDetail from "./components/landing/pages/BlogDetail";
 import AreasWeServe from "./components/landing/pages/AreasWeServe";
 
+
 const App = () => {
   return (
     <BrowserRouter basename="/interioxcel">
@@ -105,6 +107,7 @@ const App = () => {
           <Route path="contact" element={<Contacts />} />
           <Route path="architecture" element={<Architecture />} />
           <Route path="turnkey-interior" element={<Turnkey />} />
+          <Route path="services" element={<Services />} />
           <Route path=":slug" element={<ServiceDetail />} />
           {/* Website Not Found */}
           {/* <Route path="*" element={<NotFound />} /> */}

@@ -12,6 +12,8 @@ import {
   UserGroupIcon,
   CheckCircleIcon,
   ArrowRightIcon,
+  EnvelopeIcon,
+  PhoneIcon,
 } from "@heroicons/react/24/outline";
 import {
   useAchievements,
@@ -57,130 +59,69 @@ const getIconComponent = (iconName) => {
   return TrophyIcon;
 };
 
-const getGradientColor = (index) => {
-  const gradients = [
-    "from-blue-500 to-indigo-500",
-    "from-amber-500 to-yellow-500",
-    "from-emerald-500 to-teal-500",
-    "from-yellow-500 to-orange-800",
-    "from-purple-500 to-pink-500",
-    "from-red-500 to-orange-500",
-  ];
-  return gradients[index % gradients.length];
-};
-
 const AchievementCard = ({ item, delay, index }) => {
   const [ref, visible] = useInView(0.1);
   const [hovered, setHovered] = useState(false);
-  const Icon = getIconComponent(item.title);
-  const gradientColor = getGradientColor(index);
+  const [imageError, setImageError] = useState(false);
+
+  // Get icon image from achievement API for background
+  const backgroundImage = item.icon ? getImageUrl(item.icon) : null;
+
+  const getGradientBackground = () => {
+    const gradients = [
+      "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)",
+      "linear-gradient(135deg, #134e5e 0%, #71b280 100%)",
+      "linear-gradient(135deg, #2c3e50 0%, #3498db 100%)",
+      "linear-gradient(135deg, #4b6cb7 0%, #182848 100%)",
+      "linear-gradient(135deg, #4568dc 0%, #b06ab3 100%)",
+    ];
+    return gradients[index % gradients.length];
+  };
 
   return (
     <div
       ref={ref}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden cursor-pointer rounded-lg shadow-md group"
+      className="relative overflow-hidden cursor-pointer rounded-lg shadow-md group min-h-[280px]"
     >
+      {/* Dynamic Background using achievement icon */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${gradientColor} opacity-90`}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-110"
+        style={{
+          backgroundImage:
+            !imageError && backgroundImage
+              ? `url(${backgroundImage})`
+              : getGradientBackground(),
+        }}
+        onError={() => setImageError(true)}
       />
-      <div className="absolute inset-0 bg-black/20" />
-      <div className="relative z-10 p-6 text-white">
-        {item.icon ? (
-          <img
-            src={getImageUrl(item.icon)}
-            alt={item.title}
-            className="w-8 h-8 mb-3 opacity-80 object-contain"
-          />
-        ) : (
-          <Icon className="w-8 h-8 mb-3 opacity-80" />
-        )}
-        <div className="text-3xl md:text-4xl font-heading font-bold mb-1">
-          {item.count}+
+
+      {/* Dark overlay */}
+      <div
+        className={`absolute inset-0 transition-all duration-300 ${
+          hovered ? "bg-black/50" : "bg-black/60"
+        }`}
+      />
+
+      <div className="relative z-10 p-6 text-white h-full flex flex-col justify-between min-h-[280px]">
+        <div>
+          {/* Removed the small icon image - now only background */}
+          <div className="text-3xl md:text-4xl font-heading font-bold mb-1">
+            {item.count}+
+          </div>
+          <h4 className="font-heading font-semibold mb-1 text-white">
+            {item.title}
+          </h4>
+          <p className="text-white/80 text-sm leading-relaxed">
+            {item.description}
+          </p>
         </div>
-        <h4 className="font-heading font-semibold mb-1">{item.title}</h4>
-        <p className="text-white/80 text-sm leading-relaxed">
-          {item.description}
-        </p>
         <div
-          className={`absolute bottom-0 left-0 right-0 h-0.5 bg-white transition-transform duration-500 ${
+          className={`w-full h-0.5 bg-white transition-transform duration-500 origin-left ${
             hovered ? "scale-x-100" : "scale-x-0"
           }`}
         />
-      </div>
-    </div>
-  );
-};
-
-const VideoSection = () => {
-  const [ref, visible] = useInView(0.1);
-  const [playing, setPlaying] = useState(false);
-  const videoId = "dQw4w9WgXcQ";
-
-  return (
-    <div ref={ref} className="container mx-auto section-px pt-16 pb-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h6 className="mb-2">OUR STORY</h6>
-          <h2 className="mb-2">Journey of Excellence</h2>
-          <div className="w-12 h-px bg-brand-gold opacity-70 mx-auto mt-3" />
-        </div>
-
-        <div
-          className="relative w-full bg-black cursor-pointer overflow-hidden rounded-lg shadow-xl aspect-video"
-          onClick={() => setPlaying(true)}
-        >
-          {playing ? (
-            <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-              title="Achievement Video"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full border-0"
-            />
-          ) : (
-            <>
-              <img
-                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                alt="Video thumbnail"
-                className="absolute inset-0 w-full h-full object-cover brightness-75"
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg";
-                }}
-              />
-              <div className="absolute top-3 left-3 right-3 flex items-center gap-2 bg-gradient-to-b from-black/60 to-transparent p-2">
-                <div className="bg-brand-gold px-2 py-0.5 rounded text-white text-xs font-bold tracking-wide">
-                  FEATURED
-                </div>
-                <span className="text-xs text-white/80">
-                  InterioXcel • Est. 2017
-                </span>
-                <div className="ml-auto flex items-center gap-1 bg-black/70 px-2 py-0.5 rounded">
-                  <span className="text-white text-[10px] tracking-wider uppercase">
-                    IX
-                  </span>
-                </div>
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-brand-gold/90 rounded-full flex items-center justify-center shadow-xl hover:bg-brand-gold transition-colors duration-300 cursor-pointer">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent flex justify-between">
-                <span className="text-xs text-white/80">
-                  Watch our journey →
-                </span>
-                <span className="text-xs text-white/40">
-                  7+ years of excellence
-                </span>
-              </div>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -210,7 +151,6 @@ const BlogCard = ({ post, delay }) => {
               "https://images.pexels.com/photos/279607/pexels-photo-279607.jpeg";
           }}
         />
-      
       </div>
 
       <div className="p-5">
@@ -238,61 +178,66 @@ const BlogCard = ({ post, delay }) => {
   );
 };
 
+// Updated ClientCard - Same as Home page with logo on top
 const ClientCard = ({ client, index }) => {
   const [hovered, setHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div
-      className="relative bg-white p-5 rounded-lg shadow-sm border border-brand-gold/10 hover:shadow-md transition-all duration-300 group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="group relative bg-white rounded-lg p-5 border border-brand-gold/10 hover:shadow-md transition-all duration-300"
     >
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-12 h-12 bg-brand-gold/10 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
-          {client.logo ? (
+      {/* Logo on top - centered */}
+      <div className="flex justify-center mb-4">
+        <div className=" bg-brand-gold/10 rounded-full flex items-center justify-center overflow-hidden">
+          {client.logo && !imageError ? (
             <img
               src={getImageUrl(client.logo)}
               alt={client.company || client.name}
-              className="w-full h-full object-cover transition-all duration-300 group-hover:grayscale-0 grayscale"
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/48?text=Logo";
-              }}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
             />
           ) : (
-            <BuildingOfficeIcon className="w-6 h-6 text-brand-gold" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h5 className="text-brand-charcoal truncate">
-            {client.company || client.name}
-          </h5>
-          {client.name && client.name !== (client.company || client.name) && (
-            <p className="text-sm text-brand-charcoal/60 truncate">
-              {client.name}
-            </p>
+            <BuildingOfficeIcon className="w-10 h-10 text-brand-gold" />
           )}
         </div>
       </div>
 
+      {/* Company details below logo */}
+      <div className="text-center">
+        <h5 className="font-heading font-semibold text-brand-charcoal mb-1 line-clamp-1">
+          {client.company || client.name}
+        </h5>
+        {client.name && client.company !== client.name && (
+          <p className="text-xs text-brand-charcoal/50 mb-3 line-clamp-1">
+            {client.name}
+          </p>
+        )}
+      </div>
+
+      {/* Contact info - if available */}
       {(client.email || client.phone) && (
-        <div className="space-y-1.5">
+        <div className="space-y-2 mt-3 pt-3 border-t border-brand-gold/10">
           {client.email && (
-            <div className="flex items-center gap-1.5 text-sm text-brand-charcoal/60">
-              <span className="font-medium w-14">Email:</span>
-              <span className="truncate flex-1">{client.email}</span>
+            <div className="flex items-center justify-center gap-2 text-xs text-brand-charcoal/60">
+              <EnvelopeIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
+              <span className="truncate">{client.email}</span>
             </div>
           )}
           {client.phone && (
-            <div className="flex items-center gap-1.5 text-sm text-brand-charcoal/60">
-              <span className="font-medium w-14">Phone:</span>
-              <span className="flex-1">{client.phone}</span>
+            <div className="flex items-center justify-center gap-2 text-xs text-brand-charcoal/60">
+              <PhoneIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
+              <span>{client.phone}</span>
             </div>
           )}
         </div>
       )}
 
+      {/* Hover effect line */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-gold transition-transform duration-500 ${
+        className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-gold transition-transform duration-500 origin-left ${
           hovered ? "scale-x-100" : "scale-x-0"
         }`}
       />
@@ -489,9 +434,6 @@ const Achievement = () => {
             </div>
           )}
 
-          {/* Video Section */}
-          <VideoSection />
-
           {/* Timeline Section */}
           <div className="bg-white">
             <div
@@ -511,7 +453,7 @@ const Achievement = () => {
             </div>
           </div>
 
-          {/* Clients Section */}
+          {/* Clients Section - Updated to match Home page style */}
           <div ref={clientsRef} className="bg-bg-soft">
             <div className="container mx-auto section-px py-16">
               <div className="text-center mb-12">
@@ -519,7 +461,7 @@ const Achievement = () => {
                 <h2 className="mb-2">Trusted By Industry Leaders</h2>
                 <div className="w-12 h-px bg-brand-gold opacity-70 mx-auto" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 {clients?.map((client, index) => (
                   <ClientCard
                     key={client.id || index}
@@ -572,5 +514,4 @@ const Achievement = () => {
   );
 };
 
-export { VideoSection };
 export default Achievement;

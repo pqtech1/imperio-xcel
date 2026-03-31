@@ -8,7 +8,7 @@ import {
   OurServices,
   WhyChooseUs,
 } from "./Interior";
-import { VideoSection } from "./Achievement";
+
 import {
   BuildingOfficeIcon,
   BuildingStorefrontIcon,
@@ -294,10 +294,7 @@ const Architecture = () => {
         <OurServices />
       </div>
 
-      {/* Video Section */}
-      <div className="mt-6">
-        <VideoSection />
-      </div>
+    
 
       {/* Why Work With Us Section */}
       <div

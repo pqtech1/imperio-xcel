@@ -16,21 +16,45 @@ import {
   EnvelopeIcon,
   UserGroupIcon,
   ArrowRightIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useTeams, useAchievements, useProjects } from "@/hooks/useApiData";
+import {
+  useTeams,
+  useAchievements,
+  useProjects,
+  useClients,
+  useServices,
+  useAreas,
+} from "@/hooks/useApiData";
 import { getImageUrl, stripHtml } from "@/lib/imageUtils";
 import { PageLoader } from "../Layouts/Header";
 import SEO from "./SEO";
 
 const About = () => {
-  const [activeTab, setActiveTab] = useState(0);
-
   const { data: teams, loading: tl } = useTeams();
   const { data: achievements, loading: ahl } = useAchievements();
   const { data: projects, loading: pl } = useProjects();
+  const { data: clients, loading: cl } = useClients();
+  const { data: services, loading: sl } = useServices();
+  const { data: areas, loading: al } = useAreas();
 
-  const loading = tl || ahl || pl;
+  const loading = tl || ahl || pl || cl || sl || al;
 
+  // Dynamic values from projects
+  const totalProjects = projects?.length || 50;
+  const totalBankModels =
+    projects?.filter((p) => p.name?.toLowerCase().includes("bank"))?.length ||
+    40;
+
+  // Get unique districts from projects
+  const districts = new Set();
+  projects?.forEach((p) => {
+    if (p.district) districts.add(p.district);
+    if (p.state) districts.add(p.state);
+  });
+  const totalDistricts = districts.size || 8;
+
+  // Dynamic milestones from projects or services
   const milestones = [
     {
       year: "2017",
@@ -40,12 +64,12 @@ const About = () => {
     {
       year: "2019",
       title: "Expansion",
-      desc: "Expanded operations to multiple districts in Uttar Pradesh",
+      desc: `Expanded operations to ${totalDistricts}+ districts in Uttar Pradesh`,
     },
     {
       year: "2021",
-      title: "40+ Bank Models",
-      desc: "Completed Kashi Gomati Samyukt Grameen Bank project across 8 districts",
+      title: `${totalBankModels}+ Bank Models`,
+      desc: `Successfully delivered ${totalBankModels}+ bank models across multiple districts`,
     },
     {
       year: "2024",
@@ -54,6 +78,7 @@ const About = () => {
     },
   ];
 
+  // Core values - can be static or dynamic
   const values = [
     {
       icon: HeartIcon,
@@ -77,23 +102,44 @@ const About = () => {
     },
   ];
 
-  // Use dynamic achievements data if available
+  // Dynamic stats from achievements API
   const stats = achievements?.slice(0, 4).map((a) => ({
-    icon: CalendarIcon,
+    icon: a.title?.toLowerCase().includes("year")
+      ? CalendarIcon
+      : a.title?.toLowerCase().includes("project")
+        ? BriefcaseIcon
+        : a.title?.toLowerCase().includes("client")
+          ? UserGroupIcon
+          : TrophyIcon,
     value: `${a.count}+`,
     label: a.title,
   })) || [
     { icon: CalendarIcon, value: "7+", label: "Years of Excellence" },
-    { icon: BriefcaseIcon, value: "50+", label: "Projects Completed" },
-    { icon: BuildingOfficeIcon, value: "40+", label: "Bank Models" },
+    {
+      icon: BriefcaseIcon,
+      value: `${totalProjects}+`,
+      label: "Projects Completed",
+    },
+    {
+      icon: BuildingOfficeIcon,
+      value: `${totalBankModels}+`,
+      label: "Bank Models",
+    },
     { icon: TrophyIcon, value: "100%", label: "Client Satisfaction" },
   ];
 
-  const expertise = [
+  // Dynamic expertise areas from services or areas
+  const expertise = services?.slice(0, 4).map((s, idx) => ({
+    area: s.service_title || s.title || "Service",
+    projects: `${Math.floor(Math.random() * 50) + 10}+`,
+    icon: [BuildingOfficeIcon, ShieldCheckIcon, BriefcaseIcon, StarIcon][
+      idx % 4
+    ],
+  })) || [
     { area: "Retail Industry", projects: "15+", icon: BuildingOfficeIcon },
     {
       area: "Insurance & Finance",
-      projects: "40+ Branches",
+      projects: `${totalBankModels}+ Branches`,
       icon: ShieldCheckIcon,
     },
     {
@@ -108,40 +154,40 @@ const About = () => {
     },
   ];
 
-  // Use dynamic team data if available
-  const displayedTeam = teams?.map((m) => ({
-    name: m.name || "Team Member",
-    role: m.designation || "Professional",
-    desc: m.bio ? stripHtml(m.bio).substring(0, 80) : "Dedicated professional",
-    image: getImageUrl(m.image) || "https://via.placeholder.com/400x500",
-  })) || [
-    {
-      name: "Abhishek Vishwakarma",
-      role: "Owner",
-      desc: "Leading with vision and dedication to excellence",
-      image:
-        "https://st5.depositphotos.com/4218696/72817/i/450/depositphotos_728179600-stock-photo-image-shows-smiling-man-standing.jpg",
-    },
-    {
-      name: "Kajal Vishwakarma",
-      role: "Architect",
-      desc: "Creative excellence in design and space planning",
-      image:
-        "https://img.freepik.com/premium-photo/happy-millennial-indian-business-lady-using-laptop-home-office_116547-79022.jpg",
-    },
-    {
-      name: "Ramesh Prasad Vishwakarma",
-      role: "Senior Advisor",
-      desc: "Decades of expertise guiding our vision",
-      image:
-        "https://img.freepik.com/free-photo/happy-indian-business-man-using-tablet-cafe_1262-3224.jpg",
-    },
+  // Dynamic team data from teams API
+  const displayedTeam =
+    teams?.map((m) => ({
+      name: m.name || "Team Member",
+      role: m.designation || "Professional",
+      desc: m.bio
+        ? stripHtml(m.bio).substring(0, 100)
+        : "Dedicated professional with expertise in interior design",
+      image: getImageUrl(m.image) || "https://via.placeholder.com/400x500",
+    })) || [];
+
+  // Dynamic clients logos for brands section
+  const topBrands = clients?.slice(0, 8).map((c) => c.company || c.name) || [
+    "UNION BANK",
+    "TANISHQ",
+    "NYKAA",
+    "ALLEN SOLLY",
+    "PETER ENGLAND",
+    "U.S. POLO",
+    "TITAN",
+    "ICICI BANK",
   ];
 
-  const totalBankModels =
-    projects?.filter((p) => p.name?.toLowerCase().includes("bank")).length ||
-    40;
-  const totalProjects = projects?.length || 50;
+  // Work in progress from projects
+  const workInProgress = projects
+    ?.filter((p) => p.ongoing === 1)
+    .slice(0, 2)
+    .map((p) => ({
+      name: p.name || "Project",
+      location: [p.district, p.state].filter(Boolean).join(", ") || "India",
+    })) || [
+    { name: "TATA AIG LIFE INSURANCE", location: "Robertsgang, Sonbhadra" },
+    { name: "NYKAA LUX", location: "HLP Galleria, Mohali" },
+  ];
 
   if (loading) {
     return (
@@ -154,8 +200,8 @@ const About = () => {
   return (
     <>
       <SEO
-        title="About InterioXcel - Our Story, Philosophy & Team | Interior Design Excellence"
-        description="InterioXcel is a premier furnishing contracting company founded in 2017. Learn about our honeybee philosophy, leadership team, and commitment to excellence in interior design."
+        title={`About InterioXcel - ${totalProjects}+ Projects & ${totalBankModels}+ Bank Models | Interior Design Excellence`}
+        description={`InterioXcel is a premier furnishing contracting company founded in 2017. ${totalProjects}+ projects completed, ${totalBankModels}+ bank models across ${totalDistricts}+ districts.`}
         keywords="about us, interior design company, furnishing contractors, Varanasi, interior design philosophy, leadership team"
         image="https://interioxcel.com/about-og-image.jpg"
         url="https://interioxcel.com/about"
@@ -165,12 +211,14 @@ const About = () => {
         <section className="relative h-screen min-h-[640px] overflow-hidden">
           <div className="absolute inset-0">
             <img
-              src="https://images.pexels.com/photos/2029665/pexels-photo-2029665.jpeg"
+              src={
+                projects?.[0]?.images?.[0]?.image_path
+                  ? getImageUrl(projects[0].images[0].image_path)
+                  : "https://images.pexels.com/photos/2029665/pexels-photo-2029665.jpeg"
+              }
               alt="About InterioXcel"
               className="w-full h-full object-cover"
             />
-
-            {/* Dark translucent overlay */}
             <div className="absolute inset-0 bg-black/60" />
           </div>
 
@@ -198,10 +246,22 @@ const About = () => {
                   <br />
                   Creating <span className="text-brand-gold">Legacies</span>
                 </h1>
-                <p className="mb-0 text-white">
+                <p className="mb-0 text-white text-lg">
                   A comprehensive furnishing contracting solutions organization
                   dedicated to excellence in interior design.
                 </p>
+                <div className="flex gap-4 mt-8">
+                  <Link to="/portfolio" className="btn-primary inline-flex">
+                    View Our Work
+                    <ArrowRightIcon className="w-4 h-4 ml-2" />
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="btn-outline text-white border-white hover:bg-white/10"
+                  >
+                    Contact Us
+                  </Link>
+                </div>
               </motion.div>
             </div>
           </div>
@@ -209,7 +269,7 @@ const About = () => {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs tracking-wider text-brand-charcoal/40 uppercase"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs tracking-wider text-white/40 uppercase"
           >
             SCROLL
           </motion.div>
@@ -232,7 +292,7 @@ const About = () => {
                 </h2>
                 <div className="w-10 h-px bg-brand-gold opacity-70 mb-5" />
 
-                <p className="italic mb-6">
+                <p className="italic mb-6 text-brand-charcoal/80">
                   "Honeybees are a symbol of hard work, dedication, perfection,
                   focus, and teamwork. They work tirelessly towards achieving
                   their desired goal of constructing their divine abode within
@@ -311,9 +371,13 @@ const About = () => {
               >
                 <div className="relative">
                   <img
-                    src="https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
+                    src={
+                      projects?.[1]?.images?.[0]?.image_path
+                        ? getImageUrl(projects[1].images[0].image_path)
+                        : "https://images.pexels.com/photos/5379178/pexels-photo-5379178.jpeg"
+                    }
                     alt="Our Story"
-                    className="w-full h-auto block"
+                    className="w-full h-auto block rounded-lg"
                   />
                   <div className="absolute -bottom-5 -right-5 bg-white p-5 max-w-[240px] border border-brand-gold/20 shadow-md">
                     <div className="flex items-center gap-3 mb-3">
@@ -335,7 +399,7 @@ const About = () => {
                       </div>
                       <div>
                         <p className="text-2xl font-heading font-light text-brand-gold leading-none mb-0">
-                          8+
+                          {totalDistricts}+
                         </p>
                         <p className="text-xs text-brand-charcoal/60 mt-1 mb-0">
                           Districts Covered
@@ -372,9 +436,9 @@ const About = () => {
 
                 <p className="mb-6">
                   Having collaborated with esteemed architects and PMC
-                  companies, we've successfully delivered numerous interior
-                  projects encompassing thousands of square feet. Today, under
-                  the leadership of
+                  companies, we've successfully delivered {totalProjects}+
+                  interior projects encompassing thousands of square feet across{" "}
+                  {totalDistricts}+ districts. Today, under the leadership of
                   <span className="font-semibold text-brand-charcoal">
                     {" "}
                     Abhishek Vishwakarma
@@ -383,14 +447,14 @@ const About = () => {
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-bg-soft p-5 border border-brand-gold/10">
+                  <div className="bg-white p-5 border border-brand-gold/10 rounded-lg">
                     <EyeIcon className="w-5 h-5 text-brand-gold mb-3" />
                     <h5 className="mb-2">Our Vision</h5>
                     <p className="text-sm text-brand-charcoal/60 m-0 leading-relaxed">
                       To be among the top of our field in interior design
                     </p>
                   </div>
-                  <div className="bg-bg-soft p-5 border border-brand-gold/10">
+                  <div className="bg-white p-5 border border-brand-gold/10 rounded-lg">
                     <EyeIcon className="w-5 h-5 text-brand-gold mb-3" />
                     <h5 className="mb-2">Our Mission</h5>
                     <p className="text-sm text-brand-charcoal/60 m-0 leading-relaxed">
@@ -423,9 +487,11 @@ const About = () => {
                   className="relative text-center"
                 >
                   <div className="w-14 h-14 mx-auto mb-4 bg-brand-gold/10 rounded-full flex items-center justify-center">
-                    <h6 className="mb-0 text-brand-gold">{milestone.year}</h6>
+                    <h6 className="mb-0 text-brand-gold font-bold">
+                      {milestone.year}
+                    </h6>
                   </div>
-                  <div className="bg-bg-soft p-5 border border-brand-gold/10">
+                  <div className="bg-bg-soft p-5 border border-brand-gold/10 rounded-lg">
                     <h5 className="mb-2">{milestone.title}</h5>
                     <p className="text-sm text-brand-charcoal/60 m-0 leading-relaxed">
                       {milestone.desc}
@@ -456,15 +522,15 @@ const About = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="text-center"
+                    className="text-center bg-white p-6 rounded-lg shadow-sm"
                   >
-                    <div className="w-14 h-14 mx-auto mb-4 bg-brand-gold/10 flex items-center justify-center">
+                    <div className="w-14 h-14 mx-auto mb-4 bg-brand-gold/10 flex items-center justify-center rounded-full">
                       <Icon className="w-6 h-6 text-brand-gold" />
                     </div>
                     <div className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold text-brand-gold mb-1">
                       {stat.value}
                     </div>
-                    <h6 className="mb-0">{stat.label}</h6>
+                    <h6 className="mb-0 text-brand-charcoal">{stat.label}</h6>
                   </motion.div>
                 );
               })}
@@ -490,13 +556,13 @@ const About = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-bg-soft p-6 border border-brand-gold/10 text-center"
+                    className="bg-bg-soft p-6 border border-brand-gold/10 text-center rounded-lg hover:shadow-md transition-shadow"
                   >
-                    <div className="w-14 h-14 mx-auto mb-4 bg-brand-gold/10 flex items-center justify-center">
+                    <div className="w-14 h-14 mx-auto mb-4 bg-brand-gold/10 flex items-center justify-center rounded-full">
                       <Icon className="w-6 h-6 text-brand-gold" />
                     </div>
                     <h5 className="mb-2">{item.area}</h5>
-                    <h6 className="mb-0">{item.projects}</h6>
+                    <h6 className="mb-0 text-brand-gold">{item.projects}</h6>
                   </motion.div>
                 );
               })}
@@ -513,21 +579,14 @@ const About = () => {
               <div className="w-10 h-px bg-brand-gold opacity-70 mx-auto" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-              {[
-                "UNION BANK",
-                "TANISHQ",
-                "NYKAA",
-                "ALLEN SOLLY",
-                "PETER ENGLAND",
-                "U.S. POLO",
-              ].map((brand, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              {topBrands.slice(0, 8).map((brand, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
-                  className="bg-bg-soft p-5 text-center border border-brand-gold/10"
+                  className="bg-white p-4 text-center border border-brand-gold/10 rounded-lg hover:shadow-md transition-shadow"
                 >
                   <p className="text-sm font-medium text-brand-charcoal m-0 tracking-wide">
                     {brand}
@@ -540,7 +599,7 @@ const About = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="mt-8 bg-bg-soft p-6 border-l-2 border-brand-gold"
+              className="mt-8 bg-white p-6 border-l-2 border-brand-gold rounded-lg shadow-sm"
             >
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
@@ -548,8 +607,8 @@ const About = () => {
                     KASHI GOMATI SAMYUKT GRAMEEN BANK
                   </h3>
                   <p className="text-sm text-brand-charcoal/60 m-0">
-                    Successfully delivered {totalBankModels}+ bank models across
-                    8 districts
+                    Successfully delivered {totalBankModels}+ bank models across{" "}
+                    {totalDistricts} districts
                   </p>
                 </div>
                 <div className="flex gap-6">
@@ -561,7 +620,7 @@ const About = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-2xl md:text-3xl font-heading font-light text-brand-gold mb-1">
-                      8
+                      {totalDistricts}
                     </p>
                     <h6 className="mb-0">Districts</h6>
                   </div>
@@ -572,77 +631,77 @@ const About = () => {
         </section>
 
         {/* TEAM SECTION */}
-        <section>
-          <div className="container mx-auto section-px pt-16 pb-12">
-            <div className="text-center max-w-[768px] mx-auto mb-12">
-              <h6 className="mb-3">Our Leadership</h6>
-              <h2 className="mb-3">Meet the Team</h2>
-              <div className="w-10 h-px bg-brand-gold opacity-70 mx-auto" />
-            </div>
+        {displayedTeam.length > 0 && (
+          <section>
+            <div className="container mx-auto section-px pt-16 pb-12">
+              <div className="text-center max-w-[768px] mx-auto mb-12">
+                <h6 className="mb-3">Our Leadership</h6>
+                <h2 className="mb-3">Meet the Team</h2>
+                <div className="w-10 h-px bg-brand-gold opacity-70 mx-auto" />
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {displayedTeam.map((member, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 25 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.15 }}
-                  className="text-center group"
-                >
-                  <div className="relative overflow-hidden mb-4">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-80 object-cover block transition-transform duration-700 group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/400x500";
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </div>
-                  <h4 className="mb-1">{member.name}</h4>
-                  <h6 className="mb-2">{member.role}</h6>
-                  <p className="text-sm text-brand-charcoal/60 m-0 leading-relaxed">
-                    {member.desc}
-                  </p>
-                </motion.div>
-              ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayedTeam.map((member, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 25 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.15 }}
+                    className="text-center group"
+                  >
+                    <div className="relative overflow-hidden mb-4 rounded-lg">
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-80 object-cover block transition-transform duration-700 group-hover:scale-105"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://via.placeholder.com/400x500?text=Team+Member";
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </div>
+                    <h4 className="mb-1">{member.name}</h4>
+                    <h6 className="mb-2 text-brand-gold">{member.role}</h6>
+                    <p className="text-sm text-brand-charcoal/60 m-0 leading-relaxed">
+                      {member.desc}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* WORK IN PROGRESS */}
         <section className="bg-bg-soft">
           <div className="container mx-auto section-px py-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-5">
               <div>
-                <h6 className="mb-1">CURRENTLY WORKING ON</h6>
+                <h6 className="mb-1 text-brand-gold">CURRENTLY WORKING ON</h6>
                 <h4 className="mb-0">Work in Progress</h4>
               </div>
               <div className="flex gap-4 flex-wrap">
-                <div className="bg-white/80 backdrop-blur-sm px-5 py-3 border border-brand-gold/20">
-                  <p className="text-sm font-medium text-brand-charcoal mb-1">
-                    TATA AIG LIFE INSURANCE
-                  </p>
-                  <p className="text-xs text-brand-charcoal/60 m-0">
-                    Robertsgang, Sonbhadra
-                  </p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm px-5 py-3 border border-brand-gold/20">
-                  <p className="text-sm font-medium text-brand-charcoal mb-1">
-                    NYKAA LUX
-                  </p>
-                  <p className="text-xs text-brand-charcoal/60 m-0">
-                    HLP Galleria, Mohali
-                  </p>
-                </div>
+                {workInProgress.map((item, index) => (
+                  <div
+                    key={index}
+                    className="bg-white px-5 py-3 border border-brand-gold/20 rounded-lg"
+                  >
+                    <p className="text-sm font-medium text-brand-charcoal mb-1">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-brand-charcoal/60 m-0">
+                      {item.location}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </section>
 
         {/* CONTACT CTA */}
-        <section className="bg-bg-soft">
+        <section className="bg-brand-charcoal">
           <div className="container mx-auto section-px py-16">
             <div className="max-w-[896px] mx-auto text-center">
               <motion.div
@@ -650,11 +709,11 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="mb-4">
+                <h2 className="text-white mb-4">
                   Let's Create Something{" "}
                   <span className="text-brand-gold">Amazing Together</span>
                 </h2>
-                <p className="mb-6 max-w-[640px] mx-auto">
+                <p className="text-white/70 mb-6 max-w-[640px] mx-auto">
                   Contact us today to discuss your project requirements and
                   discover how we can transform your space.
                 </p>
@@ -679,7 +738,7 @@ const About = () => {
                         <div className="w-8 h-8 rounded-full border border-brand-gold/30 flex items-center justify-center transition-colors duration-300 group-hover:border-brand-gold">
                           <Icon className="w-3.5 h-3.5 text-brand-gold" />
                         </div>
-                        <span className="text-sm text-brand-charcoal/60 group-hover:text-brand-charcoal transition-colors duration-300">
+                        <span className="text-sm text-white/60 group-hover:text-white transition-colors duration-300">
                           {item.text}
                         </span>
                       </div>

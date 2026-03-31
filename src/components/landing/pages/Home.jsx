@@ -21,6 +21,7 @@ import {
   CubeIcon,
   SwatchIcon,
   BuildingOfficeIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import {
   BuildingLibraryIcon,
@@ -177,43 +178,65 @@ const StatItem = ({ value, label, bordered }) => {
 
 /* ─────── SERVICE CARD ─────── */
 const ServiceCard = ({ service, index }) => {
-  const [hov, setHov] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.7, delay: index * 0.12 }}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className={`relative cursor-default transition-all duration-500 border-t border-brand-charcoal/10 p-6 md:p-8 ${
-        hov ? "bg-bg-soft" : "bg-transparent"
-      }`}
+      transition={{ duration: 0.7, delay: index * 0.1 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100"
     >
-      <div
-        className={`absolute top-0 left-0 h-px bg-gradient-to-r from-brand-gold to-transparent transition-all duration-600 ${
-          hov ? "w-full" : "w-0"
-        }`}
-      />
-      <h6 className="mb-4">0{index + 1}</h6>
-      <h3 className="mb-3">{service.title}</h3>
-      <p className="mb-5">{service.description}</p>
-      {service.features?.length > 0 && (
-        <ul className="list-none p-0 m-0 mb-6 flex flex-col gap-2">
-          {service.features.map((f, i) => (
-            <li key={i} className="flex items-center gap-2.5 list-none">
-              <div className="w-1 h-1 rounded-full bg-brand-gold flex-shrink-0" />
-              <span className="text-base text-brand-charcoal/60">{f}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Link
-        to={`/${service.slug}`}
-        className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline transition-all duration-300 hover:gap-3.5 hover:text-brand-gold-light"
-      >
-        Explore <ArrowRightIcon className="w-3 h-3" />
-      </Link>
+      {/* Image Container */}
+      <div className="relative h-56 overflow-hidden">
+        <img
+          src={
+            !imageError && service.image
+              ? service.image
+              : "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg"
+          }
+          alt={service.title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={() => setImageError(true)}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Category Badge */}
+        <div className="absolute top-4 left-4 bg-brand-gold text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
+          Service
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        <h3 className="text-xl font-heading font-bold mb-2 text-brand-charcoal group-hover:text-brand-gold transition-colors line-clamp-2">
+          {service.title}
+        </h3>
+
+        <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+          {service.description}
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-brand-gold">
+            <SparklesIcon className="w-4 h-4" />
+            <span>Premium Service</span>
+          </div>
+
+          <Link
+            to={service.slug}
+            className={`inline-flex items-center gap-2 text-brand-gold font-medium text-sm transition-all duration-300 ${
+              hovered ? "gap-3" : "gap-2"
+            }`}
+          >
+            Learn More <ArrowRightIcon className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -379,8 +402,9 @@ const ClientCard = ({ client, index }) => {
       onMouseLeave={() => setHov(false)}
       className="group relative bg-white rounded-lg p-5 border border-brand-gold/10 hover:shadow-md transition-all duration-300"
     >
-      <div className="flex items-center gap-4 mb-3">
-        <div className="w-14 h-14 rounded-full bg-brand-gold/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+      {/* Logo on top */}
+      <div className="flex justify-center mb-4">
+        <div className=" bg-brand-gold/10 flex items-center justify-center overflow-hidden">
           {client.logo ? (
             <img
               src={getImageUrl(client.logo)}
@@ -388,31 +412,32 @@ const ClientCard = ({ client, index }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <BuildingOfficeIcon className="w-7 h-7 text-brand-gold" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h5 className="font-heading font-semibold text-brand-charcoal truncate mb-1">
-            {client.company || client.name}
-          </h5>
-          {client.name && client.company !== client.name && (
-            <p className="text-xs text-brand-charcoal/50 truncate">
-              {client.name}
-            </p>
+            <BuildingOfficeIcon className="w-10 h-10 text-brand-gold" />
           )}
         </div>
       </div>
 
+      {/* Company details below logo */}
+      <div className="text-center">
+        <h5 className="font-heading font-semibold text-brand-charcoal mb-1">
+          {client.company || client.name}
+        </h5>
+        {client.name && client.company !== client.name && (
+          <p className="text-xs text-brand-charcoal/50 mb-3">{client.name}</p>
+        )}
+      </div>
+
+      {/* Contact info - if available */}
       {(client.email || client.phone) && (
-        <div className="space-y-2">
+        <div className="space-y-2 mt-3 pt-3 border-t border-brand-gold/10">
           {client.email && (
-            <div className="flex items-center gap-2 text-xs text-brand-charcoal/60">
+            <div className="flex items-center justify-center gap-2 text-xs text-brand-charcoal/60">
               <EnvelopeIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
               <span className="truncate">{client.email}</span>
             </div>
           )}
           {client.phone && (
-            <div className="flex items-center gap-2 text-xs text-brand-charcoal/60">
+            <div className="flex items-center justify-center gap-2 text-xs text-brand-charcoal/60">
               <PhoneIcon className="w-3 h-3 text-brand-gold flex-shrink-0" />
               <span>{client.phone}</span>
             </div>
@@ -420,6 +445,7 @@ const ClientCard = ({ client, index }) => {
         </div>
       )}
 
+      {/* Hover effect line */}
       <div
         className={`absolute bottom-0 left-0 right-0 h-0.5 bg-brand-gold transition-transform duration-500 ${
           hov ? "scale-x-100" : "scale-x-0"
@@ -492,6 +518,95 @@ const FAQItem = ({ item, index }) => {
   );
 };
 
+
+const AreaCard = ({ area, index }) => {
+  const [hovered, setHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const Icon = area.icon;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-brand-gold/10"
+    >
+      <div className="relative h-48 overflow-hidden">
+        {!imageError && area.image ? (
+          <img
+            src={area.image}
+            alt={area.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={() => {
+              console.error("Failed to load area image:", area.image);
+              setImageError(true);
+            }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-brand-gold/10 to-brand-charcoal/10 flex items-center justify-center">
+            <Icon className="w-20 h-20 text-brand-gold/30" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+        <div className="absolute top-4 left-4 bg-white/90 p-2 rounded-lg backdrop-blur-sm">
+          <Icon className="w-5 h-5 text-brand-gold" />
+        </div>
+
+        <div className="absolute bottom-4 right-4 bg-brand-gold text-white px-3 py-1 rounded-full text-xs font-semibold">
+          {area.projects} Projects
+        </div>
+      </div>
+
+      <div className="p-5">
+        <h4 className="mb-2 group-hover:text-brand-gold transition-colors font-heading font-semibold">
+          {area.title}
+        </h4>
+
+        <p className="text-brand-charcoal/60 text-sm mb-4 line-clamp-2">
+          {area.description}
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-bg-soft p-3 text-center border border-brand-gold/10 rounded-lg">
+            <div className="text-lg font-heading font-bold text-brand-gold">
+              {area.projects}
+            </div>
+            <p className="text-xs text-brand-charcoal/60 mb-0">Projects</p>
+          </div>
+          <div className="bg-bg-soft p-3 text-center border border-brand-gold/10 rounded-lg">
+            <div className="text-lg font-heading font-bold text-brand-gold">
+              {area.clientsServed}
+            </div>
+            <p className="text-xs text-brand-charcoal/60 mb-0">Clients</p>
+          </div>
+        </div>
+
+        {area.experience && (
+          <div>
+            <div className="flex justify-between text-xs text-brand-charcoal/60 mb-1">
+              <span>Experience</span>
+              <span>{area.experience} years</span>
+            </div>
+            <div className="w-full bg-bg-soft rounded-full h-1.5">
+              <div
+                className="bg-brand-gold rounded-full h-1.5 transition-all duration-500"
+                style={{
+                  width: `${Math.min(100, (area.experience / 30) * 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 /* ═══════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════ */
@@ -559,19 +674,14 @@ const Home = () => {
     );
 
   const displayedServices =
-    services?.slice(0, 3).map((s, i) => ({
-      icon: [SwatchIcon, Squares2X2Icon, CubeIcon][i % 3],
+    services?.slice(0, 4).map((s) => ({
       title: s.service_title || s.title || "Service",
       description:
         s.service_short_description ||
         stripHtml(s.description || "").substring(0, 120) ||
         "Comprehensive interior solutions",
-      features: s.what_we_do?.slice(0, 3).map((w) => w.title) || [
-        "Interior Detailing",
-        "Space Planning",
-        "Material Selection",
-      ],
-      slug: s.slug || s.id,
+      image: s.service_banner_img ? getImageUrl(s.service_banner_img) : null, // This gets the full URL
+      slug: `/${s.slug || s.id}`,
     })) || [];
 
   const stats = achievements
@@ -584,16 +694,22 @@ const Home = () => {
   ];
 
   const displayedAreas =
-    areas?.slice(0, 4).map((a, i) => ({
+    areas?.slice(0, 4).map((a, idx) => ({
+      id: a.id,
+      title: a.title || "Area",
+      description:
+        a.description ||
+        "Specialized interior solutions with proven expertise.",
+      projects: `${a.projects_done || 0}+`,
+      clientsServed: `${a.clients_served || 25}+`,
+      experience: a.years_experience || 5,
+      image: a.image ? getImageUrl(a.image) : null, 
       icon: [
         BuildingStorefrontIcon,
         BuildingLibraryIcon,
         BuildingOffice2Icon,
         HomeModernIcon,
-      ][i % 4],
-      title: a.title || "Area",
-      description: a.description || "Specialized solutions",
-      projects: `${a.projects_done || 0}+`,
+      ][idx % 4],
     })) || [];
 
   const displayedProjects =
@@ -905,7 +1021,7 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.8 }}
-                className="absolute bottom-10 -left-7 bg-white p-6 max-w-[300px] border-l-2 border-brand-gold shadow-md"
+                className="absolute bottom-10 -left-3 bg-white p-6 max-w-[300px] border-l-2 border-brand-gold shadow-md"
               >
                 <p className="text-sm text-brand-charcoal italic leading-relaxed mb-2 font-serif">
                   "Adherence to values and principles of honesty and
@@ -989,7 +1105,7 @@ const Home = () => {
               </div>
             </Inner>
             <Inner className="pb-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayedServices.map((s, i) => (
                   <ServiceCard key={i} service={s} index={i} />
                 ))}
@@ -1018,32 +1134,13 @@ const Home = () => {
                   <HR className="mx-auto mt-4" />
                 </Reveal>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-brand-charcoal/10">
-                {displayedAreas.map((area, i) => {
-                  const Icon = area.icon;
-                  return (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className={`py-10 px-6 text-center ${
-                        i < 3 && "lg:border-r border-brand-charcoal/10"
-                      }`}
-                    >
-                      <div className="w-11 h-11 border border-brand-gold/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Icon className="w-4.5 h-4.5 text-brand-gold" />
-                      </div>
-                      <h4 className="mb-2">{area.title}</h4>
-                      <p className="text-sm text-brand-charcoal/60 leading-relaxed mb-3">
-                        {area.description}
-                      </p>
-                      <h6 className="mb-0">{area.projects} Projects</h6>
-                    </motion.div>
-                  );
-                })}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {displayedAreas.map((area, i) => (
+                  <AreaCard key={area.id || i} area={area} index={i} />
+                ))}
               </div>
+
               <div className="text-center mt-8">
                 <Link
                   to="/areas-we-serve"
@@ -1179,22 +1276,14 @@ const Home = () => {
                 </Reveal>
               </div>
 
+              {/* Display ALL clients - removed slice limit */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                {clients.slice(0, 8).map((client, index) => (
+                {clients.map((client, index) => (
                   <ClientCard key={client.id} client={client} index={index} />
                 ))}
               </div>
 
-              {clients.length > 8 && (
-                <div className="text-center mt-8">
-                  <Link
-                    to="/clients"
-                    className="inline-flex items-center gap-2 text-brand-gold font-medium no-underline uppercase tracking-wide transition-all duration-300 hover:gap-3 hover:text-brand-gold-light"
-                  >
-                    View All Clients <ArrowRightIcon className="w-2.5 h-2.5" />
-                  </Link>
-                </div>
-              )}
+              {/* Removed the "View All Clients" link */}
             </Inner>
           </section>
         )}
@@ -1374,8 +1463,6 @@ const Home = () => {
                   <FAQItem key={item.id || i} item={item} index={i} />
                 ))}
               </div>
-
-              
             </div>
           </section>
         )}
